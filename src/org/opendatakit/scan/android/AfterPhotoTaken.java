@@ -1,0 +1,240 @@
+package org.opendatakit.scan.android;
+
+import java.io.IOException;
+import java.util.Date;
+
+import org.droidparts.preference.MultiSelectListPreference;
+import org.opendatakit.scan.android.RunProcessor.Mode;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+/**
+ * This activity starts the form processor and provides user feedback by
+ * displaying progress dialogs and the alignment results.
+ */
+public class AfterPhotoTaken extends Activity {
+
+	private static final String LOG_TAG = "ODKScan";
+
+	private String photoName;
+	private RunProcessor runProcessor;
+
+	private Button processButton;
+	private LinearLayout content;
+
+	private long startTime;// only needed in debugMode
+
+	private String[] templatePaths;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		try {
+			Log.i(LOG_TAG, "After Photo taken");
+
+			setContentView(R.layout.after_photo_taken);
+
+			content = (LinearLayout) findViewById(R.id.myLinearLayout);
+
+			Button retake = (Button) findViewById(R.id.retake_button);
+			retake.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(getApplication(),
+							PhotographForm.class);
+					startActivity(intent);
+					finish();
+				}
+			});
+
+			Bundle extras = getIntent().getExtras();
+			if (extras == null) {
+				Log.i(LOG_TAG, "extras == null");
+				// This might happen if we use back to reach this activity from
+				// the camera activity.
+				content.setVisibility(View.VISIBLE);
+				return;
+			}
+
+			photoName = extras.getString("photoName");
+
+			SharedPreferences settings = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
+
+			if (extras.getBoolean("preAligned")) {
+				String[] templatePath = { ScanUtils.getTemplatePath(photoName) };
+				runProcessor = new RunProcessor(handler, photoName,
+						templatePath, settings.getString("calibrationFile",
+								null));
+
+				startThread(RunProcessor.Mode.LOAD);
+			} else {
+
+				templatePaths = MultiSelectListPreference
+						.fromPersistedPreferenceValue(settings.getString(
+								"select_templates", ""));
+
+				if (templatePaths == null) {
+					RelativeLayout failureMessage = (RelativeLayout) findViewById(R.id.failureMessage);
+					failureMessage.setVisibility(View.VISIBLE);
+					content.setVisibility(View.VISIBLE);
+					return;
+				}
+
+				// Start another thread to handle all the image processing:
+				runProcessor = new RunProcessor(handler, photoName,
+						templatePaths, settings.getString("calibrationFile",
+								null));
+
+				startThread(RunProcessor.Mode.LOAD_ALIGN);
+			}
+
+			processButton = (Button) findViewById(R.id.process_button);
+			processButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					startThread(RunProcessor.Mode.PROCESS);
+				}
+			});
+		} catch (Exception e) {
+			// Display an error dialog if something goes wrong.
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(e.toString())
+					.setCancelable(false)
+					.setNeutralButton("Ok",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+									finish();
+								}
+							});
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
+	}
+
+	// Launch a thread that runs runProcessor.
+	// Shows a status dialog as well.
+	protected void startThread(Mode mode) {
+		if (ScanUtils.DebugMode) {
+			Log.i(LOG_TAG, "photoName: " + photoName);
+			startTime = new Date().getTime();
+		}
+		showDialog(mode.ordinal());
+		runProcessor.setMode(mode);
+
+		Thread thread = new Thread(runProcessor);
+		thread.setPriority(Thread.MAX_PRIORITY);
+		thread.start();
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args) {
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		switch (RunProcessor.Mode.values()[id]) {
+		case LOAD:
+			builder.setTitle("Loading Image");
+			break;
+		case LOAD_ALIGN:
+			builder.setTitle(getResources().getString(R.string.aligning_form));
+			break;
+		case PROCESS:
+			builder.setTitle(getResources().getString(R.string.processing_form));
+			//builder.setMessage("The first time you use a template this will be slow because the classifier is being trained.");
+			break;
+		default:
+			return null;
+		}
+		builder.setCancelable(false);
+
+		return builder.create();
+	}
+
+	/**
+	 * Updates the UI based on the result of the loading/alignment stage.
+	 * 
+	 * @param success
+	 */
+	public void updateUI(boolean success, String errorMessage) {
+		Log.i(LOG_TAG, "errorMessage:" + errorMessage);
+		if (success) {
+			ScanUtils.displayImageInWebView(
+					(WebView) findViewById(R.id.webview),
+					ScanUtils.getAlignedPhotoPath(photoName));
+		} else {
+			RelativeLayout failureMessage = (RelativeLayout) findViewById(R.id.failureMessage);
+			failureMessage.setVisibility(View.VISIBLE);
+		}
+		content.setVisibility(View.VISIBLE);
+		processButton.setEnabled(success);
+	}
+
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+
+			RunProcessor.Mode mode = RunProcessor.Mode.values()[msg.what];
+			boolean success = (msg.arg1 == 1);
+			String errorMessage = msg.getData().getString("errorMessage");
+			try {
+				dismissDialog(msg.what);
+			} catch (IllegalArgumentException e) {
+				Log.i(LOG_TAG, "Exception: Dialog with id " + msg.what
+						+ " was not previously shown.");
+			}
+
+			if (ScanUtils.DebugMode) {
+				Log.i(LOG_TAG, "Mode: " + mode);
+				if (success) {
+					Log.i(LOG_TAG, "Success!");
+				}
+				double timeTaken = (double) (new Date().getTime() - startTime) / 1000;
+				Log.i(LOG_TAG, "Time taken:" + String.format("%.2f", timeTaken));
+			}
+			switch (mode) {
+			case LOAD:
+				updateUI(success, errorMessage);
+				break;
+			case LOAD_ALIGN:
+				if (success) {
+					int templatePathIdx = msg.arg2;
+					try {
+						ScanUtils.setTemplatePath(photoName,
+								templatePaths[templatePathIdx]);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+					}
+				}
+				updateUI(success, errorMessage);
+				break;
+			case PROCESS:
+				if (success) {
+					Intent intent = new Intent(getApplication(),
+							DisplayProcessedForm.class);
+					intent.putExtra("photoName", photoName);
+					startActivity(intent);
+					finish();
+				}
+				break;
+			default:
+				return;
+			}
+		}
+	};
+}

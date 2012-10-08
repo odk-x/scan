@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:visibility="gone"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:id="@+id/myLinearLayout">
+	
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_weight="0"
+		android:paddingTop="4dp" android:paddingLeft="4dp"
+		android:paddingRight="4dp" android:layout_gravity="center_horizontal|bottom|left">
+		<Button 
+			style="@style/APTButton"
+			android:id="@+id/retake_button"
+			android:text="@string/retake_photo"
+			android:layout_weight="1" />
+		<Button
+			style="@style/APTButton"
+			android:id="@+id/process_button"
+			android:text="@string/process_form"
+			android:layout_weight="1"
+			android:enabled="false" />
+	</LinearLayout>
+	
+	<WebView
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/webview" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:background="#000000"
+		android:scrollbars="none" android:layout_weight="1" 
+		android:visibility="gone" />
+	<RelativeLayout
+		android:id="@+id/failureMessage"
+		android:visibility="gone" 
+		android:layout_weight="1"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		xmlns:android="http://schemas.android.com/apk/res/android">
+		<TextView
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="24dp"
+			android:layout_centerInParent="true"
+			android:text="@string/could_not_register" />
+	</RelativeLayout>
+	
+</LinearLayout>

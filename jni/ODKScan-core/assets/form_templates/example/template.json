@@ -1,0 +1,133 @@
+{
+     "imageFilename": "example.jpg",
+     "height": 1169,
+     "width": 827,
+     "type": "input",
+     "fields": [
+          {
+               "name": "square_checkboxes",
+               "label": "square checkboxes",
+               "segments": [
+                    {
+                         "segment_x": 100,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    },
+                    {
+                         "segment_x": 200,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    },
+                    {
+                         "segment_x": 300,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    },
+                    {
+                         "segment_x": 400,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    },
+                    {
+                         "segment_x": 500,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    },
+                    {
+                         "segment_x": 600,
+                         "segment_y": 200,
+                         "segment_width": 100,
+                         "segment_height": 100
+                    }
+               ],
+               "classifier": {
+                    "classification_map": {
+                         "empty": false
+                    },
+                    "default_classification": true,
+                    "training_data_uri": "checkboxes",
+                    "classifier_height": 24,
+                    "classifier_width": 24
+               },
+               "items": [
+                    {
+                         "item_x": 50,
+                         "item_y": 20
+                    },
+                    {
+                         "item_x": 50,
+                         "item_y": 50
+                    },
+                    {
+                         "item_x": 50,
+                         "item_y": 80
+                    }
+               ]
+          },
+          {
+               "name": "bubbles",
+               "label": "bubbles",
+               "segment_width": 80,
+               "segment_height": 100,
+               "segments": [
+                    {
+                         "segment_x": 300,
+                         "segment_y": 900
+                    }
+               ],
+               "classifier": {
+                    "classification_map": {
+                         "empty": false
+                    },
+                    "default_classification": true,
+                    "training_data_uri": "bubbles",
+                    "classifier_height": 14,
+                    "classifier_width": 16
+               },
+               "type": "select",
+               "items": [
+                    {
+                         "item_x": 20,
+                         "item_y": 25,
+                         "label": "A",
+                         "value": "A"
+                    },
+                    {
+                         "item_x": 60,
+                         "item_y": 25,
+                         "label": "B",
+                         "value": "B"
+                    },
+                    {
+                         "item_x": 20,
+                         "item_y": 50,
+                         "label": "C",
+                         "value": "C"
+                    },
+                    {
+                         "item_x": 60,
+                         "item_y": 50,
+                         "label": "D",
+                         "value": "D"
+                    },
+                    {
+                         "item_x": 20,
+                         "item_y": 75,
+                         "label": "E",
+                         "value": "E"
+                    },
+                    {
+                         "item_x": 60,
+                         "item_y": 75,
+                         "label": "F",
+                         "value": "F"
+                    }
+               ]
+          }
+     ]
+}

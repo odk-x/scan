@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.opendatakit.scan.android"
+    android:versionCode="16"
+    android:versionName="0.16" >
+
+    <uses-sdk
+        android:minSdkVersion="6"
+        android:targetSdkVersion="6" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" >
+    </uses-feature>
+    <uses-feature android:name="android.hardware.camera.flash" >
+    </uses-feature>
+    <uses-feature android:name="android.hardware.touchscreen" >
+    </uses-feature>
+
+    <uses-permission android:name="android.permission.CAMERA" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="ODK Scan"
+        android:theme="@android:style/Theme.Light" >
+        <activity
+            android:name="MainMenu"
+            android:label="ODK Scan"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="JSON2XForm"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="PhotographForm"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="ViewScannedForms"
+            android:label="@string/view_bubble_forms_activity" >
+        </activity>
+        <activity
+            android:name="Instructions"
+            android:label="@string/bubble_instructions_activity" >
+        </activity>
+        <activity
+            android:name="DisplayProcessedForm"
+            android:label="@string/display_processed_form_activity"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="AfterPhotoTaken"
+            android:configChanges="orientation|keyboardHidden|keyboard"
+            android:label="@string/after_photo_taken_activity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="AppSettings"
+            android:label="Settings" >
+        </activity>
+        <activity
+            android:name="org.droidparts.preference.MultiSelectListPreference"
+            android:label="MultiSelectListPreference" >
+        </activity>
+    </application>
+
+</manifest>
