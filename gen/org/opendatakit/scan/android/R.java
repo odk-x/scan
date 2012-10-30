@@ -43,18 +43,19 @@ containing a value of this type.
         public static final int SettingsButton=0x7f09000b;
         public static final int ViewFormsButton=0x7f090009;
         public static final int createdTime=0x7f090007;
-        public static final int exportToODK=0x7f09000e;
+        public static final int exportToODK=0x7f09000f;
         public static final int failureMessage=0x7f090004;
         public static final int myLinearLayout=0x7f090000;
+        public static final int nextPageBtn=0x7f09000d;
         public static final int photoStatus=0x7f090005;
         public static final int process_button=0x7f090002;
         public static final int retake_button=0x7f090001;
-        public static final int scanNewForm=0x7f09000f;
-        public static final int startOver=0x7f090010;
+        public static final int scanNewForm=0x7f090010;
+        public static final int startOver=0x7f090011;
         public static final int templateName=0x7f090006;
         public static final int version_display=0x7f09000c;
         public static final int webview=0x7f090003;
-        public static final int webview2=0x7f09000d;
+        public static final int webview2=0x7f09000e;
     }
     public static final class layout {
         public static final int after_photo_taken=0x7f030000;
@@ -74,10 +75,10 @@ containing a value of this type.
         /**  Instructions 
  Instructions 
          */
-        public static final int Instructions1=0x7f060019;
-        public static final int Instructions2=0x7f06001a;
-        public static final int Instructions3=0x7f06001b;
-        public static final int Instructions4=0x7f06001c;
+        public static final int Instructions1=0x7f06001a;
+        public static final int Instructions2=0x7f06001b;
+        public static final int Instructions3=0x7f06001c;
+        public static final int Instructions4=0x7f06001d;
         public static final int InstructionsButton=0x7f06000e;
         public static final int ScanButton=0x7f06000c;
         public static final int SettingsButton=0x7f06000f;
@@ -93,14 +94,17 @@ containing a value of this type.
          */
         public static final int calibrate=0x7f060008;
         public static final int could_not_register=0x7f060014;
-        public static final int display_data=0x7f060017;
+        public static final int display_data=0x7f060018;
         public static final int display_processed_data_activity=0x7f060006;
         public static final int display_processed_form_activity=0x7f060005;
         public static final int doFormDetection=0x7f060009;
         /**  Popup menu 
          */
-        public static final int export_to_ODK=0x7f060015;
-        public static final int main_menu=0x7f060018;
+        public static final int export_to_ODK=0x7f060016;
+        public static final int main_menu=0x7f060019;
+        /**  DisplayProcessedForm 
+         */
+        public static final int next_page=0x7f060015;
         /**  AfterPhotoTaken 
  AfterPhotoTaken 
          */
@@ -109,7 +113,7 @@ containing a value of this type.
         public static final int retake_photo=0x7f060011;
         /**  Popup menu 
          */
-        public static final int save_data=0x7f060016;
+        public static final int save_data=0x7f060017;
         public static final int the_current_health_center_is=0x7f06000b;
         public static final int view_bubble_forms_activity=0x7f060003;
     }

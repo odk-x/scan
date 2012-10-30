@@ -1,5 +1,9 @@
 package org.opendatakit.scan.android;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -18,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Button;
 
 /**
  * This activity displays the image of a processed form
@@ -29,6 +34,10 @@ public class DisplayProcessedForm extends Activity {
 	private String photoName;
 	private String templatePath;
 	WebView myWebView;
+	
+	private Bundle extras;
+
+	private boolean morePagesToScan = false;
 
 	// Set up the UI and load the processed image
 	@Override
@@ -37,7 +46,7 @@ public class DisplayProcessedForm extends Activity {
 		try {
 			setContentView(R.layout.processed_form);
 
-			Bundle extras = getIntent().getExtras();
+			extras = getIntent().getExtras();
 			if (extras != null) {
 				photoName = extras.getString("photoName");
 				// templatePath = settings.getString(photoName, "");
@@ -49,6 +58,39 @@ public class DisplayProcessedForm extends Activity {
 					return;
 				}
 			}
+			//TODO: Check for template.json
+			final File nextPageTemplatePath = new File(templatePath, "nextPage");
+			morePagesToScan = nextPageTemplatePath.exists();
+			if(morePagesToScan){
+				Button nextPage = (Button) findViewById(R.id.nextPageBtn);
+				nextPage.setVisibility(View.VISIBLE);
+				nextPage.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Intent intent = new Intent(getApplication(), PhotographForm.class);
+						intent.putExtra("templatePath", nextPageTemplatePath.toString());
+						ArrayList<String> prevTemplatePaths = extras.getStringArrayList("prevTemplatePaths");
+						ArrayList<String> prevPhotoNames = extras.getStringArrayList("prevPhotoNames");
+						if(prevTemplatePaths == null || prevPhotoNames == null){
+							intent.putStringArrayListExtra("prevTemplatePaths", new ArrayList<String>(
+								    Arrays.asList(templatePath)));
+							intent.putStringArrayListExtra("prevPhotoNames", new ArrayList<String>(
+								    Arrays.asList(photoName)));
+						} else {
+							prevTemplatePaths.add(templatePath);
+							prevPhotoNames.add(photoName);
+							//Can I modify the array list in extras or do I need to do a put?
+						}
+						if(prevPhotoNames != null){
+							intent.putExtra("photoName", photoName.replace("\\(page[0-9]+\\)", "(page" + (prevPhotoNames.size() + 1) + ")"));
+						} else {
+							intent.putExtra("photoName", photoName + "(page2)");
+						}
+						startActivity(intent);
+						finish();
+					}
+				});
+			}
+			
 			/*
 			 * String url = "file://" + ScanUtils.getFormViewHTMLDir() +
 			 * "formView.html" + "?" + "formLocation=" +
@@ -142,6 +184,7 @@ public class DisplayProcessedForm extends Activity {
 		if (data.getData() == null) {
 			// No instance specified, create or find one with new activity.
 			Intent intent = new Intent(getApplication(), JSON2XForm.class);
+			intent.putExtras(extras);
 			intent.putExtras(data);
 			intent.putExtra("templatePath", templatePath);
 			intent.putExtra("photoName", photoName);
@@ -155,7 +198,6 @@ public class DisplayProcessedForm extends Activity {
 		// Initialize the intent that will start collect and use it to see if
 		// collect is installed.
 		Intent intent = new Intent();
-		// intent.setFlags(Intent.);
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setComponent(new ComponentName("org.odk.collect.android",
@@ -199,6 +241,7 @@ public class DisplayProcessedForm extends Activity {
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
+		if(morePagesToScan) return;
 		// Show the options menu when the activity is started (so people know it
 		// exists)
 		openOptionsMenu();
@@ -206,6 +249,7 @@ public class DisplayProcessedForm extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		if(morePagesToScan) return false;
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mscan_menu, menu);
 		return true;

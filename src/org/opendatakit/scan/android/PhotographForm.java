@@ -9,10 +9,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 /**
@@ -26,16 +24,24 @@ public class PhotographForm extends Activity {
 	private String photoName;
     private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
+    private Bundle extras;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+		extras = getIntent().getExtras();
+		if(extras != null){
+			if(extras.containsKey("photoName")){
+				photoName = extras.getString("photoName");
+			}
+		}
 		File outputPath = new File(ScanUtils.getOutputPath(photoName));
 		//Try to create an output folder
 		if(!outputPath.mkdirs()){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Could not create output folder. There may be a problem with the device's storage.")
+			builder.setMessage("Could not create output folder ["+outputPath+"].\n There may be a problem with the device's storage.")
 			       .setCancelable(false)
 			       .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
@@ -61,6 +67,9 @@ public class PhotographForm extends Activity {
 			finishActivity(TAKE_PICTURE);
 			if (resultCode == Activity.RESULT_OK) {
 				Intent intent = new Intent(getApplication(), AfterPhotoTaken.class);
+				if(extras != null) {
+					intent.putExtras(extras);
+				}
 				intent.putExtra("photoName", photoName);
 				if( new File(ScanUtils.getPhotoPath(photoName)).exists() ) {
 					Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));

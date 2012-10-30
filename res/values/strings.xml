@@ -28,6 +28,9 @@
 <string name="processing_form">Processing form...</string>
 <string name="could_not_register">Sorry, the form could not be registered.</string>
 
+<!-- DisplayProcessedForm -->
+<string name="next_page">Scan Next Page</string>
+
 <!-- Popup menu -->
 <string name ="export_to_ODK">Export to Collect</string>
 <string name="save_data">Save Data</string>

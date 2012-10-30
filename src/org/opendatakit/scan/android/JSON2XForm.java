@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,18 +36,16 @@ import android.util.Log;
 public class JSON2XForm extends Activity {
 	
 	private static final String LOG_TAG = "ODKScan";
-	
-    private static final String COLLECT_FORMS_URI_STRING =
-            "content://org.odk.collect.android.provider.odk.forms/forms";
-    private static final Uri COLLECT_FORMS_CONTENT_URI =
-            Uri.parse(COLLECT_FORMS_URI_STRING);
-    private static final String COLLECT_INSTANCES_URI_STRING =
-            "content://org.odk.collect.android.provider.odk.instances/instances";
-    private static final Uri COLLECT_INSTANCES_CONTENT_URI =
-            Uri.parse(COLLECT_INSTANCES_URI_STRING);
-	
-	private String photoName;
-	
+
+	private static final String COLLECT_FORMS_URI_STRING =
+			"content://org.odk.collect.android.provider.odk.forms/forms";
+	private static final Uri COLLECT_FORMS_CONTENT_URI =
+			Uri.parse(COLLECT_FORMS_URI_STRING);
+	private static final String COLLECT_INSTANCES_URI_STRING =
+			"content://org.odk.collect.android.provider.odk.instances/instances";
+	private static final Uri COLLECT_INSTANCES_CONTENT_URI =
+			Uri.parse(COLLECT_INSTANCES_URI_STRING);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,72 +54,82 @@ public class JSON2XForm extends Activity {
 			Bundle extras = getIntent().getExtras();
 
 			if(extras == null){ throw new Exception("No parameters specified"); }
-			
-			photoName = extras.getString("photoName");
-			String jsonOutPath = ScanUtils.getJsonPath(photoName);
-			String templatePath = extras.getString("templatePath");
-			
-			if(jsonOutPath == null){ throw new Exception("jsonOutPath is null"); }
-			if(templatePath == null){ throw new Exception("Could not identify template."); }
-			
-			Log.i(LOG_TAG,"jsonOutPath : " + jsonOutPath);
-			Log.i(LOG_TAG,"templatePath : " + templatePath);
-			
-			String templateName = new File(templatePath).getName();
 
-			String jsonPath = new File(templatePath, "template.json").getPath();
-			String xFormPath = new File(templatePath, templateName + ".xml").getPath();
+			String templatePath = extras.getString("templatePath");
+			if(templatePath == null){ throw new Exception("Could not identify template."); }
+			ArrayList<String> templatePaths = extras.getStringArrayList("prevTemplatePaths");
+			if(templatePaths == null){
+				templatePaths = new ArrayList<String>(Arrays.asList(templatePath));
+			} else {
+				templatePaths.add(templatePath);
+			}
+			String rootTemplatePath = templatePaths.get(0);
+			Log.i(LOG_TAG,"templatePaths : " + templatePaths);
+			
+			String photoName = extras.getString("photoName");
+			if(photoName == null){ throw new Exception("jsonOutPath is null"); }
+			ArrayList<String> photoNames = extras.getStringArrayList("prevPhotoNames");
+			if(photoNames == null){
+				photoNames = new ArrayList<String>(Arrays.asList(photoName));
+			} else {
+				photoNames.add(photoName);
+			}
+			String rootPhotoName = photoNames.get(0);
+			Log.i(LOG_TAG,"photoNames : " + photoNames);
+			
+			String templateName = new File(rootTemplatePath).getName();
+			//String jsonPath = new File(rootTemplatePath, "template.json").getPath();
+			String xFormPath = new File(rootTemplatePath, templateName + ".xml").getPath();
 
 			//////////////
 			Log.i(LOG_TAG, "Checking if there is no xform or the xform is out of date.");
 			//////////////
 			File xformFile = new File(xFormPath);
-			if( !xformFile.exists() || 
-				new File(jsonPath).lastModified() > xformFile.lastModified()){
+			if( !xformFile.exists() || anyModifiedAfter(templatePaths, xformFile.lastModified())){
 				//////////////
 				Log.i(LOG_TAG, "Unregistering any existing old versions of xform.");
 				//////////////
-			    String [] deleteArgs = { templateName };
-		        int deleteResult = getContentResolver().delete(COLLECT_FORMS_CONTENT_URI, "jrFormId like ?", deleteArgs);
-		        Log.w(LOG_TAG, "Removing " + deleteResult + " rows.");
+				String [] deleteArgs = { templateName };
+				int deleteResult = getContentResolver().delete(COLLECT_FORMS_CONTENT_URI, "jrFormId like ?", deleteArgs);
+				Log.w(LOG_TAG, "Removing " + deleteResult + " rows.");
 				//////////////
 				Log.i(LOG_TAG, "Creating new xform.");
 				//////////////
-			    buildXForm(jsonPath, xFormPath, templateName, templateName);
+				buildXForm(templatePaths, xFormPath);
 			}
 			String jrFormId = verifyFormInCollect(xFormPath, templateName);
 			//////////////
 			Log.i(LOG_TAG, "Checking if the form instance is already registered with collect.");
 			//////////////
 			int instanceId;
-		    String instanceName = templateName + '_' + photoName;
-		    String instancePath = "/sdcard/odk/instances/" + instanceName + "/";
-		    (new File(instancePath)).mkdirs();
-		    String instanceFilePath = instancePath + instanceName + ".xml";
+			String instanceName = templateName + '_' + rootPhotoName;
+			String instancePath = "/sdcard/odk/instances/" + instanceName + "/";
+			(new File(instancePath)).mkdirs();
+			String instanceFilePath = instancePath + instanceName + ".xml";
 			String selection = "instanceFilePath = ?";
-	        String[] selectionArgs = { instanceFilePath };
-	        Cursor c = getContentResolver().query(COLLECT_INSTANCES_CONTENT_URI, null, selection, selectionArgs, null);
-	        //Log.i(LOG_TAG, Arrays.toString(c.getColumnNames()));
-	    	if(c.moveToFirst()){
-	    		//////////////
+			String[] selectionArgs = { instanceFilePath };
+			Cursor c = getContentResolver().query(COLLECT_INSTANCES_CONTENT_URI, null, selection, selectionArgs, null);
+			//Log.i(LOG_TAG, Arrays.toString(c.getColumnNames()));
+			if(c.moveToFirst()){
+				//////////////
 				Log.i(LOG_TAG, "Registered odk instance found.");
 				//////////////
-	    		instanceId = c.getInt(c.getColumnIndex("_id"));
-	    	}
-	    	else{
+				instanceId = c.getInt(c.getColumnIndex("_id"));
+			}
+			else{
 				//////////////
 				Log.i(LOG_TAG, "Registered odk instance not found, creating one...");
 				//////////////
-	    		jsonOut2XFormInstance(jsonOutPath, xFormPath, instancePath, instanceName);
-	            ContentValues insertValues = new ContentValues();
-	            insertValues.put("displayName", instanceName);
-	            insertValues.put("instanceFilePath", instanceFilePath);
-	            insertValues.put("jrFormId", jrFormId);
-	            Uri insertResult = getContentResolver().insert(
-	                    COLLECT_INSTANCES_CONTENT_URI, insertValues);
-	            instanceId = Integer.valueOf(insertResult.getLastPathSegment());
-	    	}
-	    	c.close();
+				jsonOut2XFormInstance(photoNames, xFormPath, instancePath, instanceName);
+				ContentValues insertValues = new ContentValues();
+				insertValues.put("displayName", instanceName);
+				insertValues.put("instanceFilePath", instanceFilePath);
+				insertValues.put("jrFormId", jrFormId);
+				Uri insertResult = getContentResolver().insert(
+						COLLECT_INSTANCES_CONTENT_URI, insertValues);
+				instanceId = Integer.valueOf(insertResult.getLastPathSegment());
+			}
+			c.close();
 			Log.i(LOG_TAG, "instanceId: " + instanceId);
 
 			Intent resultData = new Intent();
@@ -127,22 +137,31 @@ public class JSON2XForm extends Activity {
 			resultData.setData(Uri.parse(COLLECT_INSTANCES_URI_STRING + "/" + instanceId));
 			setResult(RESULT_OK, resultData);
 			finish();
-		    
+
 		} catch (Exception e) {
 			//Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(e.toString())
-			       .setCancelable(false)
-			       .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			                dialog.cancel();
-			                finish();
-			           }
-			       });
+			.setCancelable(false)
+			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					finish();
+				}
+			});
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-		
+
+	}
+	private boolean anyModifiedAfter(ArrayList<String> templatePaths,
+			long lastModified) {
+		for (String tp : templatePaths){
+			if(new File(tp).lastModified() > lastModified){
+				return true;
+			}
+		}
+		return false;
 	}
 	/**
      * Verify that the form is in collect and put it in collect if it is not.
@@ -174,7 +193,7 @@ public class JSON2XForm extends Activity {
 	/**
 	 * Generates an instance of an xform at xFormPath from the JSON output file
 	 */
-	private void jsonOut2XFormInstance(String jsonOutFile, String xFormPath, String instancePath, String instanceName)
+	private void jsonOut2XFormInstance(ArrayList<String> photoNames, String xFormPath, String instancePath, String instanceName)
 			throws JSONException, IOException, XmlPullParserException {
 		//////////////
 	    Log.i(LOG_TAG, "Reading the xform...");
@@ -201,8 +220,15 @@ public class JSON2XForm extends Activity {
         //////////////
         Log.i(LOG_TAG, "Parsing the JSON output:");
         //////////////
-        JSONObject formRoot = JSONUtils.parseFileToJSONObject(jsonOutFile);
-		JSONArray fields = formRoot.getJSONArray("fields");
+    	JSONArray fields = new JSONArray();
+		for(String photoName : photoNames){
+			JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).getJSONArray("fields");
+			int photoFieldsLength = photoFields.length();
+			for(int i = 0; i < photoFieldsLength; i++){
+				fields.put(photoFields.get(i));
+			}
+			Log.i(LOG_TAG, "Concated " + photoName);
+		}
 		int fieldsLength = fields.length();
 		if(fieldsLength == 0){
 			throw new JSONException("There are no fields in the json output file.");
@@ -280,23 +306,27 @@ public class JSON2XForm extends Activity {
     /**
      * Builds an XFrom from a JSON template and writes it out to the specified file.
      * It builds it as a string which really isn't the best way to go.
-     * @param templatePath
+     * @param templatePaths
      * @param outputPath
-     * @param title
-     * @param id
      * @throws IOException
      * @throws JSONException 
      */
-    public static void buildXForm(String templatePath, String outputPath, String title, String id) throws IOException, JSONException {
-		Log.i(LOG_TAG, templatePath);
-		JSONObject formRoot = JSONUtils.applyInheritance( JSONUtils.parseFileToJSONObject(templatePath) );
-
-		Log.i(LOG_TAG, "Parsed");
-		JSONArray initFields = formRoot.getJSONArray("fields");
-		int initFieldsLength = initFields.length();
-		
-		//Make fields array with no null values
+    public static void buildXForm(ArrayList<String> templatePaths, String outputPath) throws IOException, JSONException {
+    	String title = new File(templatePaths.get(0)).getName();
+    	String id = title;
+    	JSONArray initFields = new JSONArray();
+		for(String templatePath : templatePaths){
+			String jsonPath = new File(templatePath, "template.json").toString();
+			JSONArray templateFields = JSONUtils.applyInheritance( JSONUtils.parseFileToJSONObject(jsonPath) ).getJSONArray("fields");
+			int templateFieldsLength = templateFields.length();
+			for(int i = 0; i < templateFieldsLength; i++){
+				initFields.put(templateFields.get(i));
+			}
+			Log.i(LOG_TAG, "Concated " + templatePath);
+		}
 		JSONArray fields = new JSONArray();
+		int initFieldsLength = initFields.length();
+		//Make fields array with no null values
 		for(int i = 0; i < initFieldsLength; i++){
 			JSONObject field = initFields.optJSONObject(i);
 			if(field != null){

@@ -40,6 +40,8 @@ public class AfterPhotoTaken extends Activity {
 	private long startTime;// only needed in debugMode
 
 	private String[] templatePaths;
+	
+	private Bundle extras;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,7 @@ public class AfterPhotoTaken extends Activity {
 				}
 			});
 
-			Bundle extras = getIntent().getExtras();
+			extras = getIntent().getExtras();
 			if (extras == null) {
 				Log.i(LOG_TAG, "extras == null");
 				// This might happen if we use back to reach this activity from
@@ -76,14 +78,22 @@ public class AfterPhotoTaken extends Activity {
 					.getDefaultSharedPreferences(getApplicationContext());
 
 			if (extras.getBoolean("preAligned")) {
+				// This is for opening forms from the scanned form list that haven't yet been processed.
 				String[] templatePath = { ScanUtils.getTemplatePath(photoName) };
 				runProcessor = new RunProcessor(handler, photoName,
 						templatePath, settings.getString("calibrationFile",
 								null));
 
 				startThread(RunProcessor.Mode.LOAD);
+			} else if (extras.containsKey("templatePath")) {
+				// This is for specifying the next page in a multi-page form.
+				String[] templatePath = { extras.getString("templatePath") };
+				templatePaths = templatePath;
+				runProcessor = new RunProcessor(handler, photoName,
+						templatePath, settings.getString("calibrationFile",
+								null));
+				startThread(RunProcessor.Mode.LOAD_ALIGN);
 			} else {
-
 				templatePaths = MultiSelectListPreference
 						.fromPersistedPreferenceValue(settings.getString(
 								"select_templates", ""));
@@ -99,7 +109,6 @@ public class AfterPhotoTaken extends Activity {
 				runProcessor = new RunProcessor(handler, photoName,
 						templatePaths, settings.getString("calibrationFile",
 								null));
-
 				startThread(RunProcessor.Mode.LOAD_ALIGN);
 			}
 
@@ -113,15 +122,15 @@ public class AfterPhotoTaken extends Activity {
 			// Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(e.toString())
-					.setCancelable(false)
-					.setNeutralButton("Ok",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-									finish();
-								}
-							});
+			.setCancelable(false)
+			.setNeutralButton("Ok",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,
+						int id) {
+					dialog.cancel();
+					finish();
+				}
+			});
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
@@ -144,7 +153,7 @@ public class AfterPhotoTaken extends Activity {
 
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args) {
-		
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		switch (RunProcessor.Mode.values()[id]) {
@@ -227,7 +236,7 @@ public class AfterPhotoTaken extends Activity {
 				if (success) {
 					Intent intent = new Intent(getApplication(),
 							DisplayProcessedForm.class);
-					intent.putExtra("photoName", photoName);
+					intent.putExtras(extras);
 					startActivity(intent);
 					finish();
 				}

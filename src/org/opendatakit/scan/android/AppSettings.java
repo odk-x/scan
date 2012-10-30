@@ -43,7 +43,7 @@ public class AppSettings extends PreferenceActivity {
 		// Remove suffixes and set paths
 		String[] templatePaths = new String[templateNames.length];
 		for (int i = 0; i < templateNames.length; i++) {
-			templateNames[i] = templateNames[i].replace(".json", "");
+			templateNames[i] = templateNames[i];//.replace(".json", "");
 			templatePaths[i] = ScanUtils.getTemplateDirPath()
 					+ templateNames[i];
 		}
