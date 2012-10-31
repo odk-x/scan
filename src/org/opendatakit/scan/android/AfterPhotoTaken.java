@@ -53,16 +53,6 @@ public class AfterPhotoTaken extends Activity {
 
 			content = (LinearLayout) findViewById(R.id.myLinearLayout);
 
-			Button retake = (Button) findViewById(R.id.retake_button);
-			retake.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-					Intent intent = new Intent(getApplication(),
-							PhotographForm.class);
-					startActivity(intent);
-					finish();
-				}
-			});
-
 			extras = getIntent().getExtras();
 			if (extras == null) {
 				Log.i(LOG_TAG, "extras == null");
@@ -73,6 +63,18 @@ public class AfterPhotoTaken extends Activity {
 			}
 
 			photoName = extras.getString("photoName");
+			
+			Button retake = (Button) findViewById(R.id.retake_button);
+			retake.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(getApplication(),
+							PhotographForm.class);
+					extras.putString("photoName", photoName + "_retake");
+					intent.putExtras(extras);
+					startActivity(intent);
+					finish();
+				}
+			});
 
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext());
