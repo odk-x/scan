@@ -250,8 +250,8 @@ public class JSON2XForm extends Activity {
 				JSONObject segment = segments.getJSONObject(j);
 				String imageName = fieldName + "_image_" + j;
 				Element fieldImageElement = instance.createElement("", imageName);
-				if(!segment.has("image_path") || segment.isNull("image_path") ){
-					fieldImageElement.addChild(Node.TEXT, "segmentNotAligned.jpg");
+				if(!segment.has("image_path") || segment.isNull("image_path")){
+					fieldImageElement.addChild(Node.TEXT, "");
 					instance.addChild(Node.ELEMENT, fieldImageElement);
 					continue;
 				}
@@ -440,7 +440,7 @@ public class JSON2XForm extends Activity {
         	JSONArray segments = field.getJSONArray("segments");
         	for(int j = 0; j < segments.length(); j++){
 	            writer.write("<bind nodeset=\"/data/" + fieldNames[i] + "_image_" + j + "\" " +
-	            		    "appearance=\"web\"" +
+	            		    //"appearance=\"web\" " +
 				            "readonly=\"true()\" " + 
 				            "type=\"binary\"/>");
         	}
