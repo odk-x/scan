@@ -280,6 +280,12 @@ public class JSON2XForm extends Activity {
 			}
 			instance.addChild(Node.ELEMENT, fieldElement);
 		}
+		{
+			Element metaElement = instance.createElement("", "meta");
+			metaElement.addChild(Node.ELEMENT, instance.createElement("", "instanceID"));
+			instance.addChild(Node.ELEMENT, metaElement);
+		}
+		
         //////////////
         Log.i(LOG_TAG, "Outputing the instance file:");
         //////////////
@@ -384,6 +390,7 @@ public class JSON2XForm extends Activity {
         		writer.write("<" + fieldNames[i] + "/>");
         	}
         }
+        writer.write("<meta><instanceID/></meta>");
         writer.write("</data>");
         writer.write("</instance>");
         writer.write("<itext>");
@@ -445,6 +452,7 @@ public class JSON2XForm extends Activity {
 				            "type=\"binary\"/>");
         	}
         }
+        writer.write("<bind calculate=\"concat(\'uuid:\', uuid())\" nodeset=\"/data/meta/instanceID\" readonly=\"true()\" type=\"string\"/>");
         writer.write("</model>");
         writer.write("</h:head>");
         writer.write("<h:body>");
