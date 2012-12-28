@@ -1,117 +1,109 @@
 {
-    "width": 832, 
-    "form_title": "Example Form", 
-    "classifier": {
-        "training_data_uri": "bubbles", 
-        "classifier_height": 20, 
-        "classifier_width": 18, 
-        "default_classification": true, 
-        "classification_map": {
-            "empty": false
-        }, 
-        "advanced": {
-            "alignment_radius": 4.0, 
-            "flip_training_data": true
-        }
-    }, 
     "fields": [
         {
-            "min_height": 100, 
             "segments": [
                 {
                     "segment_y": 100, 
                     "segment_x": 40, 
-                    "segment_height": 100, 
-                    "segment_width": 376
+                    "segment_height": 160, 
+                    "segment_width": 251
+                }
+            ], 
+            "type": "note", 
+            "name": "a_note", 
+            "label": "This is an\nexample form\nfor ODK Scan"
+        }, 
+        {
+            "min_height": 80, 
+            "segments": [
+                {
+                    "segment_width": 251, 
+                    "segment_y": 100, 
+                    "segment_x": 291, 
+                    "segment_height": 80
                 }
             ], 
             "type": "string", 
             "name": "name", 
-            "label": "Enter your name:"
+            "label": "Health center name:"
+        }, 
+        {
+            "min_height": 80, 
+            "segments": [
+                {
+                    "segment_width": 251, 
+                    "segment_y": 180, 
+                    "segment_x": 291, 
+                    "segment_height": 80
+                }
+            ], 
+            "type": "string", 
+            "name": "address", 
+            "label": "Health center address:"
         }, 
         {
             "segments": [
                 {
+                    "segment_width": 251, 
                     "segment_y": 100, 
-                    "segment_x": 416, 
-                    "segment_height": 100, 
-                    "segment_width": 376
+                    "segment_x": 541, 
+                    "segment_height": 30
+                }
+            ], 
+            "type": "string", 
+            "name": "month", 
+            "label": "Month:"
+        }, 
+        {
+            "segments": [
+                {
+                    "segment_width": 251, 
+                    "segment_y": 130, 
+                    "segment_x": 541, 
+                    "segment_height": 30
                 }
             ], 
             "type": "int", 
-            "name": "age", 
-            "label": "Enter your age:"
+            "name": "day", 
+            "label": "Day:"
         }, 
         {
-            "items": [
-                {
-                    "item_y": 20, 
-                    "item_x": 510, 
-                    "value": "female", 
-                    "label": "female"
-                }, 
-                {
-                    "item_y": 20, 
-                    "item_x": 600, 
-                    "value": "male", 
-                    "label": "male"
-                }
-            ], 
             "segments": [
                 {
-                    "segment_y": 200, 
+                    "segment_width": 251, 
+                    "segment_y": 160, 
+                    "segment_x": 541, 
+                    "segment_height": 100
+                }
+            ], 
+            "type": "int", 
+            "name": "year", 
+            "label": "Year:"
+        }, 
+        {
+            "min_height": 50, 
+            "segments": [
+                {
+                    "segment_y": 260, 
                     "segment_x": 40, 
-                    "segment_height": 40, 
+                    "segment_height": 50, 
                     "segment_width": 752
                 }
             ], 
-            "type": "select1", 
-            "name": "gender", 
-            "label": "Enter your gender:"
+            "type": "note", 
+            "name": "immunizations_section", 
+            "label": "In the last 30 days, how many of the following immunizations have been given?\n(Fill in a bubble for each.)"
         }, 
         {
             "items": [
                 {
-                    "item_y": 40, 
-                    "item_x": 130, 
-                    "value": "horse", 
-                    "label": "horse"
+                    "item_x": 20, 
+                    "item_y": 40
                 }, 
                 {
-                    "item_y": 40, 
-                    "item_x": 220, 
-                    "value": "cat", 
-                    "label": "cat"
+                    "item_x": 40, 
+                    "item_y": 40
                 }, 
-                {
-                    "item_y": 40, 
-                    "item_x": 310, 
-                    "value": "dog", 
-                    "label": "dog"
-                }, 
-                {
-                    "item_y": 40, 
-                    "item_x": 400, 
-                    "value": "fish", 
-                    "label": "fish"
-                }
-            ], 
-            "segments": [
-                {
-                    "segment_y": 240, 
-                    "segment_x": 40, 
-                    "segment_height": 60, 
-                    "segment_width": 752
-                }
-            ], 
-            "type": "select", 
-            "name": "pet_types", 
-            "label": "Why kinds of pets do you have:"
-        }, 
-        {
-            "name": "num_pets", 
-            "default": 3, 
-            "items": [
                 {
                     "item_x": 60, 
                     "item_y": 40
@@ -211,19 +203,1039 @@
                 {
                     "item_x": 540, 
                     "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
                 }
             ], 
             "segments": [
                 {
-                    "segment_y": 300, 
+                    "segment_y": 310, 
                     "segment_x": 40, 
                     "segment_height": 60, 
                     "segment_width": 752
                 }
             ], 
-            "label": "Fill in a bubble for every pet you have:", 
-            "type": "int"
+            "type": "int", 
+            "name": "Tetanus", 
+            "label": "Tetanus"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 370, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "Measles", 
+            "label": "Measles"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 430, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "Polio", 
+            "label": "Polio"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 490, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "DPT", 
+            "label": "DPT"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 550, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "MMR", 
+            "label": "MMR"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 610, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "Hepatitis_A", 
+            "label": "Hepatitis A"
+        }, 
+        {
+            "items": [
+                {
+                    "item_x": 20, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 40, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 60, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 80, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 100, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 120, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 140, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 160, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 180, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 200, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 220, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 240, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 260, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 280, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 300, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 320, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 340, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 360, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 380, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 400, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 420, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 440, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 460, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 480, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 500, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 520, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 540, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 560, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 580, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 600, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 620, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 640, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 660, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 680, 
+                    "item_y": 40
+                }, 
+                {
+                    "item_x": 700, 
+                    "item_y": 40
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 670, 
+                    "segment_x": 40, 
+                    "segment_height": 60, 
+                    "segment_width": 752
+                }
+            ], 
+            "type": "int", 
+            "name": "Hepatitis_B", 
+            "label": "Hepatitis B"
+        }, 
+        {
+            "items": [
+                {
+                    "item_y": 40, 
+                    "item_x": 90, 
+                    "value": "Yes", 
+                    "label": "Yes"
+                }, 
+                {
+                    "item_y": 40, 
+                    "item_x": 180, 
+                    "value": "No", 
+                    "label": "No"
+                }
+            ], 
+            "segments": [
+                {
+                    "segment_y": 730, 
+                    "segment_x": 40, 
+                    "segment_height": 200, 
+                    "segment_width": 376
+                }
+            ], 
+            "type": "select1", 
+            "name": "other_immunizations_given", 
+            "label": "Have any other immunizations been given?"
+        }, 
+        {
+            "min_height": 200, 
+            "segments": [
+                {
+                    "segment_y": 730, 
+                    "segment_x": 416, 
+                    "segment_height": 200, 
+                    "segment_width": 376
+                }
+            ], 
+            "type": "string", 
+            "name": "other_immunizations", 
+            "label": "If so please list them:"
         }
     ], 
-    "height": 1076
+    "height": 1076, 
+    "width": 832, 
+    "form_title": "Example Form", 
+    "font": "12pt Verdana, sans-serif", 
+    "classifier": {
+        "training_data_uri": "bubbles", 
+        "classifier_height": 20, 
+        "classifier_width": 18, 
+        "default_classification": true, 
+        "classification_map": {
+            "empty": false
+        }, 
+        "advanced": {
+            "alignment_radius": 4.0, 
+            "flip_training_data": true
+        }
+    }
 }
