@@ -47,18 +47,29 @@ public class DisplayProcessedForm extends Activity {
 			setContentView(R.layout.processed_form);
 
 			extras = getIntent().getExtras();
-			if (extras != null) {
-				photoName = extras.getString("photoName");
-				// templatePath = settings.getString(photoName, "");
-				templatePath = ScanUtils.getTemplatePath(photoName);
-				if (extras.getBoolean("startCollect", false)) {
-					Intent dataIntent = new Intent();
-					dataIntent.putExtra("start", true);
-					startCollect(dataIntent);
-					return;
-				}
+			if (extras == null || !extras.containsKey("photoName")) {
+				throw new Exception("This activity must be lauched with a photoName specified in the extras.");
 			}
-			//TODO: Check for template.json
+			photoName = extras.getString("photoName");
+			if (extras.getBoolean("startCollect", false)) {
+				Intent dataIntent = new Intent();
+				dataIntent.putExtra("start", true);
+				startCollect(dataIntent);
+				return;
+			}
+			templatePath = ScanUtils.getTemplatePath(photoName);
+			if(!(new File(templatePath, "template.json")).exists()){
+				throw new Exception("The form template is missing.");
+			}
+			
+			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");
+			//Multipage forms:
+			//If there is a nextPage directory in the template directory 
+			//Scan will assume it is processing a multipage form
+			//where the template for the next page is in the nextPage directory.
+			//In the extras, the prevTemplatePaths and prevPhotoPaths arrays are passed through
+			//subsequent invocations of the Scan activities in order to store
+			//information about the previous pages used to combine them into an xform.
 			final File nextPageTemplatePath = new File(templatePath, "nextPage");
 			morePagesToScan = nextPageTemplatePath.exists();
 			if(morePagesToScan){
@@ -87,6 +98,19 @@ public class DisplayProcessedForm extends Activity {
 						}
 						startActivity(intent);
 						finish();
+					}
+				});
+			} else {
+				Button saveData = (Button) findViewById(R.id.saveBtn);
+				saveData.setVisibility(View.VISIBLE);
+				saveData.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Log.i(LOG_TAG, "Using template: " + templatePath);
+						Intent dataIntent = new Intent();
+						//Start indicates that the form should be launched from the first question
+						//rather than the prompt list.
+						dataIntent.putExtra("start", true);
+						startCollect(dataIntent);
 					}
 				});
 			}
@@ -139,46 +163,10 @@ public class DisplayProcessedForm extends Activity {
 			alert.show();
 		}
 	}
-
-	/*
-	 * private void makeAlert(final String field){ AlertDialog.Builder alert =
-	 * new AlertDialog.Builder(this); alert.setTitle("field");
-	 * alert.setMessage("field :" + field);
-	 * 
-	 * // Set an EditText view to get user input final EditText input = new
-	 * EditText(this); alert.setView(input);
-	 * 
-	 * alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	 * public void onClick(DialogInterface dialog, int whichButton) { String
-	 * value = input.getText().toString();
-	 * myWebView.loadUrl("javascript:testEcho('" + field + "', '"+ value +"')");
-	 * return; } });
-	 * 
-	 * alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	 * 
-	 * public void onClick(DialogInterface dialog, int which) { // TODO
-	 * Auto-generated method stub return; } }); alert.show(); } public class
-	 * JavaScriptInterface { Context mContext; BufferedWriter bufferWritter;
-	 * 
-	 * // Instantiate the interface and set the context
-	 * JavaScriptInterface(Context c, File file) { mContext = c; FileWriter
-	 * fileWritter; try { fileWritter = new FileWriter(file.toString());
-	 * bufferWritter = new BufferedWriter(fileWritter); } catch (IOException e)
-	 * { // TODO Auto-generated catch block e.printStackTrace(); } } public void
-	 * saveData(String data){ try { bufferWritter.write(data);
-	 * bufferWritter.flush(); } catch (IOException e) { // TODO Auto-generated
-	 * catch block e.printStackTrace(); } }
-	 * 
-	 * public void makePopup(String field, int field_idx) { Log.i(LOG_TAG,
-	 * "makePopup args: " + field + ' ' + field_idx); makeAlert(field);
-	 * 
-	 * }
-	 * 
-	 * public void launchCollect(String field, int segment_idx, int field_idx) {
-	 * //It would probably be better to launch collect directly if the form has
-	 * already been exported. Log.i(LOG_TAG, "args: " + field + ' ' +
-	 * segment_idx + ' ' + field_idx); Intent dataIntent = new Intent();
-	 * dataIntent.putExtra("goto", field_idx); startCollect(dataIntent); } }
+	/**
+	 * This method launches Collect with the xform instance indicated by the data intent.
+	 * If the data intent has does not reference an xform JSON2XForm will be launched instead to generate one.
+	 * @param data
 	 */
 	public void startCollect(Intent data) {
 		if (data.getData() == null) {
@@ -237,7 +225,7 @@ public class DisplayProcessedForm extends Activity {
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-
+/*
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
@@ -246,10 +234,10 @@ public class DisplayProcessedForm extends Activity {
 		// exists)
 		openOptionsMenu();
 	}
-
+*/
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(morePagesToScan) return false;
+		//if(morePagesToScan) return false;
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.mscan_menu, menu);
 		return true;
@@ -260,19 +248,24 @@ public class DisplayProcessedForm extends Activity {
 		// Handle item selection
 		Intent intent;
 		int itemId = item.getItemId();
+		/*
 		if (itemId == R.id.exportToODK) {
 			Log.i(LOG_TAG, "Using template: " + templatePath);
 			Intent dataIntent = new Intent();
 			dataIntent.putExtra("start", true);
 			startCollect(dataIntent);
 			return true;
-		} else if (itemId == R.id.scanNewForm) {
+		}
+		*/
+		if (itemId == R.id.scanNewForm) {
 			intent = new Intent(getApplication(), PhotographForm.class);
 			startActivity(intent);
+			finish();
 			return true;
 		} else if (itemId == R.id.startOver) {
 			intent = new Intent(getApplication(), MainMenu.class);
 			startActivity(intent);
+			finish();
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);

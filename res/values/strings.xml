@@ -16,7 +16,7 @@
 <!-- For Main Screen -->
 <string name="Health_Center">Health Center</string>
 <string name="the_current_health_center_is">The current health center is:</string>
-<string name="ScanButton">Scan New Form</string>
+<string name="scan_new_form">Scan New Form</string>
 <string name="ViewFormsButton">View Images</string>
 <string name="InstructionsButton">Instructions</string>
 <string name="SettingsButton">Settings</string>
@@ -32,7 +32,6 @@
 <string name="next_page">Scan Next Page</string>
 
 <!-- Popup menu -->
-<string name ="export_to_ODK">Export to Collect</string>
 <string name="save_data">Save Data</string>
 <string name="display_data">Display Data</string>
 <string name="main_menu">Main Menu</string>
