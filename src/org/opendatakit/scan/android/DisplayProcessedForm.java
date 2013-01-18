@@ -225,16 +225,7 @@ public class DisplayProcessedForm extends Activity {
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-/*
-	@Override
-	public void onAttachedToWindow() {
-		super.onAttachedToWindow();
-		if(morePagesToScan) return;
-		// Show the options menu when the activity is started (so people know it
-		// exists)
-		openOptionsMenu();
-	}
-*/
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		//if(morePagesToScan) return false;

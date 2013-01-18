@@ -32,20 +32,26 @@
 		android:layout_height="fill_parent" android:background="#000000"
 		android:scrollbars="none" android:layout_weight="1" 
 		android:visibility="gone" />
+	
 	<RelativeLayout
-		android:id="@+id/failureMessage"
-		android:visibility="gone" 
+		android:id="@+id/failureContainer"
 		android:layout_weight="1"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
+		android:layout_margin="1sp"
+		android:visibility="gone"
 		xmlns:android="http://schemas.android.com/apk/res/android">
+
 		<TextView
-			xmlns:android="http://schemas.android.com/apk/res/android"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textSize="24dp"
-			android:layout_centerInParent="true"
-			android:text="@string/could_not_register" />
+		    xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:id="@+id/failureMessage"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_centerInParent="true"
+		    android:layout_margin="5dp"
+		    android:text="Error"
+		    android:textSize="24dp" />
+
 	</RelativeLayout>
 	
 </LinearLayout>

@@ -75,8 +75,8 @@ public class RunProcessor implements Runnable {
 					
 					for(int i = 0; i < templatePaths.length; i++){ 
 						Log.i(LOG_TAG, "loadingFD: " + templatePaths[i]);
-						if(mProcessor.loadFeatureData(templatePaths[i])){
-							new Exception("Could not load feature data from: " + templatePaths[i]);
+						if(!mProcessor.loadFeatureData(templatePaths[i])){
+							throw new Exception("Could not load feature data from: " + templatePaths[i]);
 						}
 					}
 					
@@ -91,22 +91,22 @@ public class RunProcessor implements Runnable {
 								msg.arg1 = 1;//indicates success
 								Log.i(LOG_TAG,"aligned");
 							}
+							else {
+								throw new Exception("Failed to align form.");
+							}
 						}
 						else {
-							Log.i(LOG_TAG,"Failed to set template.");
-							new Exception("Failed to set template.");
+							throw new Exception("Failed to set template.");
 						}
 					}
 					else {
-						Log.i(LOG_TAG,"Failed to detect form.");
-						new Exception("Failed to detect form.");
+						throw new Exception("Failed to detect form.");
 					}
 					//Indicate which template was used.
 					msg.arg2 = formIdx;
 				}
 				else {
-					Log.i(LOG_TAG,"Failed to load image: " + photoName);
-					new Exception("Failed to load image: " + photoName);
+					throw new Exception("Failed to load image: " + photoName);
 				}
 			}
 			else if(mode == Mode.PROCESS) {
@@ -118,8 +118,9 @@ public class RunProcessor implements Runnable {
 			}
 		}
 		catch(Exception e){
+			Log.i(LOG_TAG,e.getMessage());
 			Bundle errorMessage = new Bundle();
-			errorMessage.putString("errorMessage", e.toString());
+			errorMessage.putString("errorMessage", e.getMessage());
 			msg.setData(errorMessage);
 		}
 		handler.sendMessage(msg);

@@ -38,24 +38,25 @@ containing a value of this type.
         public static final int stand_example=0x7f020004;
     }
     public static final class id {
-        public static final int InstructionsButton=0x7f09000a;
-        public static final int ScanButton=0x7f090008;
-        public static final int SettingsButton=0x7f09000b;
-        public static final int ViewFormsButton=0x7f090009;
-        public static final int createdTime=0x7f090007;
-        public static final int failureMessage=0x7f090004;
+        public static final int InstructionsButton=0x7f09000b;
+        public static final int ScanButton=0x7f090009;
+        public static final int SettingsButton=0x7f09000c;
+        public static final int ViewFormsButton=0x7f09000a;
+        public static final int createdTime=0x7f090008;
+        public static final int failureContainer=0x7f090004;
+        public static final int failureMessage=0x7f090005;
         public static final int myLinearLayout=0x7f090000;
-        public static final int nextPageBtn=0x7f09000d;
-        public static final int photoStatus=0x7f090005;
+        public static final int nextPageBtn=0x7f09000e;
+        public static final int photoStatus=0x7f090006;
         public static final int process_button=0x7f090002;
         public static final int retake_button=0x7f090001;
-        public static final int saveBtn=0x7f09000e;
-        public static final int scanNewForm=0x7f090010;
-        public static final int startOver=0x7f090011;
-        public static final int templateName=0x7f090006;
-        public static final int version_display=0x7f09000c;
+        public static final int saveBtn=0x7f09000f;
+        public static final int scanNewForm=0x7f090011;
+        public static final int startOver=0x7f090012;
+        public static final int templateName=0x7f090007;
+        public static final int version_display=0x7f09000d;
         public static final int webview=0x7f090003;
-        public static final int webview2=0x7f09000f;
+        public static final int webview2=0x7f090010;
     }
     public static final class layout {
         public static final int after_photo_taken=0x7f030000;

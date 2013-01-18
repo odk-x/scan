@@ -22,6 +22,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * This activity starts the form processor and provides user feedback by
@@ -52,7 +53,8 @@ public class AfterPhotoTaken extends Activity {
 			setContentView(R.layout.after_photo_taken);
 
 			content = (LinearLayout) findViewById(R.id.myLinearLayout);
-
+			processButton = (Button) findViewById(R.id.process_button);
+			
 			extras = getIntent().getExtras();
 			if (extras == null) {
 				Log.i(LOG_TAG, "extras == null");
@@ -100,10 +102,8 @@ public class AfterPhotoTaken extends Activity {
 						.fromPersistedPreferenceValue(settings.getString(
 								"select_templates", ""));
 
-				if (templatePaths == null) {
-					RelativeLayout failureMessage = (RelativeLayout) findViewById(R.id.failureMessage);
-					failureMessage.setVisibility(View.VISIBLE);
-					content.setVisibility(View.VISIBLE);
+				if (templatePaths == null || templatePaths.length == 0) {
+					updateUI(false, "No templates are selected.\nYou can select templates in the Settings menu.");
 					return;
 				}
 
@@ -114,7 +114,6 @@ public class AfterPhotoTaken extends Activity {
 				startThread(RunProcessor.Mode.LOAD_ALIGN);
 			}
 
-			processButton = (Button) findViewById(R.id.process_button);
 			processButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					startThread(RunProcessor.Mode.PROCESS);
@@ -189,8 +188,11 @@ public class AfterPhotoTaken extends Activity {
 					(WebView) findViewById(R.id.webview),
 					ScanUtils.getAlignedPhotoPath(photoName));
 		} else {
-			RelativeLayout failureMessage = (RelativeLayout) findViewById(R.id.failureMessage);
+			RelativeLayout failureMessage = (RelativeLayout) findViewById(R.id.failureContainer);
 			failureMessage.setVisibility(View.VISIBLE);
+			if(errorMessage != null && errorMessage.length() > 0) {
+				((TextView) findViewById(R.id.failureMessage)).setText(errorMessage);
+			}
 		}
 		content.setVisibility(View.VISIBLE);
 		processButton.setEnabled(success);
