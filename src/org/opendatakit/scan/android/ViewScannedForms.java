@@ -18,7 +18,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
 /**
- * This activity displays a list of previously scanned forms
+ * This activity displays a list of previously scanned forms.
+ * WARNING: Currently is it not used and it is not being maintained.
  **/
 public class ViewScannedForms extends ListActivity {
 

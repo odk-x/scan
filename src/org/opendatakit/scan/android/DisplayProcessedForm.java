@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -146,6 +147,7 @@ public class DisplayProcessedForm extends Activity {
 			ScanUtils.displayImageInWebView(
 					(WebView) findViewById(R.id.webview2),
 					ScanUtils.getMarkedupPhotoPath(photoName));
+			
 		} catch (Exception e) {
 			// Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -169,20 +171,6 @@ public class DisplayProcessedForm extends Activity {
 	 * @param data
 	 */
 	public void startCollect(Intent data) {
-		if (data.getData() == null) {
-			// No instance specified, create or find one with new activity.
-			Intent intent = new Intent(getApplication(), JSON2XForm.class);
-			intent.putExtras(extras);
-			intent.putExtras(data);
-			intent.putExtra("templatePath", templatePath);
-			intent.putExtra("photoName", photoName);
-			startActivityForResult(intent, 1);
-			//Once we get the result we rerun this function and collect should start.
-			return;
-		}
-		// ////////////
-		Log.i(LOG_TAG, "Starting Collect...");
-		// ////////////
 		// Initialize the intent that will start collect and use it to see if
 		// collect is installed.
 		Intent intent = new Intent();
@@ -192,21 +180,47 @@ public class DisplayProcessedForm extends Activity {
 				"org.odk.collect.android.activities.FormEntryActivity"));
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
+			// ////////////
+			Log.i(LOG_TAG, "Collect is not installed.");
+			// ////////////		
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("ODK Collect was not found on this device.")
 					.setCancelable(false)
-					.setNeutralButton("Ok",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-								}
-							});
+					.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int id) {
+							Intent goToMarket = new Intent(Intent.ACTION_VIEW)
+						    	.setData(Uri.parse("market://details?id=org.odk.collect.android"));
+							startActivity(goToMarket);
+							dialog.cancel();
+						}
+					})
+					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int id) {
+							dialog.cancel();
+						}
+					});
 			AlertDialog alert = builder.create();
 			alert.show();
 			return;
 		}
+		
+		if (data.getData() == null) {
+			// No instance specified, create or find one with new activity.
+			Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
+			createInstanceIntent.putExtras(extras);
+			createInstanceIntent.putExtras(data);
+			createInstanceIntent.putExtra("templatePath", templatePath);
+			createInstanceIntent.putExtra("photoName", photoName);
+			startActivityForResult(createInstanceIntent, 1);
+			//Once we get the result we rerun this function and collect should start.
+			return;
+		}
 
+		// ////////////
+		Log.i(LOG_TAG, "Starting Collect...");
+		// ////////////		
 		intent.setAction(Intent.ACTION_EDIT);
 		intent.putExtras(data);
 		intent.setData(data.getData());
