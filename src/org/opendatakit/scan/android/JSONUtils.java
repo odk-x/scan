@@ -21,9 +21,9 @@ public class JSONUtils {
 
 	private static JSONObject inheritFrom(JSONObject child, JSONObject parent)
 			throws JSONException {
-		Iterator<String> propertyIterator = parent.keys();
+		Iterator<?> propertyIterator = parent.keys();
 		while (propertyIterator.hasNext()) {
-			String currentProperty = propertyIterator.next();
+			String currentProperty = (String) propertyIterator.next();
 			if (!child.has(currentProperty)) {
 				child.put(currentProperty, parent.get(currentProperty));
 			}
@@ -73,6 +73,8 @@ public class JSONUtils {
 		while ((line = br.readLine()) != null) {
 			text.append(line);
 		}
+		
+		br.close();
 
 		return new JSONObject(text.toString());
 	}

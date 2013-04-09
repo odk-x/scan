@@ -11,6 +11,7 @@ import java.util.Date;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.os.Environment;
 import android.os.StatFs;
 
 /**
@@ -24,10 +25,10 @@ public class ScanUtils {
 
 	public static final boolean DebugMode = false;
 
-	public static final String appFolder = "/sdcard/ODKScan/";
+	public static final String appFolder = Environment.getExternalStorageDirectory().getPath() + "/ODKScan/";
 
 	public static String getOutputDirPath() {
-		return appFolder + "output/";
+		return  appFolder + "output/";
 	}
 
 	public static String getOutputPath(String photoName) {
@@ -104,6 +105,8 @@ public class ScanUtils {
 		while ((line = br.readLine()) != null) {
 			text.append(line);
 		}
+		
+		br.close();
 
 		return text.toString();
 	}
