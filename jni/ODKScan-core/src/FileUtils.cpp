@@ -17,6 +17,7 @@ extern "C" {
 }
 #include <fstream>
 #include "FileUtils.h"
+#include <json/json.h>
 
 using namespace std;
 
@@ -161,4 +162,21 @@ static void HandleDir(char *dirpath, DIR *d, vector<string> &filenames) {
 
 bool isImage(const std::string& filename){
 	return filename.find(".jpg") != std::string::npos;
+}
+
+bool parseJsonFromFile(const string& filePath, Json::Value& myRoot) {
+	ifstream JSONin;
+	Json::Reader reader;
+
+	JSONin.open(filePath.c_str(), ifstream::in);
+	bool parse_successful = reader.parse( JSONin, myRoot );
+
+	JSONin.close();
+	if(parse_successful){
+		return true;
+	}
+	else{
+		cout << reader.getFormatedErrorMessages() << endl;
+	}
+	return false;
 }

@@ -1,28 +1,13 @@
 #include "TemplateProcessor.h"
+#include "FileUtils.h"
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-bool parseJsonFromFile(const string& filePath, Json::Value& myRoot) {
-	ifstream JSONin;
-	Json::Reader reader;
-	
-	JSONin.open(filePath.c_str(), ifstream::in);
-	bool parse_successful = reader.parse( JSONin, myRoot );
-	
-	JSONin.close();
-	if(parse_successful){
-		return true;
-	}
-	else{
-		cout << reader.getFormatedErrorMessages() << endl;
-	}
-	return false;
-}
 //inheritMembers makes the child value inherit the members that it does not override from the specified parent json value.
-//The parent is copied so it can be written over, while the child is passed in and returned with added members by refrence.
+//The parent is copied so it can be written over, while the child is passed in by reference and returned with added members.
 Json::Value& TemplateProcessor::inheritMembers(Json::Value& child, Json::Value parent) const {
 	Json::Value::Members members = child.getMemberNames();
 	for( Json::Value::Members::iterator itr = members.begin() ; itr != members.end() ; itr++ ) {
@@ -31,7 +16,7 @@ Json::Value& TemplateProcessor::inheritMembers(Json::Value& child, Json::Value p
 		//parent[*itr] = inheritMembers(child[*itr], parent[*itr]);
 		parent[*itr] = child[*itr];
 	}
-	//I'm worried that we end up with refrences to elements of the stack allocated parent copy.
+	//I'm worried that we end up with references to elements of the stack allocated parent copy.
 	//However, I think operator= is overloaded so that this doesn't happen.
 	return child = parent;
 }
@@ -61,7 +46,7 @@ Json::Value TemplateProcessor::fieldFunction(const Json::Value& field){
 }
 Json::Value TemplateProcessor::formFunction(const Json::Value& templateRoot){
 	const Json::Value fields = templateRoot["fields"];
-	Json::Value outForm;
+	Json::Value outForm = Json::Value(templateRoot);
 	Json::Value outFields;
 
 	for ( size_t i = 0; i < fields.size(); i++ ) {

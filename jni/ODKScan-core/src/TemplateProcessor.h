@@ -2,14 +2,15 @@
 #include <iostream>
 #include <fstream>
 
-//TODO: Add exceptions
-
-/**
-	This class allows you to specify functions that will be applied to the form/field/segment objects 
-	as they are recursed over in a pre-order traversal.
-	We assume templates that are nested like this:
-		{fields : [ segments : [] ]}
-	You need to call the base class functions for the recursion to happen.
+/*
+ * This is a class for traversing form definition JSON.
+ * The idea is that you extend the class with the behaviors your want
+ * for the form/field/segment objects, and make calls to the parent class
+ * to descend into their children. In addition the form/field/segment
+ * functions are called with JSON objects that inherit from their parent.
+ *
+ * In hindsight I think this class was a bad idea because of the complication in adds.
+ * It would have been better to stick with nested for loops.
  */
 class TemplateProcessor
 {
@@ -27,4 +28,3 @@ class TemplateProcessor
 	virtual ~TemplateProcessor(){}
 };
 
-bool parseJsonFromFile(const std::string& filePath, Json::Value& myRoot);

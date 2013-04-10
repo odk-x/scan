@@ -147,6 +147,12 @@ bool isQuadValid(const vector< Point_<T> >& quad) {
 			sign*C.cross(D).at<double>(0, 2) > 0 &&
 			sign*A.cross(E).at<double>(0, 2) > 0;
 }
+bool testQuadValidity(const vector<Point2f>& quad) {
+	return isQuadValid(quad);
+}
+bool testQuadValidity(const vector<Point>& quad) {
+	return isQuadValid(quad);
+}
 bool testQuad(const vector<Point>& quad, const Size& sz, float sizeThresh) {
 	float quadArea = contourArea(Mat(quad)); //This might be a bit inexact unfortunately...
 		/*

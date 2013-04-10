@@ -1,17 +1,28 @@
 ODKScan
 =====
 
+Setting up your environment
+===========================
+This app is a mix of Java and native C++ code, so it can be a bit complicated to work with
+
+The [OpenCV guide here](http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/android_dev_intro.html#quick-environment-setup-for-android-development)
+suggests using the [The NVIDIA Tegra Android development pack](https://developer.nvidia.com/tegra-android-development-pack) to setup your Android development environment.
+It may take a few hours or a day to register for a Nvidia developer account in order to download it, but it can save a lot of trouble.
+
+Install swig:
+
+```bash
+sudo apt-get install swig
+```
+
+Set the sdk path in `local.properties`
+
+Set the ndk path in `local.env.mk`
+
+Now you should be ready to build.
+
 Building the project
 ====================
-This app is a mix of Java and native C++ code, so it can be little bit complicated to build.
-
-[This tutorial here gives a pretty good overview.] (http://opencv.itseez.com/doc/tutorials/introduction/android_binary_package/android_binary_package_using_with_NDK.html)
-
-The only external dependencies are the android sdk and ndk (and swig)
-We assume that you have the SDK in /home/nathan/android-sdk-linux_x86 (Which it is almost surely not!)
-Change that directory in local.properties and watch out tildas don't work.
-We assume that you have the NDK in ~/android-ndk-r6
-You can change this directory in local.env.mk
 
 To clean the project:
 

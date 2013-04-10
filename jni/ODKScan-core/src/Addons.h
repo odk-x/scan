@@ -41,4 +41,7 @@ void debugShow(const cv::Mat & image);
 
 int strToInt( const std::string& s );
 std::string intToStr( int n );
+
+//JSON FUnctions
+Json::Value& extend(Json::Value& base, const Json::Value& extender);
 #endif

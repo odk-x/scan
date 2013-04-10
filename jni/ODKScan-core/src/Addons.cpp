@@ -155,3 +155,10 @@ string intToStr( int n )
 	result << n;
 	return result.str();
 }
+Json::Value& extend(Json::Value& base, const Json::Value& extender) {
+	Json::Value::Members members = extender.getMemberNames();
+	for( Json::Value::Members::iterator itr = members.begin() ; itr != members.end() ; itr++ ) {
+		base[*itr] = extender[*itr];
+	}
+	return base;
+}

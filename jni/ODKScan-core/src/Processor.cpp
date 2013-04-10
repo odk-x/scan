@@ -6,7 +6,6 @@
 #include "SegmentAligner.h"
 #include "AlignmentUtils.h"
 #include "Addons.h"
-#include "TemplateProcessor.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -39,15 +38,10 @@
 using namespace std;
 using namespace cv;
 
-Json::Value getFieldValue(const Json::Value& field){
+//Iterates over a field's segments and items to determine it's value.
+Json::Value computeFieldValue(const Json::Value& field){
 	Json::Value output;
 	const Json::Value segments = field["segments"];
-	//Add a delimiter for select type fields
-	string selectDelimiter("");
-	string select("select");
-	if (field.get("type", "none").asString().compare(0, select.length(), select) == 0) {
-		selectDelimiter = " ";
-	}
 	for ( size_t i = 0; i < segments.size(); i++ ) {
 		const Json::Value segment = segments[i];
 		const Json::Value items = segment["items"];
@@ -60,21 +54,33 @@ Json::Value getFieldValue(const Json::Value& field){
 			switch ( classification.type() )
 			{
 				case Json::stringValue:
+					//This case isn't used right now.
+					//It's for classifiers that picks up letters.
+					//The idea is to concatenate all the letters into a word.
 					output = Json::Value(output.asString() +
 						             classification.asString());
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
+						//This case is for selects.
+						//The values of the filled (i.e. true) items
+						//are stored in a space delimited string.
 						if(classification.asBool()){
-							output = Json::Value(output.asString() + selectDelimiter +
+							if( output.asString().length() == 0 ){
+								output = Json::Value(itemValue.asString());
+							}
+							else{
+								output = Json::Value(output.asString() + " " +
 									     itemValue.asString());
+							}
 						}
 						else{
 							output = Json::Value(output.asString());
 						}
 						break;
 					}
-					//Fall through and be counted as a 1 or 0
+					//Fall through and count the boolean as a 1 or 0
+					//for a tally.
 				case Json::intValue:
 				case Json::uintValue:
 					output = Json::Value(output.asInt() + classification.asInt());
@@ -158,9 +164,11 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 			}
 			stringstream ss;
 			ss << field.get("value", "");
-			putText(markupImage, ss.str(), textBoxTL,
+			string markupString(ss.str());
+			markupString = markupString.substr(0, markupString.length() - 1);
+			putText(markupImage, markupString, textBoxTL,
 			        FONT_HERSHEY_SIMPLEX, 1., Scalar::all(0), 3, CV_AA);
-			putText(markupImage, ss.str(), textBoxTL,
+			putText(markupImage, markupString, textBoxTL,
 			        FONT_HERSHEY_SIMPLEX, 1., boxColor, 2, CV_AA);
 		}
 	}
@@ -203,11 +211,9 @@ const std::string currentDateTime() {
     strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
     return buf;
 }
-class Processor::ProcessorImpl : public TemplateProcessor
+class Processor::ProcessorImpl
 {
 private:
-	typedef TemplateProcessor super;
-
 	Mat formImage;
 
 	Aligner aligner;
@@ -296,22 +302,23 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier){
 	}
 	return classifiers[key];
 }
-Json::Value segmentFunction(const Json::Value& segmentTemplate) {
-
+Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Value& parentProperties) {
+	Json::Value extendedSegment = Json::Value(parentProperties);
+	extend(extendedSegment, segmentTemplate);
 	Json::Value segmentJsonOut;
 	Mat segmentImg;
 	vector <Point> segBubbleLocs;
 	vector <int> bubbleVals;
-	Rect segmentRect( SCALEPARAM * Point(segmentTemplate.get( "segment_x", INT_MIN ).asInt(),
-	                                     segmentTemplate.get( "segment_y", INT_MIN ).asInt()),
-	                                     SCALEPARAM * Size(segmentTemplate.get("segment_width", INT_MIN).asInt(),
-	                                                       segmentTemplate.get("segment_height", INT_MIN).asInt()));
+	Rect segmentRect( SCALEPARAM * Point(extendedSegment.get( "segment_x", INT_MIN ).asInt(),
+	                                     extendedSegment.get( "segment_y", INT_MIN ).asInt()),
+	                                     SCALEPARAM * Size(extendedSegment.get("segment_width", INT_MIN).asInt(),
+	                                                       extendedSegment.get("segment_height", INT_MIN).asInt()));
 	//Transfromation and offest are used to get absolute bubble locations.
 	Mat transformation = (Mat_<double>(3,3) << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 	Point offset = segmentRect.tl();
 
 	//Get the cropped segment image:
-	if(segmentTemplate.get("align_segment", false).asBool()) {
+	if(extendedSegment.get("align_segment", false).asBool()) {
 		//Segment alignment is off by default because it seems to perform worse.
 		Rect expandedRect = resizeRect(segmentRect, 1 + SEGMENT_BUFFER);
 	
@@ -364,10 +371,10 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate) {
 	}
 
 	//Do classification stuff:
-	Json::Value items = segmentTemplate["items"];
+	Json::Value items = extendedSegment["items"];
 	if(!items.isNull()){
 		Json::Value itemsJsonOut;
-		Json::Value classifierJson = segmentTemplate["classifier"];
+		Json::Value classifierJson = extendedSegment["classifier"];
 		double alignment_radius = classifierJson.get("alignment_radius", 0.0).asDouble();
 		Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
 		
@@ -415,9 +422,9 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate) {
 	string segmentOutPath;
 	string segmentName;
 	try{
-		segmentOutPath = segmentTemplate.get("output_path", 0).asString() + "segments/";
-		segmentName = segmentTemplate["name"].asString() + "_image_" +
-		              intToStr(segmentTemplate.get("index", 0).asInt()) + ".jpg";
+		segmentOutPath = extendedSegment.get("output_path", 0).asString() + "segments/";
+		segmentName = extendedSegment["name"].asString() + "_image_" +
+		              intToStr(extendedSegment.get("index", 0).asInt()) + ".jpg";
 		imwrite(segmentOutPath + segmentName, segment_out);
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
@@ -429,9 +436,14 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate) {
 	segmentJsonOut.removeMember("output_path");
 	return segmentJsonOut;
 }
-Json::Value fieldFunction(const Json::Value& field){
-	Json::Value fieldJsonOut;
+Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentProperties){
+	Json::Value extendedField = Json::Value(parentProperties);
+	extend(extendedField, field);
+	const Json::Value segments = extendedField["segments"];
+	Json::Value outField = Json::Value(field);
+	Json::Value outSegments;
 
+	//This field is just used to block out features from some region.
 	if(field.get("mask", false).asBool()) {
 		cout << "mask" << endl;
 		return Json::Value();
@@ -441,31 +453,37 @@ Json::Value fieldFunction(const Json::Value& field){
 		namer.setPrefix(field.get("label", "unlabeled").asString());
 	#endif
 
-	//Add segment index numbers:
-	Json::Value mutableField;
-	const Json::Value segments = field["segments"];
-	Json::Value outSegments;
 	for ( size_t j = 0; j < segments.size(); j++ ) {
-		Json::Value segment = segments[j];
-		segment["index"] = (int)j;
-		outSegments.append(segment);
+		const Json::Value segment = segments[j];
+		Json::Value outSegment = segmentFunction(segment, extendedField);
+		outSegment["index"] = (int)j;
+		if(!outSegment.isNull()){
+			outSegments.append(outSegment);
+		}
 	}
-	mutableField = field;
-	mutableField["segments"] = outSegments;
+	outField["segments"] = outSegments;
 
-	fieldJsonOut = super::fieldFunction(mutableField);
-	inheritMembers(fieldJsonOut, mutableField);
-	Json::Value value = getFieldValue(fieldJsonOut);
+	Json::Value value = computeFieldValue(outField);
 	if(!value.isNull()){
-		fieldJsonOut["value"] = value;
+		outField["value"] = value;
 	}
-	fieldJsonOut.removeMember("fields");
-	fieldJsonOut.removeMember("items");
-	fieldJsonOut.removeMember("classifier");
-	return fieldJsonOut;
+	outField.removeMember("fields");
+	outField.removeMember("items");
+	outField.removeMember("classifier");
+	return outField;
 }
 Json::Value formFunction(const Json::Value& templateRoot){
-	Json::Value outForm = super::formFunction(templateRoot);
+	const Json::Value fields = templateRoot["fields"];
+	Json::Value outForm = Json::Value(templateRoot);
+	Json::Value outFields;
+	for ( size_t i = 0; i < fields.size(); i++ ) {
+		const Json::Value field = fields[i];
+		Json::Value outField = fieldFunction(field, templateRoot);
+		if(!outField.isNull()){
+			outFields.append(outField);
+		}
+	}
+	outForm["fields"] = outFields;
 	outForm["form_scale"] = SCALEPARAM;
 	outForm["timestamp"] = currentDateTime();
 	outForm.removeMember("items");

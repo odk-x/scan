@@ -1,6 +1,6 @@
 #include "StatCollector.h"
 #include "Addons.h"
-#include "TemplateProcessor.h"
+#include "FileUtils.h"
 
 #include <iostream>
 

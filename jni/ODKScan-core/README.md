@@ -18,17 +18,50 @@ Setup
 
 2. Set OPENCV_INCLUDES in the makefile. If you're using ubuntu you just need to do this:
 
-==
-	#install pkg-config:
-	apt-get install pkg-config
-	#add this to your .bashrc:
-	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+```
+#install pkg-config:
+apt-get install pkg-config
+#add this to your .bashrc:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+```
 
-Usage
-=====
+Command Line Usage:
+===================
 
-	make
-	./ODKScan.run assets/form_templates/example example_input/img0.jpg output/img0
+The image processing code does not create directories.
+It is necessairy to create the output folder and the segments folder inside of it in advance.
+
+```
+make
+./ODKScan.run assets/form_templates/example example_input/img0.jpg output/img0
+```
+
+# Info for further development:
+
+## How to modify the form alignment code:
+
+Aligner.cpp does image alignment using the OpenCV 2D features framework.
+This framework consistes of modular components for detecting, describing and matching features respectively.
+(The OpenCV Docs have some tutorials on it available [here](http://docs.opencv.org/doc/tutorials/features2d/table_of_content_features2d/table_of_content_features2d.html#table-of-content-feature2d).)
+These compontents are set and configured in the Aligner class's initialization function.
+
+OpenCV provides a number of different classes to choose between for each module,
+in addition to a number of different ways to parameterize them.
+Figuring out which works the best has involved a lot trial and error for me.
+(Many of the feature modules are designed with some goal or trade-off in mind
+(e.g. speed vs. scale/rotation invariance).)
+Setting the SHOW_MATCHES_WINDOW constant will display a debug window during alignments that shows
+how various detector/descriptor/matcher settings are perfoming.
+
+Aligner.cpp also transforms the entire input image by computing a homography from the matched features.
+Using region based alignment instead may be been better for dealing with deformations.
+
+## Adding new field types:
+
+The field type property is passed though into the output JSON, so most names can be used.
+All segments are output into the `segments` folder of the output directory regardless of the type,
+so it should be easy to add a stage to the processing pipeline that handles a new type like barcode.
+Segment objects in the output JSON have an `image_path` field that could help with this.
 
 Source file information
 =======================

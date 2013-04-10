@@ -487,5 +487,7 @@ void Aligner::alignFormImage(Mat& aligned_img, const Size& aligned_img_sz, size_
 		imwrite(qiname, dbg);
 	#endif
 
-	if( ! testQuad(quad, .85 * currentImg.size()) ) CV_Error(CV_StsError, "Invalid quad found.");
+	//Disabling size checking
+	//if( ! testQuad(quad, .85 * currentImg.size()) ) CV_Error(CV_StsError, "Invalid quad found.");
+	if( ! testQuadValidity(quad) ) CV_Error(CV_StsError, "Invalid quad found.");
 }

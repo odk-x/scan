@@ -20,6 +20,23 @@ string getLabel(const string& filepath){
 	int start = filepath.find_last_of("/") + 1;
 	return	filepath.substr(start, filepath.find_last_of("_") - start);
 }
+string removeLastComponent(const string& filepath){
+	if(filepath.find_last_of("/") == filepath.length() - 1){
+		return removeLastComponent(filepath.substr(0, filepath.length() - 1));
+	}
+	return filepath.substr(0, filepath.find_last_of("/"));
+}
+//Create all the missing directorys on the specified path.
+void mkdirs(const string& path){
+	int start = path.find_last_of("/");
+	struct stat buf;
+	//If the current path doesn't exist create its parent
+	if(stat(path.c_str(), &buf) != 0){
+		mkdirs(removeLastComponent(path));
+	}
+	mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	return;
+}
 int main(int argc, char *argv[]) {
 
 	clock_t init, final;	
@@ -50,9 +67,8 @@ int main(int argc, char *argv[]) {
 
 		init = clock();
 
-		//Make a directory with the name of the form
-		//TODO: Move?
-		mkdir(outputPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		cout << "Creating output directory: " << outputPath << endl;
+		mkdirs(outputPath);
 		mkdir((outputPath + "segments").c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 		cout << "Processing image: " << inputImage << endl;
