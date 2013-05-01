@@ -81,6 +81,14 @@ public class Processor {
     return bubblebotJNI.Processor_processForm__SWIG_1(swigCPtr, this, outputPath);
   }
 
+  public String scanAndMarkup(String outputPath) {
+    return bubblebotJNI.Processor_scanAndMarkup(swigCPtr, this, outputPath);
+  }
+
+  public String processViaJSON(String jsonString) {
+    return bubblebotJNI.Processor_processViaJSON(swigCPtr, this, jsonString);
+  }
+
   public boolean writeFormImage(String outputPath) {
     return bubblebotJNI.Processor_writeFormImage(swigCPtr, this, outputPath);
   }

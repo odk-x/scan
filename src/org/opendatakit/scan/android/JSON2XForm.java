@@ -7,8 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +50,8 @@ public class JSON2XForm extends Activity {
 			"content://org.odk.collect.android.provider.odk.instances/instances";
 	private static final Uri COLLECT_INSTANCES_CONTENT_URI =
 			Uri.parse(COLLECT_INSTANCES_URI_STRING);
-
+	private static final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,6 +98,7 @@ public class JSON2XForm extends Activity {
 				String [] deleteArgs = { templateName };
 				int deleteResult = getContentResolver().delete(COLLECT_FORMS_CONTENT_URI, "jrFormId like ?", deleteArgs);
 				Log.w(LOG_TAG, "Removing " + deleteResult + " rows.");
+				//TODO: Not sure what happens to the old instances...
 				//////////////
 				Log.i(LOG_TAG, "Creating new xform.");
 				//////////////
@@ -100,6 +107,8 @@ public class JSON2XForm extends Activity {
 			String jrFormId = verifyFormInCollect(xFormPath, templateName);
 			//////////////
 			Log.i(LOG_TAG, "Checking if the form instance is already registered with collect.");
+			//Previous instance are found using template and photo name,
+			//so Scan don't have to keep track of the instanceID.
 			//////////////
 			int instanceId;
 			String instanceName = templateName + '_' + rootPhotoName;
@@ -109,7 +118,6 @@ public class JSON2XForm extends Activity {
 			String selection = "instanceFilePath = ?";
 			String[] selectionArgs = { instanceFilePath };
 			Cursor c = getContentResolver().query(COLLECT_INSTANCES_CONTENT_URI, null, selection, selectionArgs, null);
-			//Log.i(LOG_TAG, Arrays.toString(c.getColumnNames()));
 			if(c.moveToFirst()){
 				//////////////
 				Log.i(LOG_TAG, "Registered odk instance found.");
@@ -137,7 +145,6 @@ public class JSON2XForm extends Activity {
 			resultData.setData(Uri.parse(COLLECT_INSTANCES_URI_STRING + "/" + instanceId));
 			setResult(RESULT_OK, resultData);
 			finish();
-
 		} catch (Exception e) {
 			//Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -215,7 +222,7 @@ public class JSON2XForm extends Activity {
         Element instance = new Element();
         instance.setName(dataEl.getName());
         instance.setAttribute("", "id", jrFormId);
-        instance.addChild(Node.ELEMENT, instance.createElement("", "xformstarttime"));
+        //instance.addChild(Node.ELEMENT, instance.createElement("", "xformstarttime"));
         instance.addChild(Node.ELEMENT, instance.createElement("", "xformendtime"));
         //////////////
         Log.i(LOG_TAG, "Parsing the JSON output:");
@@ -236,6 +243,19 @@ public class JSON2XForm extends Activity {
 		//////////////
 		Log.i(LOG_TAG, "Transfering the values from the JSON output into the xform instance:");
 		//////////////
+		{
+			Element fieldElement = instance.createElement("", "instance_creation_time");
+			Log.i(LOG_TAG, ISO8601.format(new Date()));
+			fieldElement.addChild(Node.TEXT, ISO8601.format(new Date()));
+			instance.addChild(Node.ELEMENT, fieldElement);
+		}
+		{
+			Element fieldElement = instance.createElement("", "scan_output_directory");
+			//For multi-page forms the scan output directory is the output directory of the last page.
+			//We can figure out the previous output directories by looking at the (pageN) part.
+			fieldElement.addChild(Node.TEXT, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+			instance.addChild(Node.ELEMENT, fieldElement);
+		}
 		for(int i = 0; i < fieldsLength; i++){
 			JSONObject field = fields.optJSONObject(i);
         	if(field.getString("type").equals("note")){
@@ -285,7 +305,6 @@ public class JSON2XForm extends Activity {
 			metaElement.addChild(Node.ELEMENT, instance.createElement("", "instanceID"));
 			instance.addChild(Node.ELEMENT, metaElement);
 		}
-		
         //////////////
         Log.i(LOG_TAG, "Outputing the instance file:");
         //////////////
@@ -370,7 +389,9 @@ public class JSON2XForm extends Activity {
         writer.write("<model>");
         writer.write("<instance>");
         writer.write("<data id=\"" + id + "\">");
-        writer.write("<xformstarttime/>");
+        //writer.write("<xformstarttime/>");
+        writer.write("<instance_creation_time/>");
+        writer.write("<scan_output_directory/>");
         writer.write("<xformendtime/>");
         for(int i = 0; i < fieldsLength; i++){
         	JSONObject field = fields.getJSONObject(i);
@@ -409,7 +430,9 @@ public class JSON2XForm extends Activity {
         }
         writer.write("</translation>");
         writer.write("</itext>");
-        writer.write("<bind nodeset=\"/data/xformstarttime\" type=\"dateTime\" jr:preload=\"timestamp\" jr:preloadParams=\"start\"/>");
+        //Using the start preload param doesn't seem to work when a premade instance is loaded.
+        //writer.write("<bind nodeset=\"/data/xformstarttime\" type=\"dateTime\" jr:preload=\"timestamp\" jr:preloadParams=\"start\"/>");
+        writer.write("<bind nodeset=\"/data/instance_creation_time\" type=\"dateTime\" />");
         writer.write("<bind nodeset=\"/data/xformendtime\" type=\"dateTime\" jr:preload=\"timestamp\" jr:preloadParams=\"end\"/>");
         for(int i = 0; i < fieldsLength; i++){
         	JSONObject field = fields.getJSONObject(i);

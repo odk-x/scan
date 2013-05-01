@@ -66,6 +66,62 @@ public class AfterPhotoTaken extends Activity {
 
 			photoName = extras.getString("photoName");
 			
+			//Handler that gets called when processing finishes:
+	    	final Handler handler = new Handler(new Handler.Callback() {
+	            public boolean handleMessage(Message message) {
+					RunProcessor.Mode mode = RunProcessor.Mode.values()[message.what];
+					boolean success = (message.arg1 == 1);
+	            	Bundle result = message.getData();
+					String errorMessage = result.getString("errorMessage");
+					try {
+						dismissDialog(message.what);
+					} catch (IllegalArgumentException e) {
+						Log.i(LOG_TAG, "Exception: Dialog with id " + message.what
+								+ " was not previously shown.");
+					}
+
+					if (ScanUtils.DebugMode) {
+						Log.i(LOG_TAG, "Mode: " + mode);
+						if (success) {
+							Log.i(LOG_TAG, "Success!");
+						}
+						double timeTaken = (double) (new Date().getTime() - startTime) / 1000;
+						Log.i(LOG_TAG, "Time taken:" + String.format("%.2f", timeTaken));
+					}
+					switch (mode) {
+					case LOAD:
+						updateUI(success, errorMessage);
+						break;
+					case LOAD_ALIGN:
+						if (success) {
+							int templatePathIdx = message.arg2;
+							try {
+								ScanUtils.setTemplatePath(photoName,
+										templatePaths[templatePathIdx]);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+							}
+						}
+						updateUI(success, errorMessage);
+						break;
+					case PROCESS:
+						if (success) {
+							Intent intent = new Intent(getApplication(),
+									DisplayProcessedForm.class);
+							intent.putExtras(extras);
+							startActivity(intent);
+							finish();
+						} else {
+							updateUI(success, errorMessage);
+						}
+						break;
+					default:
+						return true;
+					}
+					return true;
+	            }
+	    	});
+			
 			Button retake = (Button) findViewById(R.id.retake_button);
 			retake.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
@@ -198,56 +254,4 @@ public class AfterPhotoTaken extends Activity {
 		processButton.setEnabled(success);
 	}
 
-	private Handler handler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-
-			RunProcessor.Mode mode = RunProcessor.Mode.values()[msg.what];
-			boolean success = (msg.arg1 == 1);
-			String errorMessage = msg.getData().getString("errorMessage");
-			try {
-				dismissDialog(msg.what);
-			} catch (IllegalArgumentException e) {
-				Log.i(LOG_TAG, "Exception: Dialog with id " + msg.what
-						+ " was not previously shown.");
-			}
-
-			if (ScanUtils.DebugMode) {
-				Log.i(LOG_TAG, "Mode: " + mode);
-				if (success) {
-					Log.i(LOG_TAG, "Success!");
-				}
-				double timeTaken = (double) (new Date().getTime() - startTime) / 1000;
-				Log.i(LOG_TAG, "Time taken:" + String.format("%.2f", timeTaken));
-			}
-			switch (mode) {
-			case LOAD:
-				updateUI(success, errorMessage);
-				break;
-			case LOAD_ALIGN:
-				if (success) {
-					int templatePathIdx = msg.arg2;
-					try {
-						ScanUtils.setTemplatePath(photoName,
-								templatePaths[templatePathIdx]);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-					}
-				}
-				updateUI(success, errorMessage);
-				break;
-			case PROCESS:
-				if (success) {
-					Intent intent = new Intent(getApplication(),
-							DisplayProcessedForm.class);
-					intent.putExtras(extras);
-					startActivity(intent);
-					finish();
-				}
-				break;
-			default:
-				return;
-			}
-		}
-	};
 }

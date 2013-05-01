@@ -1,6 +1,5 @@
 package org.opendatakit.scan.android;
 
-
 import com.bubblebot.jni.Processor;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,22 +23,6 @@ import android.widget.TextView;
 public class AlignImage extends Activity {
 
 	private static final String LOG_TAG = "ODKScan";
-	
-	/*
-	static class MyInnerHandler extends Handler{
-        WeakReference<AlignImage> outer;
-
-        MyInnerHandler(AlignImage caller) {
-        	outer = new WeakReference<AlignImage>(caller);
-        }
-
-        @Override
-        public void handleMessage(Message message) {
-        	outer.get().updateUI(message.getData());
-        }
-    }
-	*/
-
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

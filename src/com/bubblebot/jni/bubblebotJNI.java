@@ -32,6 +32,8 @@ public class bubblebotJNI {
   public final static native boolean Processor_alignForm__SWIG_1(long jarg1, Processor jarg1_, String jarg2);
   public final static native boolean Processor_processForm__SWIG_0(long jarg1, Processor jarg1_, String jarg2, boolean jarg3);
   public final static native boolean Processor_processForm__SWIG_1(long jarg1, Processor jarg1_, String jarg2);
+  public final static native String Processor_scanAndMarkup(long jarg1, Processor jarg1_, String jarg2);
+  public final static native String Processor_processViaJSON(long jarg1, Processor jarg1_, String jarg2);
   public final static native boolean Processor_writeFormImage(long jarg1, Processor jarg1_, String jarg2);
   public final static native void delete_Processor(long jarg1);
 }

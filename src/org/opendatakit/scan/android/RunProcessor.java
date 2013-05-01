@@ -112,7 +112,10 @@ public class RunProcessor implements Runnable {
 			else if(mode == Mode.PROCESS) {
 				//Create an output directory for the segments
 				new File(ScanUtils.getOutputPath(photoName), "segments").mkdirs();
-				if( mProcessor.processForm( ScanUtils.getOutputPath(photoName), false )) {
+				String result = mProcessor.scanAndMarkup( ScanUtils.getOutputPath(photoName) );
+				if( result.length() > 0 ) {
+					throw new Exception(result);
+				} else {
 					msg.arg1 = 1;
 				}
 			}
