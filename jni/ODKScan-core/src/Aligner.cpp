@@ -21,6 +21,7 @@
 
 #define MASK_CENTER_AMOUNT .41
 
+
 #ifdef OUTPUT_DEBUG_IMAGES
 	#include "NameGenerator.h"
 	NameGenerator dbgNamer("debug_form_images/", true);
@@ -29,11 +30,7 @@
 using namespace std;
 using namespace cv;
 
-#ifdef SHOW_MATCHES_WINDOW
-	Mat featureSource;
-	vector<Mat> templateImages;
-#endif
-
+//TODO: Replace this so the Template processor can be removed.
 class MaskGenerator : public TemplateProcessor
 {
 	private:
@@ -131,9 +128,18 @@ void saveFeatures(  const string& featuresFile, const Size& templImageSize,
 }
 
 Aligner::Aligner(){
-
 	//STANDARD_AREA is a parameter because we don't know how big the image should be before we detect the template.
-	//All tempaltes should be approximately the same size.
+	//All templates are expected be approximately the same size.
+
+	//With OpenCV form alignment can be broken apart into 3 components,
+	//feature detection, feature extraction, and feature matching.
+	//Here different combinations of components are configured:
+
+	//A few notes:
+	//The grid adapted feature detector is good for limiting the number of key-points,
+	//and ensuring they are reasonably well distributed around the image.
+	//BRIEF is fast but not scale/rotation invariant.
+	//SURF and SIFT have invariance but are slower and patented.
 
 	#define PARAM_SET 6
 	#if PARAM_SET == 0

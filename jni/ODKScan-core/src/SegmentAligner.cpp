@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+//#define OUTPUT_DEBUG_IMAGES
 #ifdef OUTPUT_DEBUG_IMAGES
 #include "NameGenerator.h"
 NameGenerator alignmentNamer("debug_segment_images/", false);
@@ -60,24 +61,29 @@ vector<Point> findMaxQuad(Mat& img, float approx_p_seed = 0){
 	return maxRect;
 }
 //Sum the pixels that lie on a line starting and ending in the specified rows.
+//The image can be transposed to sum pixels on vertical lines.
 int lineSum(const Mat& img, int start, int end, bool transpose) {
 
 	int hSpan;
+	int vSpan;
 	if(transpose){
-		hSpan = img.rows - 1;
+		hSpan = img.rows;
+		vSpan = img.cols;
 	}
 	else{
-		hSpan = img.cols - 1;
+		hSpan = img.cols;
+		vSpan = img.rows;
 	}
 	
 	int sum = 0;
-	double slope = (double)(end - start)/hSpan;
+	double slope = (double)(end - start) / hSpan;
 	
-	for(int i = 0; i<=hSpan; i++) {
-		int j = start + slope*i;
-
-		if(j < 0){
-			sum+=127;
+	for(int i = 0; i<hSpan; i++) {
+		int j = start + slope * i;
+		if(j < 0 || j >= vSpan){
+			//Treats pixels outside of image as gray so
+			//they are neither particularly good or bad to cross.
+			sum += 127;
 		}
 		else{
 			if(transpose){
@@ -88,6 +94,11 @@ int lineSum(const Mat& img, int start, int end, bool transpose) {
 			}
 		}
 	}
+
+	if(start < 0 && end < 0) {
+		assert(hSpan * 127 == sum);
+	}
+
 	return sum;
 }
 void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool flip, bool transpose) {
@@ -96,34 +107,33 @@ void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool
 	float maxSlope = .15;
 
 	if(transpose){
-		vSpan = img.cols - 1;
-		hSpan = img.rows - 1;
+		vSpan = img.cols;
+		hSpan = img.rows;
 		midpoint = roi.x;
-		range = roi.y;
+		if(flip) midpoint += roi.width;
+		range = roi.x;
 	}
-	else{		
-		vSpan = img.rows - 1;
-		hSpan = img.cols - 1;
+	else{
+		vSpan = img.rows;
+		hSpan = img.cols;
 		midpoint = roi.y;
+		if(flip) midpoint += roi.height;
 		range = roi.y;
 	}
-	
-	//The param limits the weigting to a certain magnitude, in this case 10% of the max.
-	int param = .15 * 255 * (hSpan + 1);
+	//This is the maximum sum of a line crossing the image.
+	int maxSum = 255 * hSpan;
+	//The param limits the weighting to a certain magnitude.
+	int param = .5;
+
 	float maxSsdFromMidpoint = 2*range*range;
 	
 	int minLs = INT_MAX;
-	for(int i = midpoint - range; i < midpoint + range; i++) {
-		for(int j = MAX(i-hSpan*maxSlope, midpoint - range); j < MIN(i+hSpan*maxSlope, midpoint + range); j++) {
+	for(int i = midpoint - range; i <= midpoint + range; i++) {
+		for(int j = MAX(i-hSpan*maxSlope, midpoint - range); j <= MIN(i+hSpan*maxSlope, midpoint + range); j++) {
 
 			float ssdFromMidpoint = (i - midpoint)*(i - midpoint) + (j - midpoint)*(j - midpoint);
-			int ls = param * ssdFromMidpoint / maxSsdFromMidpoint;
-			if(flip){
-				ls += lineSum(img, vSpan - i, vSpan - j, transpose);
-			}
-			else{
-				ls += lineSum(img, i, j, transpose);
-			}
+			int ls = param * maxSum * ssdFromMidpoint / maxSsdFromMidpoint;
+			ls += lineSum(img, i, j, transpose);
 			if( ls < minLs ){
 				start = i;
 				end = j;
@@ -132,107 +142,27 @@ void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool
 		}
 	}
 }
-/*
-float findMultiLineEnergy(const Mat& img, int& start, int& end, vector<LineIterator>& iters) {
-	int sum = 0;
-	int totalPixels = 0;
-	for(size_t itIdx; itIdx < iters.size(); itIdx++){
-		totalPixels += iters[itIdx].count;
-		for(int i = 0; i < iters[itIdx].count; i++, ++iters[itIdx])
-			sum += (int)*iters[i];
-	}
-	return float(sum)/totalPixels;
-}
-*/
 
-//#define LI_TYPE 8
-//LineIterator(img, quad[0], quad[1], LI_TYPE);
 
-//Find the minimum energy lines crossing the image.
+//Finds a minimum energy line that crosses the image
+//weighted near the region of interest.
 //A and B are the start and end points of the line.
+//The flip variable sets which side of the roi to look for a line on.
+//The transpose flag virtually transposes the image so you can look for vertical lines.
 template <class T>
 void findLines(const Mat& img, Point_<T>& A, Point_<T>& B, const Rect& roi, bool flip, bool transpose) {
 	int start, end;
 	
 	findLinesHelper(img, start, end, roi, flip, transpose);
-	
-	if(flip && transpose){
-		A = Point_<T>(img.cols - 1 - start, img.rows-1);
-		B = Point_<T>(img.cols - 1 - end, 0);
-	}
-	else if(!flip && transpose){
-		A = Point_<T>(start, 0);
-		B = Point_<T>(end, img.rows -1);
-	}
-	else if(flip && !transpose){
-		A = Point_<T>(0, img.rows - 1 - start);
-		B = Point_<T>(img.cols-1, img.rows - 1 - end);
-	}
-	else{
-		A = Point_<T>(0, start);
-		B = Point_<T>(img.cols-1, end);
-	}
-}
-//This version doesn't seem to work for some reason...
-template <class T>
-void findLinesLIt(const Mat& img, Point_<T>& A, Point_<T>& B, const Rect& roi, bool flip, bool transpose) {
-	int vSpan, hSpan;
-	int range, midpoint;
-	float maxSlope = .15;
 
+	//Reverse the transposition:
 	if(transpose){
-		vSpan = img.cols - 1;
-		hSpan = img.rows - 1;
-		midpoint = roi.x;
-		range = roi.y;
+		A = Point_<T>(start, 0);
+		B = Point_<T>(end, img.rows);
 	}
-	else{		
-		vSpan = img.rows - 1;
-		hSpan = img.cols - 1;
-		midpoint = roi.y;
-		range = roi.y;
-	}
-	
-	//The param limits the weigting to a certain magnitude, in this case 10% of the max.
-	int param = .15 * 255 * (hSpan + 1);
-	float maxSsdFromMidpoint = 2*range*range;
-	
-	int minLs = INT_MAX;
-	for(int i = midpoint - range; i < midpoint + range; i++) {
-		for(int j = MAX(i-hSpan*maxSlope, midpoint - range); j < MIN(i+hSpan*maxSlope, midpoint + range); j++) {
-
-			float ssdFromMidpoint = (i - midpoint)*(i - midpoint) + (j - midpoint)*(j - midpoint);
-			int ls = param * ssdFromMidpoint / maxSsdFromMidpoint;
-			
-			Point curA;
-			Point curB;
-			
-			if(flip){
-				curA = Point(0, vSpan - i);
-				curB = Point(hSpan, vSpan - j);
-			}
-			else{
-				curA = Point(0, i);
-				curB = Point(hSpan, j);
-			}
-			if(transpose){
-				curA = Point(curA.y, curA.x);
-				curB = Point(curB.y, curB.x);
-			}
-			
-			#define LI_TYPE 8
-			LineIterator lit(img, curA, curB, LI_TYPE);
-			if(lit.count == 0) continue;
-			for(int litIdx = 0; litIdx < lit.count; litIdx++, ++lit)
-				ls += (int)*lit;
-			ls /= lit.count;
-			
-			if( ls < minLs ){
-				A = curA;
-				B = curB;
-				minLs = ls;
-			}
-		}
+	else {
+		A = Point_<T>(0, start);
+		B = Point_<T>(img.cols, end);
 	}
 }
 template <class T>
@@ -256,6 +186,7 @@ void refineCorners(const Mat& img, vector< Point2f >& quad){
 	TermCriteria termcrit(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03);
 	cornerSubPix(img, quad, Size(1,1), Size(-1, -1), termcrit);
 }
+//Converts the types of points in the quad.
 template <class T, class U>
 void convertQuad(const vector< Point_<T> >& quad, vector< Point_<U> >& outQuad){
 	for(size_t i = 0; i<4; i++){
@@ -265,9 +196,9 @@ void convertQuad(const vector< Point_<T> >& quad, vector< Point_<U> >& outQuad){
 template <class T>
 Point_<T> getCorner(const Mat& img, const Rect&roi, const Mat& templ, const Point& offset){
 	#if 0
-	vector<Point2f> cornerVec;
-	/goodFeaturesToTrack(img(roi), cornerVec, 1, .01, 0, Mat(), 3);
-	return Point_<T>(cornerVec[0].x + roi.x, cornerVec[0].y + roi.y);
+		vector<Point2f> cornerVec;
+		goodFeaturesToTrack(img(roi), cornerVec, 1, .01, 0, Mat(), 3);
+		return Point_<T>(cornerVec[0].x + roi.x, cornerVec[0].y + roi.y);
 	#endif
 	Mat result(img.size(), CV_8U);
 	int method = 3962;//CV_TM_SQDIFF;
@@ -336,7 +267,6 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	imgThresh = (img - temp_img) > 0;
 
 	Rect contractedRoi = resizeRect(roi, .7);
-	
 	imgThresh(contractedRoi) = Scalar::all(255);
 	
 	Point_<T> A1, B1, A2, B2, A3, B3, A4, B4;
@@ -344,6 +274,10 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	findLines(imgThresh, A2, B2, roi, false, false);
 	findLines(imgThresh, A3, B3, roi, true, true);
 	findLines(imgThresh, A4, B4, roi, true, false);
+
+	//ensuring consistency idea:
+	//if contractedRoi.width||height != lineDistanceApart
+	//recompute line with most energy weighted by other line
 
 	#if QUAD_FIND_MODE == QUAD_FIND_INTERSECTION
 		vector< Point_<T> > quad;
@@ -401,8 +335,22 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	
 	//refineCorners(img, quad);
 	#ifdef OUTPUT_DEBUG_IMAGES
+
 		Mat dbg_out, dbg_out2;
 		imgThresh.copyTo(dbg_out);
+
+		vector< Point > roundQuad;
+
+		roundQuad.push_back(quad[0]);
+		roundQuad.push_back(quad[1]);
+		roundQuad.push_back(quad[2]);
+		roundQuad.push_back(quad[3]);
+
+		const Point* p = &roundQuad[0];
+		int n = (int) quad.size();
+		polylines(dbg_out, &p, &n, 1, true, Scalar::all(100), 1, CV_AA);
+		//debugShow(dbg_out);
+
 		string segfilename = alignmentNamer.get_unique_name("alignment_debug_");
 		segfilename.append(".jpg");
 		imwrite(segfilename, dbg_out);

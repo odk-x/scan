@@ -242,7 +242,7 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 }
 //Rates a region of pixels in det_img_gray on how similar it is to the classifier's training examples.
 //A lower rating means it is more similar.
-//The rating is the  sum of squard difference of the queried pixels and their PCA back projection.
+//The rating is the  sum of squared difference of the queried pixels and their PCA back projection.
 //Back projection tries to reconstruct a image/vector just using components of the PCA set (generated from the training data).
 //The theory is that if there is little difference between the reconstructed image and the original image
 //(as measured by the SSD) then the image is probably similar to some of the images used to generate the PCA set.

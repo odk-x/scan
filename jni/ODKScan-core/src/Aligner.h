@@ -4,14 +4,14 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-/*
-Form alignment can be broken apart into 3 parts, feature detection, feature extraction, and feature matching. The best option I've found so far for detection/extraction is the grid adapted SURF feature detector, with the SURF feature extractor. I've parameterized SURF to only use one octave since order of magnitude scale differences shouldn't occur in form images. If they do, the form is probably too large/small in the picture to capture all the information on it. More octaves might help with larger features, I'll have to research this more...
-The grid adapted feature detector is good for limiting the number of key-points found so that the algorithm executes in a reasonable amount of time.
-Feature matching can be pretty easily switched between the brute force matcher (which is a bit more reliable) and the flann matcher (which is a bit faster). Additionally, I'm using cross check matching code from one of the OpenCV example programs.
-*/
 class Aligner
 {
 	private:
+
+		#ifdef SHOW_MATCHES_WINDOW
+			cv::Mat featureSource;
+			std::vector<cv::Mat> templateImages;
+		#endif
 		std::vector<cv::KeyPoint> currentImgKeypoints;
 		cv::Mat currentImgDescriptors;
 		cv::Point3d trueEfficiencyScale;

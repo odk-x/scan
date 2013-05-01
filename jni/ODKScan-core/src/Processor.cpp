@@ -22,7 +22,7 @@
 // It is a percentage of the size specified in the template.
 #define SCALEPARAM 1.0
 
-// Creates a buffer around segments porpotional to their size.
+// Creates a buffer around segments proportional to their size.
 // I think .5 is the largest value that won't cause ambiguous cases.
 #define SEGMENT_BUFFER .25
 
@@ -74,7 +74,9 @@ Json::Value computeFieldValue(const Json::Value& field){
 									     itemValue.asString());
 							}
 						}
-						else{
+						else {
+							//Set the output to be a string.
+							//If this is not done, we get a null when no bubbles are selected.
 							output = Json::Value(output.asString());
 						}
 						break;
@@ -147,7 +149,7 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 					circle(markupImage, ItemLocation, 2, 	getColor(classification.asInt()), 1, CV_AA);
 				}
 				else{
-					cout << "Don't know what this is" << endl;
+					cout << "Don't know what this is: " << classification << endl;
 				}
 				
 			}
@@ -213,6 +215,8 @@ const std::string currentDateTime() {
 }
 class Processor::ProcessorImpl
 {
+public:
+	string trainingDataPath;
 private:
 	Mat formImage;
 
@@ -225,7 +229,6 @@ private:
 	ClassiferMap classifiers;
 
 	string templPath;
-	string appRootDir;
 	//string imageDir;
 
 	#ifdef TIME_IT
@@ -234,7 +237,7 @@ private:
 
 
 //NOTE: training_data_uri must be a directory with no leading or trailing slashes.
-Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier){
+Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 
 	const string& training_data_uri = classifier["training_data_uri"].asString();
 
@@ -256,7 +259,7 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier){
 		//PCA_classifier classifier = classifiers[key];
 		classifiers[key] = Ptr<PCA_classifier>(new PCA_classifier);
 		
-		string dataPath = appRootDir + "training_examples/" + training_data_uri;
+		string dataPath = trainingDataPath + training_data_uri;
 		string cachedDataPath = dataPath + "/cached_classifier_data_" + ss.str() + ".yml";
 
 		classifiers[key]->set_classifier_params(classifier);
@@ -272,6 +275,9 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier){
 				cout << "training new classifier..." << endl;
 			#endif
 			vector<string> filepaths;
+			if(!fileExists(dataPath)){
+				CV_Error( -1, "Could not find classifier data: " + dataPath);
+			}
 			CrawlFileTree(dataPath, filepaths);//TODO: Check if this dir exists and show a log message if not.
 			
 			/*
@@ -302,10 +308,7 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier){
 	}
 	return classifiers[key];
 }
-Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Value& parentProperties) {
-	Json::Value extendedSegment = Json::Value(parentProperties);
-	extend(extendedSegment, segmentTemplate);
-	Json::Value segmentJsonOut;
+Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& extendedSegment) {
 	Mat segmentImg;
 	vector <Point> segBubbleLocs;
 	vector <int> bubbleVals;
@@ -342,7 +345,7 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Valu
 		vector<Point2f> quad;
 		findSegment(segmentImg, segmentRect - expandedRect.tl(), quad);
 
-		if(testQuad(quad, segmentRect, .15)){
+		if(testQuad(quad, segmentRect, .2)){
 			#ifdef DEBUG_PROCESSOR
 				//This makes a stream of dots so we can see how fast things are going.
 				//we get a ! when things go wrong.
@@ -360,9 +363,12 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Valu
 				//Bad quad alignment detected
 				cout << "!" << flush;
 			#endif
-			segmentJsonOut["quad"] = quadToJsonArray(quad, expandedRect.tl());
+			//segmentJsonOut["quad"] = quadToJsonArray(quad, expandedRect.tl());
 			segmentJsonOut["notFound"] = true;
-			return segmentJsonOut;
+			//If the quad is not found we don't do segment alignment and go with what's
+			//in the template even though there's a good chance it's wrong.
+			segmentImg = formImage(segmentRect);
+			segmentJsonOut["quad"] = quadToJsonArray(rectToQuad( segmentRect ));
 		}
 	}
 	else {
@@ -375,22 +381,41 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Valu
 	if(!items.isNull()){
 		Json::Value itemsJsonOut;
 		Json::Value classifierJson = extendedSegment["classifier"];
-		double alignment_radius = classifierJson.get("alignment_radius", 0.0).asDouble();
+		double alignment_radius = classifierJson.get("alignment_radius", 2.0).asDouble();
 		Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
-		
+		vector<Point> locations;
+		vector<Point> deltas;
+		//Align items:
+		for (size_t i = 0; i < items.size(); i++) {
+			Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
+			Point itemLocation = initLocation;
+			if(alignment_radius > .1){
+				itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
+			}
+			locations.push_back(itemLocation);
+			deltas.push_back(itemLocation - initLocation);
+
+		}
+
+		//Catch runaway items:
+		Point avgDelta = Point(0,0);
+		for (size_t i = 0; i < deltas.size(); i++) {
+			avgDelta += deltas[i];
+		}
+		avgDelta *= 1.0 / items.size();
+
+		for (size_t i = 0; i < locations.size(); i++) {
+			if(norm(deltas[i] - avgDelta) > norm(deltas[i])){
+				locations[i] = locations[i] - deltas[i] + avgDelta;
+			}
+		}
+
+		//Classify items
 		for (size_t i = 0; i < items.size(); i++) {
 			Json::Value itemJsonOut = items[i];
-
-			//Classify the item
-			Point itemLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
-			if(alignment_radius > .1){
-				itemLocation = classifier->align_item(segmentImg, itemLocation, alignment_radius);
-			}
-			itemJsonOut["classification"] = classifier->classify_item(segmentImg, itemLocation);
-
-			//Create JSON output
-			Mat absoluteLocation = transformation.inv() * Mat(Point3d( itemLocation.x,
-		                                                                   itemLocation.y, 1.0));
+			itemJsonOut["classification"] = classifier->classify_item(segmentImg, locations[i]);
+			Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
+					locations[i].y, 1.0));
 			itemJsonOut["absolute_location"] = pointToJson(
 				Point( absoluteLocation.at<double>(0.0,0.0) / absoluteLocation.at<double>(2.0, 0.0),
 				       absoluteLocation.at<double>(1.0,0.0) / absoluteLocation.at<double>(2.0, 0.0)) +
@@ -406,34 +431,28 @@ Json::Value segmentFunction(const Json::Value& segmentTemplate, const Json::Valu
 	cvtColor(segmentImg, segment_out, CV_GRAY2RGB);
 	resize(segment_out, tmp, 2*segment_out.size());
 	segment_out = tmp;
-	/*
-	vector <Point> expectedBubbleLocs = getBubbleLocations(*classifier, segmentImg, segmentTemplate["items"], false);
 
-	Point classifier_size = jsonToPoint( segmentTemplate["classifier_size"] );
-
-	for(size_t i = 0; i < expectedBubbleLocs.size(); i++){
-		rectangle(segment_out, expectedBubbleLocs[i] - .5 * classifier_size,
-		          expectedBubbleLocs[i] + .5 * classifier_size,
-		          colors[bubbleVals[i]]);
-						   
-		circle(segment_out, segBubbleLocs[i], 1, Scalar(255, 2555, 255), -1);
-	}
-	*/
 	string segmentOutPath;
 	string segmentName;
 	try{
 		segmentOutPath = extendedSegment.get("output_path", 0).asString() + "segments/";
 		segmentName = extendedSegment["name"].asString() + "_image_" +
 		              intToStr(extendedSegment.get("index", 0).asInt()) + ".jpg";
+
+		/*
+		rectangle(segment_out, expectedBubbleLocs[i] - .5 * classifier_size,
+		          expectedBubbleLocs[i] + .5 * classifier_size,
+		          colors[bubbleVals[i]]);
+
+		circle(segment_out, segBubbleLocs[i], 1, Scalar(255, 2555, 255), -1);
+		 */
+
 		imwrite(segmentOutPath + segmentName, segment_out);
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
 	catch(...){
 		LOGI(("Could not output segment to: " + segmentOutPath+segmentName).c_str());
 	}
-	segmentJsonOut.removeMember("classifier");
-	segmentJsonOut.removeMember("index");
-	segmentJsonOut.removeMember("output_path");
 	return segmentJsonOut;
 }
 Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentProperties){
@@ -450,15 +469,22 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	}
 
 	#ifdef OUTPUT_BUBBLE_IMAGES
-		namer.setPrefix(field.get("label", "unlabeled").asString());
+		namer.setPrefix(field.get("classifier", Json::Value()).get("training_data_uri", "na").asString());
+		//namer.setPrefix(field.get("label", "unlabeled").asString());
 	#endif
 
 	for ( size_t j = 0; j < segments.size(); j++ ) {
 		const Json::Value segment = segments[j];
-		Json::Value outSegment = segmentFunction(segment, extendedField);
-		outSegment["index"] = (int)j;
-		if(!outSegment.isNull()){
-			outSegments.append(outSegment);
+		Json::Value segmentJsonOut(segment);
+		segmentJsonOut["index"] = (int)j;
+
+		Json::Value extendedSegment = Json::Value(extendedField);
+		extend(extendedSegment, segmentJsonOut);
+
+		segmentJsonOut = segmentFunction(segmentJsonOut, extendedSegment);
+
+		if(!segmentJsonOut.isNull()){
+			outSegments.append(segmentJsonOut);
 		}
 	}
 	outField["segments"] = outSegments;
@@ -493,7 +519,7 @@ Json::Value formFunction(const Json::Value& templateRoot){
 
 public:
 
-ProcessorImpl(const string& appRootDir) : appRootDir(string(appRootDir)) {}
+ProcessorImpl()  {}
 
 bool setTemplate(const char* templatePathArg) {
 	#ifdef DEBUG_PROCESSOR
@@ -571,21 +597,17 @@ bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 		init = clock();
 	#endif
 	Mat straightenedImage;
-	try{
-		Size form_sz(root.get("width", 0).asInt(), root.get("height", 0).asInt());
-		
-		if( form_sz.width <= 0 || form_sz.height <= 0)
-			CV_Error(CV_StsError, "Invalid form dimension in template.");
-		
-		//If the image was not set (because form detection didn't happen) set it.
-		if( aligner.currentImg.empty() ) aligner.setImage(formImage);
 
-		aligner.alignFormImage( straightenedImage, SCALEPARAM * form_sz, formIdx );
-	}
-	catch(cv::Exception& e){
-		LOGI(e.what());
-		return false;
-	}
+	Size form_sz(root.get("width", 0).asInt(), root.get("height", 0).asInt());
+
+	if( form_sz.width <= 0 || form_sz.height <= 0)
+		CV_Error(CV_StsError, "Invalid form dimension in template.");
+
+	//If the image was not set (because form detection didn't happen) set it.
+	if( aligner.currentImg.empty() ) aligner.setImage(formImage);
+
+	aligner.alignFormImage( straightenedImage, SCALEPARAM * form_sz, formIdx );
+
 	
 	if(straightenedImage.empty()) {
 		cout << "does this ever happen?" << endl;
@@ -606,7 +628,7 @@ bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 	#endif
 	return writeFormImage(alignedImageOutputPath);
 }
-bool processForm(const string& outputPath, bool minifyJson) {
+bool processForm(const string& outputPath, const string& jsonOutputPath, const string& markedupImagePath, bool minifyJson) {
 	#ifdef  DEBUG_PROCESSOR
 		cout << "Processing form" << endl;
 	#endif
@@ -631,10 +653,10 @@ bool processForm(const string& outputPath, bool minifyJson) {
 	#endif
 	
 	//Create the marked up image:
-	imwrite(outputPath + "markedup.jpg", markupForm(JsonOutput, formImage, true));
+	imwrite(markedupImagePath, markupForm(JsonOutput, formImage, true));
 	
 	//Create the json output file
-	ofstream outfile((outputPath + "output.json").c_str(), ios::out | ios::binary);
+	ofstream outfile(jsonOutputPath.c_str(), ios::out | ios::binary);
 	if(minifyJson){
 		Json::FastWriter writer;
 		outfile << writer.write( minifyJsonOutput(JsonOutput) );
@@ -657,16 +679,11 @@ bool writeFormImage(const char* outputPath) {
 	return imwrite(outputPath, formImage);
 }
 bool loadFeatureData(const char* templatePathArg) {
-	try{
-		string templatePath = addSlashIfNeeded(templatePathArg);
-		aligner.loadFeatureData(templatePath + "form.jpg",
-		                        templatePath + "template.json",
-		                        templatePath + "cached_features.yml");
-	}
-	catch(cv::Exception& e){
-		LOGI(e.what());
-		return false;
-	}
+	string templatePath = addSlashIfNeeded(templatePathArg);
+	aligner.loadFeatureData(templatePath + "form.jpg",
+							templatePath + "template.json",
+							templatePath + "cached_features.yml");
+
 	return true;
 }
 int detectForm(){
@@ -685,17 +702,25 @@ int detectForm(){
 };
 
 /* This stuff hooks the Processor class up to the implementation class: */
-Processor::Processor() : processorImpl(new ProcessorImpl("")){
+Processor::Processor() : processorImpl(new ProcessorImpl()){
+	processorImpl->trainingDataPath = "training_examples/";
 	LOGI("Processor successfully constructed.");
 }
-Processor::Processor(const char* appRootDir) : processorImpl(new ProcessorImpl(addSlashIfNeeded(appRootDir))){
+Processor::Processor(const char* appRootDir) : processorImpl(new ProcessorImpl()){
+	processorImpl->trainingDataPath = addSlashIfNeeded(appRootDir) + "training_examples/";
 	LOGI("Processor successfully constructed.");
 }
 bool Processor::loadFormImage(const char* imagePath, const char* calibrationFilePath){
 	return processorImpl->loadFormImage(imagePath, calibrationFilePath);
 }
 bool Processor::loadFeatureData(const char* templatePath){
-	return processorImpl->loadFeatureData(templatePath);
+	try{
+		return processorImpl->loadFeatureData(templatePath);
+	}
+	catch(cv::Exception& e){
+		LOGI(e.what());
+		return false;
+	}
 }
 int Processor::detectForm(){
 	return processorImpl->detectForm();
@@ -705,10 +730,132 @@ bool Processor::setTemplate(const char* templatePath){
 }
 bool Processor::alignForm(const char* alignedImageOutputPath, int formIdx){
 	if(formIdx < 0) return false;
-	return processorImpl->alignForm(alignedImageOutputPath, (size_t)formIdx);
+	try{
+		return processorImpl->alignForm(alignedImageOutputPath, (size_t)formIdx);
+	}
+	catch(cv::Exception& e){
+		LOGI(e.what());
+		return false;
+	}
 }
 bool Processor::processForm(const char* outputPath, bool minifyJson) {
-	return processorImpl->processForm(addSlashIfNeeded(outputPath), minifyJson);
+	try{
+		string normalizedOutDir = addSlashIfNeeded(outputPath);
+		return processorImpl->processForm(normalizedOutDir, normalizedOutDir + "output.json",
+				normalizedOutDir + "markedup.jpg", minifyJson);
+	}
+	catch(cv::Exception& e){
+		LOGI(e.what());
+		return false;
+	}
+}
+const char* Processor::scanAndMarkup(const char* outputPath) {
+	try{
+		string normalizedOutDir = addSlashIfNeeded(outputPath);
+		if(processorImpl->processForm(normalizedOutDir, normalizedOutDir + "output.json",
+				normalizedOutDir + "markedup.jpg", false)) {
+			return "";//success
+		} else {
+			return "Could not process form.";
+		}
+	}
+	catch(cv::Exception& e){
+		return e.what();
+	}
+}
+/**
+processViaJSON expects a JSON string like this:
+{
+	"inputImage" : "",
+	"outputDirectory" : "",
+	"alignedFormOutputPath" : outputDirectory + "aligned.jpg",
+	"markedupFormOutputPath" : outputDirectory + "markedup.jpg",
+	"jsonOutputPath" : outputDirectory + "output.json",
+	"alignForm" : true,
+	"processForm" : true,
+	"templatePath" : "",
+	"templatePaths" : [],
+	"calibrationFilePath" : "",
+	"trainingDataDirectory" : "training_examples/"
+}
+It will return a error string if there is an error, or an empty string if everything is OK.
+You only need to specify the inputImage, outputDirectory and templatePath(s).
+The JSON above contains all the default values.
+
+The benefits are as follows:
+- Only a single call is required to use the whole processing pipeline.
+- Keyword arguments make it clearer what the args do,
+  and allow for more flexible default behavior when they are not specified.
+- Extra data can be passed in by the caller that is not yet supported here in the core without needing by modify the interface.
+*/
+const char* Processor::processViaJSON(const char* jsonString) {
+	try {
+		Json::Value config;// will contain the root value after parsing.
+		Json::Reader reader;
+		bool parsingSuccessful = reader.parse( jsonString, config );
+		if(!parsingSuccessful){
+			return "Could not parse JSON configuration string.";
+		}
+		if(!config.isMember("inputImage")){
+			return "Missing input image path.";
+		}
+		if(!config.isMember("outputDirectory")){
+			return "Missing output image path.";
+		}
+		string outputDirectory = config["outputDirectory"].asString();
+		processorImpl->loadFormImage(config["inputImage"].asString().c_str(), config.get("calibrationFilePath", "").asString().c_str());
+
+		int formIdx = 0;
+
+		if(config.isMember("templatePath")){
+			if(!processorImpl->loadFeatureData(config["templatePath"].asString().c_str())) {
+				return "Could not load feature data.";
+			}
+			if(!processorImpl->setTemplate(config["templatePath"].asString().c_str())) {
+				return "Could not set template.";
+			}
+		} else if(config.isMember("templatePaths")) {
+			Json::Value templatePaths = config["templatePaths"];
+			for ( size_t j = 0; j < templatePaths.size(); j++ ) {
+				const Json::Value templatePath = templatePaths[j];
+				if(!processorImpl->loadFeatureData(templatePath.asString().c_str())) {
+					return "Could not load feature data.";
+				}
+			}
+			formIdx = processorImpl->detectForm();
+			if(formIdx < 0) {
+				return "Could not detect form.";
+			}
+			if(!processorImpl->setTemplate(templatePaths[formIdx].asString().c_str())) {
+				return "Could not set template.";
+			}
+		} else {
+			return "One or more template paths are required.";
+		}
+
+		if(config.get("alignForm", true).asBool()){
+			string alignedFormOutputPath = config.get("alignedFormOutputPath",
+					addSlashIfNeeded(outputDirectory) + "aligned.jpg").asString();
+			if(!processorImpl->alignForm(alignedFormOutputPath.c_str(), (size_t)formIdx)){
+				return "Could not align form.";
+			}
+		}
+		if(config.get("processForm", true).asBool()){
+			processorImpl->trainingDataPath = config.get("trainingDataDirectory", "training_examples/").asString();
+			string normalizedOutDir = addSlashIfNeeded(outputDirectory);
+			string jsonOutputPath = config.get("jsonOutputPath",
+					normalizedOutDir + "output.json").asString();
+			string markedupFormOutputPath = config.get("markedupFormOutputPath",
+					normalizedOutDir + "markedup.jpg").asString();
+			if(!processorImpl->processForm(normalizedOutDir, jsonOutputPath, markedupFormOutputPath, false)){
+				return "Could not process form.";
+			}
+		}
+		return "";//Success
+	}
+	catch(cv::Exception& e){
+		return e.what();
+	}
 }
 bool Processor::writeFormImage(const char* outputPath) const{
 	return processorImpl->writeFormImage(outputPath);

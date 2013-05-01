@@ -4,6 +4,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
+#ifdef DEBUG_MODE
+	#include <iostream>
+	#include <fstream>
+#endif
+
 using namespace std;
 using namespace cv;
 
@@ -155,35 +160,33 @@ bool testQuadValidity(const vector<Point>& quad) {
 }
 bool testQuad(const vector<Point>& quad, const Size& sz, float sizeThresh) {
 	float quadArea = contourArea(Mat(quad)); //This might be a bit inexact unfortunately...
-		/*
-		see this test:
-		if( testQuad(rectToQuad(segmentRect), segmentRect, .01) ){
-			cout << "hi" << endl;
-		}*/
+	/*
+	see this test:
+	if( testQuad(rectToQuad(segmentRect), segmentRect, .01) ){
+		cout << "Quad area differs by more than the threshold" << endl;
+	}
+	*/
 	#ifdef DEBUG_MODE
 		if(!isQuadValid(quad)){
 			cout << "invalid quad" << endl;
 		}
 		if(abs(sz.area() - quadArea) >= sizeThresh * sz.area()){
-			cout << "invalid size" << endl;
+			cout << endl << "invalid size: " << quadArea << "," << sz.area() << endl;
+			assert(false);
 		}
 		cout << "sz.area(): " << sz.area() << endl;
 	#endif
 	return isQuadValid(quad) && abs(sz.area() - quadArea) < sizeThresh * sz.area();
 }
 bool testQuad(const vector<Point2f>& quad, const Size& sz, float sizeThresh) {
-	float quadArea = contourArea(Mat(quad)); //This might be a bit inexact unfortunately...
-		/*
-		see this test:
-		if( testQuad(rectToQuad(segmentRect), segmentRect, .01) ){
-			cout << "hi" << endl;
-		}*/
+	float quadArea = contourArea(Mat(quad));
 	#ifdef DEBUG_MODE
 		if(!isQuadValid(quad)){
 			cout << "invalid quad" << endl;
 		}
 		if(abs(sz.area() - quadArea) >= sizeThresh * sz.area()){
-			cout << "invalid size" << endl;
+			cout << endl << "invalid size: " << quadArea << "," << sz.area() << endl;
+			assert(false);
 		}
 		cout << "sz.area(): " << sz.area() << endl;
 	#endif

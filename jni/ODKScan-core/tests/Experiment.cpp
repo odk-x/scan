@@ -73,6 +73,21 @@ int main(int argc, char *argv[]) {
 
 		cout << "Processing image: " << inputImage << endl;
 
+		Processor myProcessor("");
+		Json::Value config;
+		config["trainingDataDirectory"] = "assets/training_examples/";
+		config["inputImage"] = inputImage;
+		config["outputDirectory"] = outputPath;
+		config["templatePath"] = templatePath;
+		ostringstream ss;
+		ss << config;
+		string result = myProcessor.processViaJSON(ss.str().c_str());
+		if( result.size() > 0 ) {
+			cout << "\E[31m" <<  result << "\e[0m" << endl;
+			cout << "Configuration used:" <<  config << endl;
+			continue;
+		}
+		/*
 		Processor myProcessor("assets/");
 		//TODO: Specify camera calibration somewhere else?
 		//template doesn't make sense because it a property of the input image.
@@ -103,7 +118,7 @@ int main(int argc, char *argv[]) {
 			cout << "\E[31m" << "Could not process. Arg: " << "\e[0m" << outputPath << endl;
 			continue;
 		}
-
+		*/
 		final=clock()-init;
 		cout << "Time taken: " << (double)final / ((double)CLOCKS_PER_SEC) << " seconds" << endl;
 		cout << "\E[32m" << "Apparent success!" << "\e[0m" << endl;
