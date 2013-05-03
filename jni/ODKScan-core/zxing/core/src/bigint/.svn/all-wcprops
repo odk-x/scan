@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/2670/trunk/cpp/core/src/bigint
+END
+BigUnsignedInABase.cc
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigUnsignedInABase.cc
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/.gitignore
+END
+BigIntegerAlgorithms.hh
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigIntegerAlgorithms.hh
+END
+BigInteger.hh
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigInteger.hh
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/Makefile
+END
+BigUnsignedInABase.hh
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/2670/trunk/cpp/core/src/bigint/BigUnsignedInABase.hh
+END
+BigUnsigned.cc
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigUnsigned.cc
+END
+BigIntegerUtils.cc
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigIntegerUtils.cc
+END
+ChangeLog
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/ChangeLog
+END
+NumberlikeArray.hh
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/NumberlikeArray.hh
+END
+BigUnsigned.hh
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/2670/trunk/cpp/core/src/bigint/BigUnsigned.hh
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/README
+END
+BigIntegerAlgorithms.cc
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigIntegerAlgorithms.cc
+END
+BigIntegerUtils.hh
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigIntegerUtils.hh
+END
+BigIntegerLibrary.hh
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigIntegerLibrary.hh
+END
+BigInteger.cc
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2662/trunk/cpp/core/src/bigint/BigInteger.cc
+END

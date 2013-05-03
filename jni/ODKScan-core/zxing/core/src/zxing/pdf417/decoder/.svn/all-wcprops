@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2673/trunk/cpp/core/src/zxing/pdf417/decoder
+END
+DecodedBitStreamParser.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/2673/trunk/cpp/core/src/zxing/pdf417/decoder/DecodedBitStreamParser.h
+END
+BitMatrixParser.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/BitMatrixParser.h
+END
+Decoder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/2667/trunk/cpp/core/src/zxing/pdf417/decoder/Decoder.cpp
+END
+Decoder.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/Decoder.h
+END
+DecodedBitStreamParser.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/2673/trunk/cpp/core/src/zxing/pdf417/decoder/DecodedBitStreamParser.cpp
+END
+BitMatrixParser.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/2667/trunk/cpp/core/src/zxing/pdf417/decoder/BitMatrixParser.cpp
+END

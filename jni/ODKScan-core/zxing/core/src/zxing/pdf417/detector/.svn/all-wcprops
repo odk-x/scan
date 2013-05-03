@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/2676/trunk/cpp/core/src/zxing/pdf417/detector
+END
+Detector.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/2676/trunk/cpp/core/src/zxing/pdf417/detector/Detector.cpp
+END
+Detector.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/2673/trunk/cpp/core/src/zxing/pdf417/detector/Detector.h
+END
+LinesSampler.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/2675/trunk/cpp/core/src/zxing/pdf417/detector/LinesSampler.cpp
+END
+LinesSampler.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/detector/LinesSampler.h
+END

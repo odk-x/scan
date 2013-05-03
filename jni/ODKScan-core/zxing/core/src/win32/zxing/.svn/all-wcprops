@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/2654/trunk/cpp/core/src/win32/zxing
+END
+stdint.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2654/trunk/cpp/core/src/win32/zxing/stdint.h
+END
+win_iconv.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/2654/trunk/cpp/core/src/win32/zxing/win_iconv.c
+END
+iconv.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/2654/trunk/cpp/core/src/win32/zxing/iconv.h
+END

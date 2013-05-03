@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec
+END
+ModulusPoly.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ModulusPoly.cpp
+END
+ErrorCorrection.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ErrorCorrection.cpp
+END
+ModulusPoly.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ModulusPoly.h
+END
+ModulusGF.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ModulusGF.cpp
+END
+ErrorCorrection.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ErrorCorrection.h
+END
+ModulusGF.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/2664/trunk/cpp/core/src/zxing/pdf417/decoder/ec/ModulusGF.h
+END

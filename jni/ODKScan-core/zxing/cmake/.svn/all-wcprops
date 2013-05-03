@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/svn/!svn/ver/2654/trunk/cpp/cmake
+END
+FindCPPUNIT.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/2654/trunk/cpp/cmake/FindCPPUNIT.cmake
+END
+FindIconv.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/2654/trunk/cpp/cmake/FindIconv.cmake
+END
