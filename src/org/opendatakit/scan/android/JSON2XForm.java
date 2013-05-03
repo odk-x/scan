@@ -245,8 +245,10 @@ public class JSON2XForm extends Activity {
 		//////////////
 		{
 			Element fieldElement = instance.createElement("", "instance_creation_time");
-			Log.i(LOG_TAG, ISO8601.format(new Date()));
-			fieldElement.addChild(Node.TEXT, ISO8601.format(new Date()));
+			String dateTimeString = ISO8601.format(new Date());
+			Log.i(LOG_TAG, dateTimeString.substring(0, dateTimeString.length() - 2));
+			//Remove the last two zeros in the time offset:
+			fieldElement.addChild(Node.TEXT, dateTimeString.substring(0, dateTimeString.length() - 2));
 			instance.addChild(Node.ELEMENT, fieldElement);
 		}
 		{

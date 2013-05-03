@@ -5,9 +5,20 @@ CORE_OBJS := ${CORE_SRCS:.cpp=.o}
 JSON_PARSER_SRCS := $(wildcard jsoncpp-src-0.5.0/src/lib_json/*.cpp)
 JSON_PARSER_OBJS := ${JSON_PARSER_SRCS:.cpp=.o}
 
+ZXING_SRCS :=\
+$(wildcard zxing/core/src/zxing/*.cpp)\
+$(wildcard zxing/core/src/zxing/*/*.cpp)\
+$(wildcard zxing/core/src/zxing/*/*/*.cpp)\
+$(wildcard zxing/core/src/zxing/*/*/*/*.cpp)\
+$(wildcard zxing/cli/src/*.cpp)
+
+ZXING_OBJS := ${ZXING_SRCS:.cpp=.o}
+BIGINT_SRCS := $(wildcard zxing/core/src/bigint/*.cc)
+BIGINT_OBJS := ${BIGINT_SRCS:.cc=.o}
+
 ALL_SRCS := $(CORE_SRCS) StatCollector.cpp
 ALL_HEADERS := $(CORE_HEADERS) StatCollector.h configuration.h
-ALL_OBJS := $(CORE_OBJS) StatCollector.o $(JSON_PARSER_OBJS)
+ALL_OBJS := $(CORE_OBJS) StatCollector.o $(JSON_PARSER_OBJS) $(BIGINT_OBJS) $(ZXING_OBJS)
 
 #The OPENCV_INCLUDES will probably need to be adjusted if you aren't running this on a linux system.
 #Even then, pkg-config might not be set up.
@@ -15,8 +26,11 @@ ALL_OBJS := $(CORE_OBJS) StatCollector.o $(JSON_PARSER_OBJS)
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 OPENCV_INCLUDES := `pkg-config opencv --cflags --libs`
 
-#Boost is only needed for tests
-INCLUDES := $(OPENCV_INCLUDES) -I./jsoncpp-src-0.5.0/include -I./src -I./ -lboost_filesystem -lboost_system
+INCLUDES := $(OPENCV_INCLUDES)\
+-I./jsoncpp-src-0.5.0/include\
+-I./src -I./\
+-lboost_filesystem -lboost_system\
+-I./zxing/core/src -I./zxing/cli/src
 
 ODKScan: ODKScan.run
 	@echo "Made executable ODKScan.run"
@@ -47,6 +61,9 @@ Experiment: tests/Experiment.run
 Experiment2: tests/Experiment2.run
 	./$< assets/form_templates/moz_revised tests/MozExperiment tests/MozExperiment_out
 
+zxing: zxing/cli/main.run
+	./$< 
+
 #does linking
 %.run: %.cpp $(ALL_SRCS) $(ALL_OBJS) $(ALL_HEADERS)
 	g++ -g -o $@ $< $(ALL_OBJS) $(INCLUDES)
@@ -60,6 +77,7 @@ Experiment2: tests/Experiment2.run
 clean:
 	rm -rf debug_segment_images
 	rm $(ALL_OBJS)
+	rm zxing/cli/main.run
 	rm tests/*.run
 	rm *.run
 

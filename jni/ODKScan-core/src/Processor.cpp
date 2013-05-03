@@ -14,6 +14,30 @@
 
 #include <json/json.h>
 
+//QRCode stuff:
+#include "ImageReaderSource.h"
+#include <zxing/common/Counted.h>
+#include <zxing/Binarizer.h>
+#include <zxing/MultiFormatReader.h>
+#include <zxing/Result.h>
+#include <zxing/ReaderException.h>
+//#include <zxing/common/GlobalHistogramBinarizer.h>
+#include <zxing/common/HybridBinarizer.h>
+#include <exception>
+#include <zxing/Exception.h>
+#include <zxing/common/IllegalArgumentException.h>
+#include <zxing/BinaryBitmap.h>
+#include <zxing/DecodeHints.h>
+#include <zxing/qrcode/QRCodeReader.h>
+#include <zxing/multi/qrcode/QRCodeMultiReader.h>
+#include <zxing/multi/ByQuadrantReader.h>
+//#include <zxing/multi/MultipleBarcodeReader.h>
+//#include <zxing/multi/GenericMultipleBarcodeReader.h>
+
+using namespace zxing;
+using namespace zxing::multi;
+using namespace zxing::qrcode;
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -46,7 +70,9 @@ Json::Value computeFieldValue(const Json::Value& field){
 		const Json::Value segment = segments[i];
 		const Json::Value items = segment["items"];
 		if( items.isNull() ){
-			return Json::Value();
+			//If the segment already has a value,
+			//probably from a qrcode, use that.
+			return segment.get("value", Json::Value());
 		}
 		for ( size_t j = 0; j < items.size(); j++ ) {
 			const Json::Value classification = items[j].get("classification", false);
@@ -288,6 +314,7 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 				cout << classifiers.size() << endl;
 			#endif
 			*/
+
 			const Json::Value advanced = classifier.get("advanced", Json::Value());
 			bool success = classifiers[key]->train_PCA_classifier( filepaths,
 				                                               acutal_classifier_size,
@@ -424,6 +451,39 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			itemsJsonOut.append(itemJsonOut);
 		}
 		segmentJsonOut["items"] = itemsJsonOut;
+	}  else if(extendedSegment.get("type", 0) == "qrcode"){
+		LOGI("scanning qr code...");
+		Mat tmp;
+		//Blowing up the image makes decoding more accurate.
+		//It seems like there should be a better way...
+		resize(segmentImg, tmp, 4*segmentImg.size());
+		//I modifieid this zxing class to take OpenCV mats
+		Ref<LuminanceSource> source = ImageReaderSource::create(tmp);
+		//LOGI("source created..");
+		string result;
+		try {
+			Ref < Binarizer > binarizer;
+			binarizer = new HybridBinarizer(source);
+			DecodeHints hints(DecodeHints::DEFAULT_HINT);
+			//Not sure if this makes any difference.
+			hints.setTryHarder(true);
+			Ref < BinaryBitmap > binary(new BinaryBitmap(binarizer));
+			Ref<Reader> reader(new MultiFormatReader);
+			vector<Ref<Result> > results(1, reader->decode(binary, hints));
+			//LOGI("decoded!");
+			result = results[0]->getText()->getText();
+		} catch (const ReaderException& e) {
+			//This happens when the qrcode is not recognized.
+			result = string(e.what());
+		} catch (const zxing::IllegalArgumentException& e) {
+			result = "zxing::IllegalArgumentException: "
+					+ string(e.what());
+		} catch (const zxing::Exception& e) {
+			result = "zxing::Exception: " + string(e.what());
+		} catch (const std::exception& e) {
+			result = "std::exception: " + string(e.what());
+		}
+		segmentJsonOut["value"] = result;
 	}
 	
 	//Output the segment image:
@@ -445,7 +505,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		          colors[bubbleVals[i]]);
 
 		circle(segment_out, segBubbleLocs[i], 1, Scalar(255, 2555, 255), -1);
-		 */
+		*/
 
 		imwrite(segmentOutPath + segmentName, segment_out);
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;

@@ -17,4 +17,7 @@ It defines platform specific constants
 #include "log.h"
 #define LOG_COMPONENT "ODKScan"
 
+//Flag for zxing to prevent a build bug
+#define NO_ICONV
+
 #endif
