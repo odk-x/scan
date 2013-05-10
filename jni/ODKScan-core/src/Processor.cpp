@@ -76,7 +76,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 		}
 		for ( size_t j = 0; j < items.size(); j++ ) {
 			const Json::Value classification = items[j].get("classification", false);
-			const Json::Value itemValue = items[j]["value"];
+			Json::Value itemValue = items[j]["value"];
 			switch ( classification.type() )
 			{
 				case Json::stringValue:
@@ -88,6 +88,11 @@ Json::Value computeFieldValue(const Json::Value& field){
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
+						if(!itemValue.isString()) {
+							//Hack to convert ints to strings.
+							string s = itemValue.toStyledString();
+							itemValue = Json::Value(s.substr(0, s.length() - 1));
+						}
 						//This case is for selects.
 						//The values of the filled (i.e. true) items
 						//are stored in a space delimited string.
@@ -96,7 +101,8 @@ Json::Value computeFieldValue(const Json::Value& field){
 								output = Json::Value(itemValue.asString());
 							}
 							else{
-								output = Json::Value(output.asString() + " " +
+								output = Json::Value(output.asString() +
+									     field.get("delimiter", " ").asString() +
 									     itemValue.asString());
 							}
 						}
@@ -347,13 +353,10 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	Mat transformation = (Mat_<double>(3,3) << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 	Point offset = segmentRect.tl();
 
-	//Get the cropped segment image:
-	if(extendedSegment.get("align_segment", false).asBool()) {
-		//Segment alignment is off by default because it seems to perform worse.
+
 		Rect expandedRect = resizeRect(segmentRect, 1 + SEGMENT_BUFFER);
 	
 		//Reduce the segment buffer if it goes over the image edge.
-		//TODO: see if you can do this with the rectangle intersection method.
 		if(expandedRect.x < 0){
 			expandedRect.x = 0;
 		}
@@ -367,6 +370,17 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			expandedRect.height = formImage.rows - expandedRect.y;
 		}
 
+	//Get the cropped (transformed) segment image:
+	//QR codes are not aligned because the interpolation
+	//can actually make detection less reliable.
+	if(extendedSegment.get("type", 0) == "qrcode"){
+		//note that the expected ROI is used
+		//because we don't want misalined qrcodes to be cut off
+		//And for some reason detection is more reliable when there is a large margin.
+		segmentImg = formImage(expandedRect);
+		segmentJsonOut["quad"] = quadToJsonArray(rectToQuad( segmentRect ));
+	}
+	else if(extendedSegment.get("align_segment", true).asBool()) {
 		segmentImg = formImage(expandedRect);
 
 		vector<Point2f> quad;
@@ -432,7 +446,9 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		avgDelta *= 1.0 / items.size();
 
 		for (size_t i = 0; i < locations.size(); i++) {
-			if(norm(deltas[i] - avgDelta) > norm(deltas[i])){
+			//Draw a circle centered at the average delta, with the radius porportional to the alignment_radius.
+			//If the bubble's delta does not fall within that cirlce it is a runaway.
+			if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
 				locations[i] = locations[i] - deltas[i] + avgDelta;
 			}
 		}
@@ -441,11 +457,16 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		for (size_t i = 0; i < items.size(); i++) {
 			Json::Value itemJsonOut = items[i];
 			itemJsonOut["classification"] = classifier->classify_item(segmentImg, locations[i]);
+			/*
+			Point rectOffset = segmentRect.tl() - expandedRect.tl();
+			Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x  + rectOffset.x,
+					locations[i].y  + rectOffset.y, 1.0)) + Mat(Point3d(-rectOffset.x, -rectOffset.y, 0));
+			*/
 			Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
 					locations[i].y, 1.0));
 			itemJsonOut["absolute_location"] = pointToJson(
-				Point( absoluteLocation.at<double>(0.0,0.0) / absoluteLocation.at<double>(2.0, 0.0),
-				       absoluteLocation.at<double>(1.0,0.0) / absoluteLocation.at<double>(2.0, 0.0)) +
+				Point( absoluteLocation.at<double>(0u,0u) / absoluteLocation.at<double>(2, 0u),
+				       absoluteLocation.at<double>(1,0u) / absoluteLocation.at<double>(2, 0u)) +
 				offset);
 
 			itemsJsonOut.append(itemJsonOut);
@@ -453,13 +474,23 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentJsonOut["items"] = itemsJsonOut;
 	}  else if(extendedSegment.get("type", 0) == "qrcode"){
 		LOGI("scanning qr code...");
+		
+		//Blowing up the image can make decoding work sometimes.
+		Mat largeSegment;
+		resize(segmentImg, largeSegment, 4*segmentImg.size());
+		/*
 		Mat tmp;
-		//Blowing up the image makes decoding more accurate.
-		//It seems like there should be a better way...
-		resize(segmentImg, tmp, 4*segmentImg.size());
+		//Add a border because detection doesn't work unless
+		//there is enough of a margin around the QR code.
+		//No idea why.
+		int borderSize = 40;
+		copyMakeBorder( segmentImg, tmp, borderSize, borderSize, borderSize, borderSize, BORDER_CONSTANT, 0 );
+		debugShow(tmp);
+		*/
+
 		//I modifieid this zxing class to take OpenCV mats
-		Ref<LuminanceSource> source = ImageReaderSource::create(tmp);
-		//LOGI("source created..");
+		Ref<LuminanceSource> source = ImageReaderSource::create(largeSegment);
+
 		string result;
 		try {
 			Ref < Binarizer > binarizer;
@@ -484,6 +515,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			result = "std::exception: " + string(e.what());
 		}
 		segmentJsonOut["value"] = result;
+		cout << "qrcode: " << result << endl;
 	}
 	
 	//Output the segment image:
@@ -793,9 +825,8 @@ bool Processor::alignForm(const char* alignedImageOutputPath, int formIdx){
 	try{
 		return processorImpl->alignForm(alignedImageOutputPath, (size_t)formIdx);
 	}
-	catch(cv::Exception& e){
-		LOGI(e.what());
-		return false;
+	catch (...) {
+	    return false;
 	}
 }
 bool Processor::processForm(const char* outputPath, bool minifyJson) {
@@ -804,9 +835,8 @@ bool Processor::processForm(const char* outputPath, bool minifyJson) {
 		return processorImpl->processForm(normalizedOutDir, normalizedOutDir + "output.json",
 				normalizedOutDir + "markedup.jpg", minifyJson);
 	}
-	catch(cv::Exception& e){
-		LOGI(e.what());
-		return false;
+	catch (...) {
+	    return false;
 	}
 }
 const char* Processor::scanAndMarkup(const char* outputPath) {
@@ -821,6 +851,12 @@ const char* Processor::scanAndMarkup(const char* outputPath) {
 	}
 	catch(cv::Exception& e){
 		return e.what();
+	}
+	catch(std::exception& e){
+		return e.what();
+	}
+	catch (...) {
+	    return "Unknown expection.";
 	}
 }
 /**
@@ -915,6 +951,12 @@ const char* Processor::processViaJSON(const char* jsonString) {
 	}
 	catch(cv::Exception& e){
 		return e.what();
+	}
+	catch(std::exception& e){
+		return e.what();
+	}
+	catch (...) {
+	    return "Unknown expection.";
 	}
 }
 bool Processor::writeFormImage(const char* outputPath) const{

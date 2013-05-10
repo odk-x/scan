@@ -58,6 +58,8 @@ Experiment: tests/Experiment.run
 	@mkdir bubble_images
 	./$< $(TEMPLATE) $(INPUT_FOLDER) $(OUTPUT_FOLDER) $(EXPECTED_JSON)
 
+#gdb --args $< $(TEMPLATE) $(INPUT_FOLDER) $(OUTPUT_FOLDER) $(EXPECTED_JSON)
+
 Experiment2: tests/Experiment2.run
 	./$< assets/form_templates/moz_revised tests/MozExperiment tests/MozExperiment_out
 

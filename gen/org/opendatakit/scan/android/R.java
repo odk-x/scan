@@ -50,13 +50,15 @@ containing a value of this type.
         public static final int photoStatus=0x7f090006;
         public static final int process_button=0x7f090002;
         public static final int retake_button=0x7f090001;
-        public static final int saveBtn=0x7f09000f;
-        public static final int scanNewForm=0x7f090011;
-        public static final int startOver=0x7f090012;
+        public static final int saveBtn=0x7f090010;
+        public static final int save_transcribe=0x7f09000f;
+        public static final int scanNewForm=0x7f090013;
+        public static final int startOver=0x7f090014;
         public static final int templateName=0x7f090007;
+        public static final int transcribeBtn=0x7f090011;
         public static final int version_display=0x7f09000d;
         public static final int webview=0x7f090003;
-        public static final int webview2=0x7f090010;
+        public static final int webview2=0x7f090012;
     }
     public static final class layout {
         public static final int after_photo_taken=0x7f030000;

@@ -60,6 +60,7 @@ vector<Point> findMaxQuad(Mat& img, float approx_p_seed = 0){
 	}
 	return maxRect;
 }
+/*
 //Sum the pixels that lie on a line starting and ending in the specified rows.
 //The image can be transposed to sum pixels on vertical lines.
 int lineSum(const Mat& img, int start, int end, bool transpose) {
@@ -123,7 +124,7 @@ void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool
 	//This is the maximum sum of a line crossing the image.
 	int maxSum = 255 * hSpan;
 	//The param limits the weighting to a certain magnitude.
-	int param = .5;
+	double param = 0.5;
 
 	float maxSsdFromMidpoint = 2*range*range;
 	
@@ -133,7 +134,19 @@ void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool
 
 			float ssdFromMidpoint = (i - midpoint)*(i - midpoint) + (j - midpoint)*(j - midpoint);
 			int ls = param * maxSum * ssdFromMidpoint / maxSsdFromMidpoint;
-			ls += lineSum(img, i, j, transpose);
+			//ls += lineSum(img, i, j, transpose);
+			Point startPt;
+			Point end;
+			if(transpose){
+				startPt = Point(i, roi.y);
+				endPt = Point(j, roi.y + roi.height);
+			}
+			else{
+				startPt = Point(roi.x, i);
+				endPt = Point(roi.x + roi.width, j);
+			}
+
+			ls += lineSum(img, startPt, endPt);
 			if( ls < minLs ){
 				start = i;
 				end = j;
@@ -142,19 +155,12 @@ void findLinesHelper(const Mat& img, int& start, int& end, const Rect& roi, bool
 		}
 	}
 }
-
-
-//Finds a minimum energy line that crosses the image
-//weighted near the region of interest.
-//A and B are the start and end points of the line.
-//The flip variable sets which side of the roi to look for a line on.
-//The transpose flag virtually transposes the image so you can look for vertical lines.
 template <class T>
 void findLines(const Mat& img, Point_<T>& A, Point_<T>& B, const Rect& roi, bool flip, bool transpose) {
 	int start, end;
 	
 	findLinesHelper(img, start, end, roi, flip, transpose);
-
+	
 	//Reverse the transposition:
 	if(transpose){
 		A = Point_<T>(start, 0);
@@ -164,12 +170,90 @@ void findLines(const Mat& img, Point_<T>& A, Point_<T>& B, const Rect& roi, bool
 		A = Point_<T>(0, start);
 		B = Point_<T>(img.cols, end);
 	}
+	
 }
+*/
+
+template <class T>
+int lineSum(const Mat& img, Point_<T>& start, Point_<T>& end, int step=1) {
+	
+	int sum = 0;
+	
+	Point_<T> vector = (end - start);
+	int length = norm(vector);
+	float portion = step * 1.0 / length;
+
+	for(int i = 0; i< length; i++) {
+		Point_<T> point = start + vector * (portion * i);
+		sum += img.at<uchar>(point);
+	}
+
+	return sum;
+}
+//Finds a minimum energy line that crosses the image
+//weighted near the region of interest.
+//A and B are the start and end points of the line.
+//The flip variable sets which side of the roi to look for a line on.
+//The transpose flag virtually transposes the image so you can look for vertical lines.
+template <class T>
+void findLines(const Mat& img, Point_<T>& start, Point_<T>& end, const Rect& roi, bool flip, bool transpose) {
+	int hSpan;
+	int range, midpoint;
+	float maxSlope = 0.10;
+
+	if(transpose){
+		hSpan = img.rows;
+		midpoint = roi.x;
+		if(flip) midpoint += roi.width;
+		range = roi.x;
+	}
+	else{
+		hSpan = img.cols;
+		midpoint = roi.y;
+		if(flip) midpoint += roi.height;
+		range = roi.y;
+	}
+	//This is the maximum sum of a line crossing the image.
+	int maxSum = 255 * hSpan;
+	//The param limits the weighting to a certain magnitude.
+	double param = 0.5;
+
+	float maxSsdFromMidpoint = 2*range*range;
+	
+	int minLs = INT_MAX;
+	for(int i = midpoint - range; i <= midpoint + range; i++) {
+		for(int j = MAX(i-hSpan*maxSlope, midpoint - range); j <= MIN(i+hSpan*maxSlope, midpoint + range); j++) {
+
+			float ssdFromMidpoint = (i - midpoint)*(i - midpoint) + (j - midpoint)*(j - midpoint);
+			int ls = param * maxSum * ssdFromMidpoint / maxSsdFromMidpoint;
+			Point_<T> startPt, endPt;
+			if(transpose){
+				startPt = Point_<T>(i, roi.y);
+				endPt = Point_<T>(j, roi.y + roi.height);
+			}
+			else{
+				startPt = Point_<T>(roi.x, i);
+				endPt = Point_<T>(roi.x + roi.width, j);
+			}
+
+			ls += lineSum(img, startPt, endPt);
+			if( ls < minLs ){
+				start = startPt;
+				end = endPt;
+				minLs = ls;
+			}
+		}
+	}
+}
+
+
 template <class T>
 inline Point_<T> findIntersection(const Point_<T>& P1, const Point_<T>& P2,
 						const Point_<T>& P3, const Point_<T>& P4){
 	// From determinant formula here:
 	// http://en.wikipedia.org/wiki/Line_intersection
+	// "Note that the intersection point is for the infinitely long lines defined by the points,
+	// rather than the line segments between the points, and can produce an intersection point beyond the lengths of the line segments."
 	double denom = (P1.x - P2.x) * (P3.y - P4.y) - (P1.y - P2.y) * (P3.x - P4.x);
 	return Point_<T>(
 		( (P1.x * P2.y - P1.y * P2.x) * (P3.x - P4.x) -
@@ -266,6 +350,7 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 
 	imgThresh = (img - temp_img) > 0;
 
+	//White out the middle of the segment to prevent it from interfering.
 	Rect contractedRoi = resizeRect(roi, .7);
 	imgThresh(contractedRoi) = Scalar::all(255);
 	

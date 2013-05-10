@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 /**
  * This activity displays the image of a processed form
@@ -26,6 +28,8 @@ import android.widget.Button;
 public class DisplayProcessedForm extends Activity {
 
 	private static final String LOG_TAG = "ODKScan";
+
+	private static final int LENGTH_SHORT = 0;
 
 	private String photoName;
 	private String templatePath;
@@ -35,6 +39,8 @@ public class DisplayProcessedForm extends Activity {
 
 	private boolean morePagesToScan = false;
 
+	private Intent collectIntent;
+	
 	// Set up the UI and load the processed image
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +53,14 @@ public class DisplayProcessedForm extends Activity {
 				throw new Exception("This activity must be lauched with a photoName specified in the extras.");
 			}
 			photoName = extras.getString("photoName");
+			/*
 			if (extras.getBoolean("startCollect", false)) {
 				Intent dataIntent = new Intent();
 				dataIntent.putExtra("start", true);
 				startCollect(dataIntent);
 				return;
 			}
+			*/
 			templatePath = ScanUtils.getTemplatePath(photoName);
 			if(!(new File(templatePath, "template.json")).exists()){
 				throw new Exception("The form template is missing.");
@@ -97,47 +105,42 @@ public class DisplayProcessedForm extends Activity {
 					}
 				});
 			} else {
+				LinearLayout layout = (LinearLayout) findViewById(R.id.save_transcribe);
+				layout.setVisibility(View.VISIBLE);
 				Button saveData = (Button) findViewById(R.id.saveBtn);
-				saveData.setVisibility(View.VISIBLE);
 				saveData.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						Intent dataIntent = new Intent();
-						//Start indicates that the form should be launched from the first question
-						//rather than the prompt list.
-						dataIntent.putExtra("start", true);
-						startCollect(dataIntent);
+						if(collectIntent == null) {
+							collectIntent = makeCollectIntent();
+						} 
+						//collectIntent is still null if Collect not installed.
+						if(collectIntent != null) {
+							if(collectIntent.getData() == null) {
+								saveToCollect(0);
+							}
+						}
+						
+					}
+				});
+				Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
+				transcribeData.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Log.i(LOG_TAG, "Using template: " + templatePath);
+						if(collectIntent == null) {
+							collectIntent = makeCollectIntent();
+						}
+						//collectIntent is still null if Collect not installed.
+						if(collectIntent != null) {
+							if(collectIntent.getData() == null) {
+								saveToCollect(1);
+							} else {
+								startActivity(collectIntent);
+							}
+						}
 					}
 				});
 			}
-			
-			/*
-			 * String url = "file://" + ScanUtils.getFormViewHTMLDir() +
-			 * "formView.html" + "?" + "formLocation=" +
-			 * ScanUtils.getOutputPath(photoName); myWebView = (WebView)
-			 * findViewById(R.id.webview2); WebSettings webSettings =
-			 * myWebView.getSettings();
-			 * webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-			 * webSettings.setBuiltInZoomControls(true);
-			 * webSettings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
-			 * webSettings.setJavaScriptEnabled(true);
-			 * 
-			 * myWebView.loadUrl(url); //myWebView.addJavascriptInterface(new
-			 * JavaScriptInterface(getApplicationContext(), new
-			 * File(ScanUtils.getOutputPath(photoName), "transcription.txt")),
-			 * "Android");
-			 * 
-			 * Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-			 * Uri.parse(url)); startActivity(browserIntent);
-			 * 
-			 * 
-			 * setTitle(getResources().getString(R.string.Health_Center) + ": "
-			 * +
-			 * //getSharedPreferences(getResources().getString(R.string.prefs_name
-			 * ), 0)
-			 * PreferenceManager.getDefaultSharedPreferences(getApplicationContext
-			 * ()) .getString("healthCenter", "unspecifiedHC"));
-			 */
 
 			ScanUtils.displayImageInWebView(
 					(WebView) findViewById(R.id.webview2),
@@ -160,12 +163,7 @@ public class DisplayProcessedForm extends Activity {
 			alert.show();
 		}
 	}
-	/**
-	 * This method launches Collect with the xform instance indicated by the data intent.
-	 * If the data intent has does not reference an xform JSON2XForm will be launched instead to generate one.
-	 * @param data
-	 */
-	public void startCollect(Intent data) {
+	public Intent makeCollectIntent() {
 		// Initialize the intent that will start collect and use it to see if
 		// collect is installed.
 		Intent intent = new Intent();
@@ -198,39 +196,37 @@ public class DisplayProcessedForm extends Activity {
 					});
 			AlertDialog alert = builder.create();
 			alert.show();
-			return;
+			return null;
 		}
-		
-		if (data.getData() == null) {
-			// No instance specified, create or find one with new activity.
-			Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
-			createInstanceIntent.putExtras(extras);
-			createInstanceIntent.putExtras(data);
-			createInstanceIntent.putExtra("templatePath", templatePath);
-			createInstanceIntent.putExtra("photoName", photoName);
-			startActivityForResult(createInstanceIntent, 1);
-			//Once we get the result we rerun this function and collect should start.
-			return;
-		}
-
-		// ////////////
-		Log.i(LOG_TAG, "Starting Collect...");
-		// ////////////		
 		intent.setAction(Intent.ACTION_EDIT);
-		intent.putExtras(data);
-		intent.setData(data.getData());
-		startActivity(intent);
-		//startActivityForResult(intent, 0);
+		
+		//Start indicates that the form should be launched from the first question
+		//rather than the prompt list.
+		intent.putExtra("start", true);
+		return intent;
+	}
+	public void saveToCollect(int requestCode) {
+		Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
+		createInstanceIntent.putExtras(extras);
+		createInstanceIntent.putExtra("templatePath", templatePath);
+		createInstanceIntent.putExtra("photoName", photoName);
+		startActivityForResult(createInstanceIntent, requestCode);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 0) {
-			//finish();
-		} else if (requestCode == 1) {
-			if (resultCode == Activity.RESULT_OK) {
-				startCollect(data);
-			}
+		if (resultCode == Activity.RESULT_OK) {
+			Button saveData = (Button) findViewById(R.id.saveBtn);
+			saveData.setEnabled(false);
+			saveData.setText("saved");
+			collectIntent.putExtras(data);
+			collectIntent.setData(data.getData());
+		}
+		if (requestCode == 1) {
+			// ////////////
+			Log.i(LOG_TAG, "Starting Collect...");
+			// ////////////		
+			startActivity(collectIntent);
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}

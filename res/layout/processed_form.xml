@@ -14,14 +14,29 @@
    	    android:visibility="gone">
 	</Button>
 	
-	<Button
-   	    android:id="@+id/saveBtn"
-   	    style="@style/StandardButton"
-   	    android:layout_width="match_parent"
-   	    android:layout_height="wrap_content"
-   	    android:text="@string/save_data"
-   	    android:visibility="gone">
-	</Button>
+	<LinearLayout
+	    android:visibility="gone"
+	    android:id="@+id/save_transcribe"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:paddingTop="4dp" android:paddingLeft="4dp"
+		android:paddingRight="4dp" android:layout_gravity="center_horizontal|bottom|left">
+		<Button
+		    style="@style/APTButton"
+	   	    android:id="@+id/saveBtn"
+	   	    android:layout_weight="1"
+	   	    android:layout_height="match_parent"
+	   	    android:text="Save">
+		</Button>
+		<Button
+		    style="@style/APTButton"
+	   	    android:id="@+id/transcribeBtn"
+	   	    android:layout_weight="1"
+	   	    android:layout_height="match_parent"
+	   	    android:text="Transcribe">
+		</Button>
+	</LinearLayout>
+
    	
 	<WebView  xmlns:android="http://schemas.android.com/apk/res/android"
 	   android:id="@+id/webview2"

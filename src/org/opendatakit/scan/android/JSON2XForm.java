@@ -27,6 +27,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,6 +56,7 @@ public class JSON2XForm extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		showDialog(0);
 		try {
 			//Read in parameters from the intent's extras.
 			Bundle extras = getIntent().getExtras();
@@ -144,8 +146,10 @@ public class JSON2XForm extends Activity {
 			resultData.putExtras(extras);
 			resultData.setData(Uri.parse(COLLECT_INSTANCES_URI_STRING + "/" + instanceId));
 			setResult(RESULT_OK, resultData);
+			dismissDialog(0);
 			finish();
 		} catch (Exception e) {
+			dismissDialog(0);
 			//Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage(e.toString())
@@ -159,8 +163,16 @@ public class JSON2XForm extends Activity {
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-
 	}
+	
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Exporting to Collect...");
+		builder.setCancelable(false);
+		return builder.create();
+	}
+	
 	private boolean anyModifiedAfter(ArrayList<String> templatePaths,
 			long lastModified) {
 		for (String tp : templatePaths){
