@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -205,7 +206,17 @@ public class DisplayProcessedForm extends Activity {
 		intent.putExtra("start", true);
 		return intent;
 	}
+
+	@Override
+	protected Dialog onCreateDialog(int id, Bundle args) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Exporting to Collect...");
+		builder.setCancelable(false);
+		return builder.create();
+	}
+	
 	public void saveToCollect(int requestCode) {
+		showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
@@ -215,6 +226,7 @@ public class DisplayProcessedForm extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		dismissDialog(0);
 		if (resultCode == Activity.RESULT_OK) {
 			Button saveData = (Button) findViewById(R.id.saveBtn);
 			saveData.setEnabled(false);

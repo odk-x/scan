@@ -45,7 +45,10 @@ public class JSONUtils {
 		for (int i = 0; i < fieldsLength; i++) {
 			JSONObject field = inheritFrom(fields.getJSONObject(i), obj);
 
-			JSONArray segments = field.getJSONArray("segments");
+			JSONArray segments = field.optJSONArray("segments");
+			if(segments == null) {
+				continue;
+			}
 			for (int j = 0; j < segments.length(); j++) {
 				JSONObject segment = segments.getJSONObject(j);
 				segments.put(j, inheritFrom(segment, field));
