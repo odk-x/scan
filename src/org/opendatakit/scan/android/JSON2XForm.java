@@ -12,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,13 +25,14 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 /**
  * This activity converts a ODKScan JSON file into a XForm for use with Collect
@@ -88,6 +87,11 @@ public class JSON2XForm extends Activity {
 			//String jsonPath = new File(rootTemplatePath, "template.json").getPath();
 			String xFormPath = new File(rootTemplatePath, templateName + ".xml").getPath();
 
+			ContentResolver myContentResolver = getContentResolver();
+			if(myContentResolver == null) {
+				throw new Exception("Could not get content resolver. Try again.");
+			}
+			
 			//////////////
 			Log.i(LOG_TAG, "Checking if there is no xform or the xform is out of date.");
 			//////////////
@@ -97,7 +101,7 @@ public class JSON2XForm extends Activity {
 				Log.i(LOG_TAG, "Unregistering any existing old versions of xform.");
 				//////////////
 				String [] deleteArgs = { templateName };
-				int deleteResult = getContentResolver().delete(COLLECT_FORMS_CONTENT_URI, "jrFormId like ?", deleteArgs);
+				int deleteResult = myContentResolver.delete(COLLECT_FORMS_CONTENT_URI, "jrFormId like ?", deleteArgs);
 				Log.w(LOG_TAG, "Removing " + deleteResult + " rows.");
 				//TODO: Not sure what happens to the old instances...
 				//////////////
@@ -113,12 +117,12 @@ public class JSON2XForm extends Activity {
 			//////////////
 			int instanceId;
 			String instanceName = templateName + '_' + rootPhotoName;
-			String instancePath = "/sdcard/odk/instances/" + instanceName + "/";
-			(new File(instancePath)).mkdirs();
-			String instanceFilePath = instancePath + instanceName + ".xml";
+			File instanceDir = new File(Environment.getExternalStorageDirectory().getPath(), instanceName);
+			instanceDir.mkdirs();
+			String instanceFilePath = new File(instanceDir.getAbsolutePath(), instanceName + ".xml").getAbsolutePath();
 			String selection = "instanceFilePath = ?";
 			String[] selectionArgs = { instanceFilePath };
-			Cursor c = getContentResolver().query(COLLECT_INSTANCES_CONTENT_URI, null, selection, selectionArgs, null);
+			Cursor c = myContentResolver.query(COLLECT_INSTANCES_CONTENT_URI, null, selection, selectionArgs, null);
 			if(c.moveToFirst()){
 				//////////////
 				Log.i(LOG_TAG, "Registered odk instance found.");
@@ -129,7 +133,7 @@ public class JSON2XForm extends Activity {
 				//////////////
 				Log.i(LOG_TAG, "Registered odk instance not found, creating one...");
 				//////////////
-				jsonOut2XFormInstance(photoNames, xFormPath, instancePath, instanceName);
+				jsonOut2XFormInstance(photoNames, xFormPath, instanceDir, instanceName);
 				ContentValues insertValues = new ContentValues();
 				insertValues.put("displayName", instanceName);
 				insertValues.put("instanceFilePath", instanceFilePath);
@@ -202,7 +206,7 @@ public class JSON2XForm extends Activity {
 	/**
 	 * Generates an instance of an xform at xFormPath from the JSON output file
 	 */
-	private void jsonOut2XFormInstance(ArrayList<String> photoNames, String xFormPath, String instancePath, String instanceName)
+	private void jsonOut2XFormInstance(ArrayList<String> photoNames, String xFormPath, File instanceDir, String instanceName)
 			throws JSONException, IOException, XmlPullParserException {
 		//////////////
 	    Log.i(LOG_TAG, "Reading the xform...");
@@ -286,7 +290,10 @@ public class JSON2XForm extends Activity {
 				fieldImageElement.addChild(Node.TEXT, new File(imagePath).getName());
 				//Copy segment image
 				InputStream fis = new FileInputStream(imagePath);
-				FileOutputStream fos = new FileOutputStream(instancePath + new File(imagePath).getName());
+				FileOutputStream fos = new FileOutputStream(
+						new File(instanceDir.getAbsolutePath(),
+						new File(imagePath).getName())
+						.getAbsolutePath());
 				// Transfer bytes from in to out
 				byte[] buf = new byte[1024];
 				int len;
@@ -315,7 +322,8 @@ public class JSON2XForm extends Activity {
         //////////////
         Log.i(LOG_TAG, "Outputing the instance file:");
         //////////////
-	    String instanceFilePath = instancePath + instanceName + ".xml";
+	    String instanceFilePath = new File(instanceDir.getAbsolutePath(),
+	    		instanceName + ".xml").getAbsolutePath();
 	    writeXMLToFile(instance, instanceFilePath);
 	}
 	/**
@@ -459,20 +467,20 @@ public class JSON2XForm extends Activity {
         	}
         	String requiredString = "";
         	if(field.has("required")){
-        		requiredString = "required=\"";
+        		requiredString = " required=\"";
         		if(field.getBoolean("required")){
         			requiredString += "true()";
         		} else {
         			requiredString += "false()";
         		}
-        		requiredString += "\"";
+        		requiredString += "\" ";
         	}
         	String constraintString = "";
         	if(field.has("constraint")){
-        		constraintString = "constraint=\"";
+        		constraintString = " constraint=\"";
         		//TODO: This should be XML sanitized
         		constraintString += field.getString("constraint");
-        		constraintString += "\"";
+        		constraintString += "\" ";
         	}
         	writer.write("<bind nodeset=\"/data/" + fieldNames[i] +
         			"\" type=\"" + type + "\"" +

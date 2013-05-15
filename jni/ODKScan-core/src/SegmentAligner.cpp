@@ -215,15 +215,17 @@ void findLines(const Mat& img, Point_<T>& start, Point_<T>& end, const Rect& roi
 	}
 	//This is the maximum sum of a line crossing the image.
 	int maxSum = 255 * hSpan;
-	//The param limits the weighting to a certain magnitude.
-	double param = 0.5;
+	//The greater param is the more results are weighted towards the orginal position.
+	//When decreasing this watch out for prompts with lines close to the borders (e.g. bub_* prompts).
+	//There is a bit of a trade-off because lowering the param yield better alignments when it doesn't pick up the wrong line.
+	double param = 0.2;
 
 	float maxSsdFromMidpoint = 2*range*range;
 	
 	int minLs = INT_MAX;
 	for(int i = midpoint - range; i <= midpoint + range; i++) {
 		for(int j = MAX(i-hSpan*maxSlope, midpoint - range); j <= MIN(i+hSpan*maxSlope, midpoint + range); j++) {
-
+			//The initial line sum is the weighting applied
 			float ssdFromMidpoint = (i - midpoint)*(i - midpoint) + (j - midpoint)*(j - midpoint);
 			int ls = param * maxSum * ssdFromMidpoint / maxSsdFromMidpoint;
 			Point_<T> startPt, endPt;
@@ -336,8 +338,12 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	
 	Mat imgThresh, temp_img, temp_img2;
 	
+	//A binary image gradient is applied here.
+	//You can use findLines without it, but it
+	//generally leads to better performance.
+	//However, it may lead to a loss in percision.
+	//i.e. you're more likely to find the right line, but the coords will be slightly off.
 	int blurSize = 40;
-	
 	#if 1
 		blur(img, temp_img, Size(blurSize, blurSize));
 	#else
@@ -349,20 +355,15 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	#endif
 
 	imgThresh = (img - temp_img) > 0;
-
 	//White out the middle of the segment to prevent it from interfering.
 	Rect contractedRoi = resizeRect(roi, .7);
 	imgThresh(contractedRoi) = Scalar::all(255);
-	
+
 	Point_<T> A1, B1, A2, B2, A3, B3, A4, B4;
 	findLines(imgThresh, A1, B1, roi, false, true);
 	findLines(imgThresh, A2, B2, roi, false, false);
 	findLines(imgThresh, A3, B3, roi, true, true);
 	findLines(imgThresh, A4, B4, roi, true, false);
-
-	//ensuring consistency idea:
-	//if contractedRoi.width||height != lineDistanceApart
-	//recompute line with most energy weighted by other line
 
 	#if QUAD_FIND_MODE == QUAD_FIND_INTERSECTION
 		vector< Point_<T> > quad;
@@ -371,10 +372,6 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 		quad.push_back(findIntersection(A3, B3, A4, B4));
 		quad.push_back(findIntersection(A4, B4, A1, B1));
 		outQuad = quad;
-		//TODO: add some code that does this:
-		//      lines can be used to mask off sections of the image
-		//      if there is a height/width discrepancy move the weighting
-		//      line to the averate of the expected lines.
 	#elif QUAD_FIND_MODE == QUAD_FIND_CONTOURS
 		line( imgThresh, A1, B1, Scalar::all(0), 1, 4);
 		line( imgThresh, A2, B2, Scalar::all(0), 1, 4);

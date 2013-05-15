@@ -201,9 +201,9 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 			string markupString(ss.str());
 			markupString = markupString.substr(0, markupString.length() - 1);
 			putText(markupImage, markupString, textBoxTL,
-			        FONT_HERSHEY_SIMPLEX, 1., Scalar::all(0), 3, CV_AA);
+			        FONT_HERSHEY_SIMPLEX, 0.8, Scalar::all(0), 3, CV_AA);
 			putText(markupImage, markupString, textBoxTL,
-			        FONT_HERSHEY_SIMPLEX, 1., boxColor, 2, CV_AA);
+			        FONT_HERSHEY_SIMPLEX, 0.8, boxColor, 2, CV_AA);
 		}
 	}
 	return markupImage;
@@ -395,7 +395,8 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			transformation = quadToTransformation(quad, segmentRect.size());
 			offset = expandedRect.tl();
 			Mat alignedSegment(0, 0, CV_8U);
-			warpPerspective(segmentImg, alignedSegment, transformation, segmentRect.size());
+			//debugShow(formImage(segmentRect));
+			warpPerspective(segmentImg, alignedSegment, transformation, segmentRect.size());//debugShow(alignedSegment);
 			segmentImg = alignedSegment;
 			segmentJsonOut["quad"] = quadToJsonArray( quad, offset );
 		}
@@ -475,19 +476,18 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	}  else if(extendedSegment.get("type", 0) == "qrcode"){
 		LOGI("scanning qr code...");
 		
-		//Blowing up the image can make decoding work sometimes.
+		//Blowing up the image can make decoding work sometimes,
+		//but making it too big can also break it. AFAICT 2x is optimal.
 		Mat largeSegment;
-		resize(segmentImg, largeSegment, 4*segmentImg.size());
+		resize(segmentImg, largeSegment, 2*segmentImg.size());
+		
 		/*
 		Mat tmp;
-		//Add a border because detection doesn't work unless
-		//there is enough of a margin around the QR code.
-		//No idea why.
+		//Add a border can also make decoding work sometimes.
 		int borderSize = 40;
 		copyMakeBorder( segmentImg, tmp, borderSize, borderSize, borderSize, borderSize, BORDER_CONSTANT, 0 );
 		debugShow(tmp);
 		*/
-
 		//I modifieid this zxing class to take OpenCV mats
 		Ref<LuminanceSource> source = ImageReaderSource::create(largeSegment);
 

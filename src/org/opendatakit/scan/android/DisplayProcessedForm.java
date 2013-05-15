@@ -21,7 +21,6 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 /**
  * This activity displays the image of a processed form
@@ -29,8 +28,6 @@ import android.widget.Toast;
 public class DisplayProcessedForm extends Activity {
 
 	private static final String LOG_TAG = "ODKScan";
-
-	private static final int LENGTH_SHORT = 0;
 
 	private String photoName;
 	private String templatePath;
