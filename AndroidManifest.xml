@@ -86,6 +86,12 @@
             android:name="org.droidparts.preference.MultiSelectListPreference"
             android:label="MultiSelectListPreference" >
         </activity>
+        
+        <service
+        android:name=".ProcessInBG"
+        android:label="ODK Scan Background" >
+   		</service>
+    
     </application>
 
 </manifest>

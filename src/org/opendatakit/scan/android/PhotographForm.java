@@ -5,12 +5,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.droidparts.preference.MultiSelectListPreference;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 /**
@@ -24,19 +28,35 @@ public class PhotographForm extends Activity {
 	private String photoName;
     private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
-    private Bundle extras;
+    private Intent afterPhotoTaken;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
-		extras = getIntent().getExtras();
-		if(extras != null){
-			if(extras.containsKey("photoName")){
-				photoName = extras.getString("photoName");
-			}
+		Bundle extras = getIntent().getExtras();
+		if(extras == null) {
+			extras = new Bundle();
 		}
+		if(extras.containsKey("photoName")){
+			photoName = extras.getString("photoName");
+		}
+		if(!extras.containsKey("templatePaths")){
+			SharedPreferences settings = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
+			Log.d(LOG_TAG, "Captured photo: ");
+			String[] templatePaths = MultiSelectListPreference
+					.fromPersistedPreferenceValue(settings.getString(
+							"select_templates", ""));
+			extras.putStringArray("templatePaths", templatePaths);
+		}
+		
+		//afterPhotoTaken = new Intent(getApplication(), AfterPhotoTaken.class);
+		afterPhotoTaken = new Intent(this, ProcessInBG.class);
+		afterPhotoTaken.putExtras(extras);
+		afterPhotoTaken.putExtra("photoName", photoName);
+		
 		File outputPath = new File(ScanUtils.getOutputPath(photoName));
 		//Try to create an output folder
 		if(!outputPath.mkdirs()){
@@ -66,14 +86,10 @@ public class PhotographForm extends Activity {
 		if (requestCode == TAKE_PICTURE) {
 			finishActivity(TAKE_PICTURE);
 			if (resultCode == Activity.RESULT_OK) {
-				Intent intent = new Intent(getApplication(), AfterPhotoTaken.class);
-				if(extras != null) {
-					intent.putExtras(extras);
-				}
-				intent.putExtra("photoName", photoName);
 				if( new File(ScanUtils.getPhotoPath(photoName)).exists() ) {
 					Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
-					startActivity(intent);
+					//startActivity(intent);
+					startService(afterPhotoTaken);
 				}
 				else{
 					Log.e(LOG_TAG, "Photo [" + photoName + "] could not be saved.");

@@ -145,15 +145,20 @@ public class AfterPhotoTaken extends Activity {
 								null));
 
 				startThread(RunProcessor.Mode.LOAD);
-			} else if (extras.containsKey("templatePath")) {
-				// This is for specifying the next page in a multi-page form.
-				String[] templatePath = { extras.getString("templatePath") };
-				templatePaths = templatePath;
+			} else if (extras.containsKey("templatePaths")) {
+				// Supplying templatePaths in the extras overrides those in the prefs.
+				// This is used for specifying the next page in a multi-page form.
+				templatePaths = extras.getStringArray("templatePaths");
 				runProcessor = new RunProcessor(handler, photoName,
-						templatePath, settings.getString("calibrationFile",
+						templatePaths, settings.getString("calibrationFile",
 								null));
 				startThread(RunProcessor.Mode.LOAD_ALIGN);
 			} else {
+				updateUI(false, "Error: templatePaths key was not provided.");
+			}
+			/*
+			//Moving this to Photograph Form:
+			else {
 				templatePaths = MultiSelectListPreference
 						.fromPersistedPreferenceValue(settings.getString(
 								"select_templates", ""));
@@ -169,6 +174,7 @@ public class AfterPhotoTaken extends Activity {
 								null));
 				startThread(RunProcessor.Mode.LOAD_ALIGN);
 			}
+			*/
 
 			processButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {

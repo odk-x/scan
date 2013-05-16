@@ -65,7 +65,7 @@ public class DisplayProcessedForm extends Activity {
 			}
 			
 			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");
-			//Multipage forms:
+			//How multi-page forms are handled:
 			//If there is a nextPage directory in the template directory 
 			//Scan will assume it is processing a multipage form
 			//where the template for the next page is in the nextPage directory.
@@ -80,7 +80,8 @@ public class DisplayProcessedForm extends Activity {
 				nextPage.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Intent intent = new Intent(getApplication(), PhotographForm.class);
-						intent.putExtra("templatePath", nextPageTemplatePath.toString());
+						String[] templatePaths = { nextPageTemplatePath.toString() };
+						intent.putExtra("templatePaths", templatePaths);
 						ArrayList<String> prevTemplatePaths = extras.getStringArrayList("prevTemplatePaths");
 						ArrayList<String> prevPhotoNames = extras.getStringArrayList("prevPhotoNames");
 						if(prevTemplatePaths == null || prevPhotoNames == null){

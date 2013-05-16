@@ -14,6 +14,8 @@ then prints out stats breaking down the results by image label and pipeline stag
 #include <fstream>
 #include <sys/stat.h>
 
+#include <json/json.h>
+
 using namespace std;
 
 string getLabel(const string& filepath){
@@ -81,44 +83,16 @@ int main(int argc, char *argv[]) {
 		config["templatePath"] = templatePath;
 		ostringstream ss;
 		ss << config;
-		string result = myProcessor.processViaJSON(ss.str().c_str());
-		if( result.size() > 0 ) {
-			cout << "\E[31m" <<  result << "\e[0m" << endl;
+		Json::Reader reader;
+		Json::Value result;
+		reader.parse(myProcessor.processViaJSON(ss.str().c_str()), result);
+		cout << result << endl;
+		if( result.isMember("errorMessage") ) {
+			cout << "\E[31m" <<  result["errorMessage"] << "\e[0m" << endl;
 			cout << "Configuration used:" <<  config << endl;
 			continue;
 		}
-		/*
-		Processor myProcessor("assets/");
-		//TODO: Specify camera calibration somewhere else?
-		//template doesn't make sense because it a property of the input image.
-		#define CAMERA_CALIBRATION_FILE NULL
-		if( !myProcessor.loadFormImage(inputImage.c_str(), CAMERA_CALIBRATION_FILE)) {
-			cout << "\E[31m" <<  "Could not load. Arg: " << "\e[0m" << inputImage << endl;
-			continue;
-		}
-	
-		if( !myProcessor.loadFeatureData(templatePath.c_str()) ) {
-			cout << "\E[31m" <<  "Could not set load feature data. Arg: " << "\e[0m" << templatePath << endl;
-			continue;
-		}
-	
-		if( !myProcessor.setTemplate(templatePath.c_str()) ) {
-			cout << "\E[31m" <<  "Could not set template. Arg: " << "\e[0m" << templatePath << endl;
-			continue;
-		}
-	
-		cout << "Outputting aligned image to: " << outputPath << endl;
-		string alignedFormOutfile(outputPath  + "aligned.jpg");
-		if( !myProcessor.alignForm(alignedFormOutfile.c_str()) ) {
-			cout << "\E[31m" <<  "Could not align. Arg: " << "\e[0m" << alignedFormOutfile  << endl;
-			continue;
-		}
-		#define MINIFY_OUTPUT false
-		if( !myProcessor.processForm(outputPath.c_str(), MINIFY_OUTPUT) ) {
-			cout << "\E[31m" << "Could not process. Arg: " << "\e[0m" << outputPath << endl;
-			continue;
-		}
-		*/
+
 		final=clock()-init;
 		cout << "Time taken: " << (double)final / ((double)CLOCKS_PER_SEC) << " seconds" << endl;
 		cout << "\E[32m" << "Apparent success!" << "\e[0m" << endl;
@@ -126,7 +100,7 @@ int main(int argc, char *argv[]) {
 		collectors[label].addTime( (double)final / ((double)CLOCKS_PER_SEC) );
 		
 		string jsonOutfile(outputPath + "output.json");
-		if(fileExists(jsonOutfile) && fileExists(expectedJsonFile)){
+		if(fileExists(jsonOutfile) && fileExists(expectedJsonFile)) {
 			collectors[label].compareFiles(jsonOutfile, expectedJsonFile, COMP_BUBBLE_VALS);
 			//collectors[label].compareFiles(jsonOutfile, templatePath + ".json", COMP_BUBBLE_OFFSETS);
 		}

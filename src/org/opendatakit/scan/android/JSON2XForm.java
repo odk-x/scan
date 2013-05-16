@@ -113,7 +113,7 @@ public class JSON2XForm extends Activity {
 			//////////////
 			Log.i(LOG_TAG, "Checking if the form instance is already registered with collect.");
 			//Previous instance are found using template and photo name,
-			//so Scan don't have to keep track of the instanceID.
+			//so Scan doesn't have to keep track of the instanceID.
 			//////////////
 			int instanceId;
 			String instanceName = templateName + '_' + rootPhotoName;

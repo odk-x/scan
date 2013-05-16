@@ -62,6 +62,13 @@ using namespace zxing::qrcode;
 using namespace std;
 using namespace cv;
 
+const char* stringify(const Json::Value& theJson){
+	stringstream ss;
+	Json::FastWriter writer;
+	ss << writer.write( theJson );
+	return ss.str().c_str();
+}
+
 //Iterates over a field's segments and items to determine it's value.
 Json::Value computeFieldValue(const Json::Value& field){
 	Json::Value output;
@@ -874,7 +881,12 @@ processViaJSON expects a JSON string like this:
 	"calibrationFilePath" : "",
 	"trainingDataDirectory" : "training_examples/"
 }
-It will return a error string if there is an error, or an empty string if everything is OK.
+It returns a JSON string like this:
+{
+	"errorMessage" : "This is only here if there's an error",
+	"templatePath" : "path/to/template/that/was/used/for/processing"
+}
+
 You only need to specify the inputImage, outputDirectory and templatePath(s).
 The JSON above contains all the default values.
 
@@ -882,21 +894,26 @@ The benefits are as follows:
 - Only a single call is required to use the whole processing pipeline.
 - Keyword arguments make it clearer what the args do,
   and allow for more flexible default behavior when they are not specified.
-- Extra data can be passed in by the caller that is not yet supported here in the core without needing by modify the interface.
+- Extra properties can be passed in without both ends supporting them in advance.
+- The output JSON could be passed back this way without requiring use of the file system.
 */
 const char* Processor::processViaJSON(const char* jsonString) {
+	Json::Value result(Json::objectValue);
 	try {
 		Json::Value config;// will contain the root value after parsing.
 		Json::Reader reader;
 		bool parsingSuccessful = reader.parse( jsonString, config );
 		if(!parsingSuccessful){
-			return "Could not parse JSON configuration string.";
+			result["errorMessage"] = "Could not parse JSON configuration string.";
+			return stringify(result);
 		}
 		if(!config.isMember("inputImage")){
-			return "Missing input image path.";
+			result["errorMessage"] = "Missing input image path.";
+			return stringify(result);
 		}
 		if(!config.isMember("outputDirectory")){
-			return "Missing output image path.";
+			result["errorMessage"] = "Missing output image path.";
+			return stringify(result);
 		}
 		string outputDirectory = config["outputDirectory"].asString();
 		processorImpl->loadFormImage(config["inputImage"].asString().c_str(), config.get("calibrationFilePath", "").asString().c_str());
@@ -905,35 +922,44 @@ const char* Processor::processViaJSON(const char* jsonString) {
 
 		if(config.isMember("templatePath")){
 			if(!processorImpl->loadFeatureData(config["templatePath"].asString().c_str())) {
-				return "Could not load feature data.";
+				result["errorMessage"] = "Could not load feature data.";
+				return stringify(result);
 			}
 			if(!processorImpl->setTemplate(config["templatePath"].asString().c_str())) {
-				return "Could not set template.";
+				result["errorMessage"] = "Could not set template.";
+				return stringify(result);
 			}
+			result["templatePath"] = config["templatePath"];
 		} else if(config.isMember("templatePaths")) {
 			Json::Value templatePaths = config["templatePaths"];
 			for ( size_t j = 0; j < templatePaths.size(); j++ ) {
 				const Json::Value templatePath = templatePaths[j];
 				if(!processorImpl->loadFeatureData(templatePath.asString().c_str())) {
-					return "Could not load feature data.";
+					result["errorMessage"] = "Could not load feature data.";
+					return stringify(result);
 				}
 			}
 			formIdx = processorImpl->detectForm();
 			if(formIdx < 0) {
-				return "Could not detect form.";
+				result["errorMessage"] = "Could not detect form.";
+				return stringify(result);
 			}
+			result["templatePath"] = templatePaths[formIdx];
 			if(!processorImpl->setTemplate(templatePaths[formIdx].asString().c_str())) {
-				return "Could not set template.";
+				result["errorMessage"] = "Could not set template.";
+				return stringify(result);
 			}
 		} else {
-			return "One or more template paths are required.";
+			result["errorMessage"] = "One or more template paths are required.";
+			return stringify(result);
 		}
 
 		if(config.get("alignForm", true).asBool()){
 			string alignedFormOutputPath = config.get("alignedFormOutputPath",
 					addSlashIfNeeded(outputDirectory) + "aligned.jpg").asString();
 			if(!processorImpl->alignForm(alignedFormOutputPath.c_str(), (size_t)formIdx)){
-				return "Could not align form.";
+				result["errorMessage"] = "Could not align form.";
+				return stringify(result);
 			}
 		}
 		if(config.get("processForm", true).asBool()){
@@ -944,20 +970,25 @@ const char* Processor::processViaJSON(const char* jsonString) {
 			string markedupFormOutputPath = config.get("markedupFormOutputPath",
 					normalizedOutDir + "markedup.jpg").asString();
 			if(!processorImpl->processForm(normalizedOutDir, jsonOutputPath, markedupFormOutputPath, false)){
-				return "Could not process form.";
+				result["errorMessage"] = "Could not process form.";
+				return stringify(result);
 			}
 		}
-		return "";//Success
 	}
 	catch(cv::Exception& e){
-		return e.what();
+		result["errorMessage"] = e.what();
+		return stringify(result);
 	}
 	catch(std::exception& e){
-		return e.what();
+		result["errorMessage"] = e.what();
+		return stringify(result);
 	}
 	catch (...) {
-	    return "Unknown expection.";
+		result["errorMessage"] = "Unknown expection.";
+		return stringify(result);
 	}
+	LOGI(stringify(result));
+	return stringify(result);
 }
 bool Processor::writeFormImage(const char* outputPath) const{
 	return processorImpl->writeFormImage(outputPath);
