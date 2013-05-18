@@ -46,7 +46,7 @@ public class RunSetup implements Runnable {
 			//TODO: When new examples/templates are added to the assets dir they should be added here as well.
 			//It would be nice to automatically delete examples/templates in the assets dir.
 			rmdir(new File(trainingExamplesDir, "bubbles"));
-			rmdir(new File(trainingExamplesDir, "checkboxes"));
+			rmdir(new File(trainingExamplesDir, "squre_checkboxes"));
 			rmdir(new File(formTemplatesDir, "example"));
 			rmdir(new File(ScanUtils.getFormViewHTMLDir()));
 			

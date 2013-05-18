@@ -42,6 +42,7 @@ using namespace zxing::qrcode;
 #include <fstream>
 #include <map>
 #include <time.h>
+
 // This sets the resolution of the form at which to perform segment alignment and classification.
 // It is a percentage of the size specified in the template.
 #define SCALEPARAM 1.0
@@ -55,18 +56,23 @@ using namespace zxing::qrcode;
 	NameGenerator namer;
 #endif
 
-//#define TIME_IT
-
-#define REFINE_ALL_BUBBLE_LOCATIONS true
-
 using namespace std;
 using namespace cv;
 
-const char* stringify(const Json::Value& theJson){
+const string stringify(const Json::Value& theJson){
+	/*
+	string result = theJson.toStyledString();
+	LOGI(result.c_str());
+	return result.substr(0, result.length() - 1).c_str();
+	*/
 	stringstream ss;
 	Json::FastWriter writer;
 	ss << writer.write( theJson );
-	return ss.str().c_str();
+	//ss << "                        " << endl;
+	string writtenString = ss.str();
+	//string result = writtenString.substr(0, writtenString.length() - 10);
+	LOGI(writtenString.c_str());
+	return writtenString;
 }
 
 //Iterates over a field's segments and items to determine it's value.
@@ -632,7 +638,8 @@ bool setTemplate(const char* templatePathArg) {
 }
 bool loadFormImage(const char* imagePath, const char* calibrationFilePath) {
 	#ifdef DEBUG_PROCESSOR
-		cout << "loading form image..." << flush;
+		LOGI("loading form image...");
+		cout << flush;
 	#endif
 	#ifdef TIME_IT	
 		init = clock();
@@ -690,7 +697,8 @@ bool loadFormImage(const char* imagePath, const char* calibrationFilePath) {
 }
 bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 	#ifdef DEBUG_PROCESSOR
-		cout << "aligning form..." << endl;
+		LOGI("aligning form...");
+		cout << endl;
 	#endif
 	#ifdef TIME_IT	
 		init = clock();
@@ -699,17 +707,17 @@ bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 
 	Size form_sz(root.get("width", 0).asInt(), root.get("height", 0).asInt());
 
-	if( form_sz.width <= 0 || form_sz.height <= 0)
+	if( form_sz.width <= 0 || form_sz.height <= 0) {
 		CV_Error(CV_StsError, "Invalid form dimension in template.");
+	}
 
 	//If the image was not set (because form detection didn't happen) set it.
 	if( aligner.currentImg.empty() ) aligner.setImage(formImage);
 
-	aligner.alignFormImage( straightenedImage, SCALEPARAM * form_sz, formIdx );
-
-	
-	if(straightenedImage.empty()) {
-		cout << "does this ever happen?" << endl;
+	//TODO: Move this try/catch into alignFormImage perhaps?
+	try {
+		aligner.alignFormImage( straightenedImage, SCALEPARAM * form_sz, formIdx );
+	} catch(cv::Exception& e){
 		return false;
 	}
 
@@ -729,7 +737,8 @@ bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 }
 bool processForm(const string& outputPath, const string& jsonOutputPath, const string& markedupImagePath, bool minifyJson) {
 	#ifdef  DEBUG_PROCESSOR
-		cout << "Processing form" << endl;
+		LOGI("Processing form");
+		cout << endl;
 	#endif
 	#ifdef TIME_IT	
 		init = clock();
@@ -846,7 +855,7 @@ bool Processor::processForm(const char* outputPath, bool minifyJson) {
 	    return false;
 	}
 }
-const char* Processor::scanAndMarkup(const char* outputPath) {
+const string Processor::scanAndMarkup(const char* outputPath) {
 	try{
 		string normalizedOutDir = addSlashIfNeeded(outputPath);
 		if(processorImpl->processForm(normalizedOutDir, normalizedOutDir + "output.json",
@@ -867,7 +876,8 @@ const char* Processor::scanAndMarkup(const char* outputPath) {
 	}
 }
 /**
-processViaJSON expects a JSON string like this:
+processViaJSON tries to  mimic a restful client-server interface.
+It expects a JSON string like this:
 {
 	"inputImage" : "",
 	"outputDirectory" : "",
@@ -881,23 +891,24 @@ processViaJSON expects a JSON string like this:
 	"calibrationFilePath" : "",
 	"trainingDataDirectory" : "training_examples/"
 }
+You only need to specify the inputImage, outputDirectory and templatePath(s).
+The JSON above contains all the default values.
+
 It returns a JSON string like this:
 {
 	"errorMessage" : "This is only here if there's an error",
 	"templatePath" : "path/to/template/that/was/used/for/processing"
 }
 
-You only need to specify the inputImage, outputDirectory and templatePath(s).
-The JSON above contains all the default values.
-
 The benefits are as follows:
-- Only a single call is required to use the whole processing pipeline.
+- Only a single call is required to use the whole processing pipeline
+  (all the pipeline logic remains in here).
 - Keyword arguments make it clearer what the args do,
   and allow for more flexible default behavior when they are not specified.
 - Extra properties can be passed in without both ends supporting them in advance.
 - The output JSON could be passed back this way without requiring use of the file system.
 */
-const char* Processor::processViaJSON(const char* jsonString) {
+const string Processor::processViaJSON(const char* jsonString) {
 	Json::Value result(Json::objectValue);
 	try {
 		Json::Value config;// will contain the root value after parsing.
@@ -987,9 +998,18 @@ const char* Processor::processViaJSON(const char* jsonString) {
 		result["errorMessage"] = "Unknown expection.";
 		return stringify(result);
 	}
-	LOGI(stringify(result));
 	return stringify(result);
 }
 bool Processor::writeFormImage(const char* outputPath) const{
 	return processorImpl->writeFormImage(outputPath);
 }
+const string Processor::jniTest() const{
+	Json::Value result(Json::objectValue);
+	return "{\"stuff\":\"jni//ODKScan-core/src/Processor.cpp:331: error: (-1) Could not find classifier data: /mnt/sdcard/ODKScan/training_examples/square_checkboxes in function cv::Ptr<PCA_classifier>& Processor::ProcessorImpl::getClassifier(const Json::Value&)\n\"}";
+}
+const string Processor::jniEchoTest(const char* testStr) const{
+	Json::Value result(Json::objectValue);
+	result["stuff"] = testStr;
+	return stringify(result);
+}
+

@@ -52,8 +52,10 @@ containing a value of this type.
         public static final int retake_button=0x7f090001;
         public static final int saveBtn=0x7f090010;
         public static final int save_transcribe=0x7f09000f;
-        public static final int scanNewForm=0x7f090013;
-        public static final int startOver=0x7f090014;
+        public static final int scanNewForm=0x7f090015;
+        public static final int startOver=0x7f090016;
+        public static final int statusContainer=0x7f090013;
+        public static final int statusMessage=0x7f090014;
         public static final int templateName=0x7f090007;
         public static final int transcribeBtn=0x7f090011;
         public static final int version_display=0x7f09000d;
@@ -67,6 +69,7 @@ containing a value of this type.
         public static final int filename_list_item=0x7f030003;
         public static final int main_menu=0x7f030004;
         public static final int processed_form=0x7f030005;
+        public static final int status=0x7f030006;
     }
     public static final class menu {
         public static final int mscan_menu=0x7f080000;

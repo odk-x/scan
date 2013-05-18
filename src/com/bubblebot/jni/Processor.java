@@ -93,4 +93,12 @@ public class Processor {
     return bubblebotJNI.Processor_writeFormImage(swigCPtr, this, outputPath);
   }
 
+  public String jniTest() {
+    return bubblebotJNI.Processor_jniTest(swigCPtr, this);
+  }
+
+  public String jniEchoTest(String str) {
+    return bubblebotJNI.Processor_jniEchoTest(swigCPtr, this, str);
+  }
+
 }

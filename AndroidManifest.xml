@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opendatakit.scan.android"
-    android:versionCode="40"
-    android:versionName="0.40" >
+    android:versionCode="51"
+    android:versionName="0.51" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -77,6 +77,11 @@
 		        <action android:name="org.opendatakit.scan.android.ALIGN" />
 		        <category android:name="android.intent.category.DEFAULT"/>
 		    </intent-filter>
+        </activity>
+        <activity
+            android:name="DisplayStatus"
+			android:label="status"
+            android:screenOrientation="portrait"  >
         </activity>
         <activity
             android:name="AppSettings"

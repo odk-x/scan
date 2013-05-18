@@ -214,6 +214,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include "ODKScan-core/src/Processor.h"
 
 
+#include <string>
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -455,7 +458,7 @@ SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1scanAn
   jstring jresult = 0 ;
   Processor *arg1 = (Processor *) 0 ;
   char *arg2 = (char *) 0 ;
-  char *result = 0 ;
+  std::string result;
   
   (void)jenv;
   (void)jcls;
@@ -466,8 +469,8 @@ SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1scanAn
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
     if (!arg2) return 0;
   }
-  result = (char *)(arg1)->scanAndMarkup((char const *)arg2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  result = (arg1)->scanAndMarkup((char const *)arg2);
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
   return jresult;
 }
@@ -477,7 +480,7 @@ SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1proces
   jstring jresult = 0 ;
   Processor *arg1 = (Processor *) 0 ;
   char *arg2 = (char *) 0 ;
-  char *result = 0 ;
+  std::string result;
   
   (void)jenv;
   (void)jcls;
@@ -488,8 +491,8 @@ SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1proces
     arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
     if (!arg2) return 0;
   }
-  result = (char *)(arg1)->processViaJSON((char const *)arg2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  result = (arg1)->processViaJSON((char const *)arg2);
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
   return jresult;
 }
@@ -512,6 +515,43 @@ SWIGEXPORT jboolean JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1write
   }
   result = (bool)((Processor const *)arg1)->writeFormImage((char const *)arg2);
   jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1jniTest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  Processor *arg1 = (Processor *) 0 ;
+  std::string result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Processor **)&jarg1; 
+  result = ((Processor const *)arg1)->jniTest();
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1jniEchoTest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  jstring jresult = 0 ;
+  Processor *arg1 = (Processor *) 0 ;
+  char *arg2 = (char *) 0 ;
+  std::string result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(Processor **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = ((Processor const *)arg1)->jniEchoTest((char const *)arg2);
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
   if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
   return jresult;
 }

@@ -2,6 +2,7 @@
 #define PROCESSOR_H
 #include "configuration.h"
 #include <tr1/memory>
+#include <string>
 
 class Processor{
 	public:
@@ -16,11 +17,13 @@ class Processor{
 		bool alignForm(const char* alignedImageOutputPath, int templateIdx = 0);
 		bool processForm(const char* outputPath, bool minifyJson = false);
 		//scanAndMarkup is a version of processForm that returns better errors.
-		const char* scanAndMarkup(const char* outputPath);
+		const std::string scanAndMarkup(const char* outputPath);
 		//Run the full processing pipeline via a JSON configuration string.
-		const char* processViaJSON(const char* jsonString);
+		const std::string processViaJSON(const char* jsonString);
 		bool writeFormImage(const char* outputPath) const;
 
+		const std::string jniTest() const;
+		const std::string jniEchoTest(const char* str) const;
 	private:
 		class ProcessorImpl;
     		std::tr1::shared_ptr<ProcessorImpl> processorImpl;
