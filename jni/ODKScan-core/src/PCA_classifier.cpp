@@ -75,6 +75,7 @@ void PCA_classifier::set_classifier_params(const Json::Value& classifier_params_
 	//TODO: Push more of the param setting into this function.
 	classifier_params = classifier_params_arg;
 }
+//Find the classification index correponding to the given filename
 int PCA_classifier::getClassificationIdx(const string& filepath) {
 	int nameIdx = filepath.find_last_of("/");
 	string filename = filepath.substr(nameIdx + 1, filepath.size() - nameIdx);
@@ -108,6 +109,7 @@ void PCA_classifier::PCA_set_push_back(Mat& PCA_set, const Mat& img) {
 		PCA_set.push_back(PCA_set_row.reshape(0,1));
 	}
 }
+//Serialize a vector to the given filestream.
 template <class Tp>
 void writeVector(FileStorage& fs, const string& label, const vector<Tp>& vec) {
 	fs << label << "[";
@@ -345,10 +347,7 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 	return loc + offset;
 }
 /*
-//This bit of code finds the location in the search_window most likely to be a bubble
-//then it checks that rather than the exact specified location.
-//This section probably slows things down by quite a bit and it might not provide significant
-//improvement to accuracy. We will need to run some tests to find out if it's worth using.
+//minimize the rate_item function by checking all the locations in the search window.
 Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_location) const {
 	if(search_window.width == 0 || search_window.height == 0){
 		return seed_location;
@@ -374,7 +373,6 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 
 //Compare the specified bubble with all the training bubbles via PCA.
 Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& item_location) const {
-
 	int classificationIndex;	
 	Mat query_pixels;
 	//cout << item_location << endl;

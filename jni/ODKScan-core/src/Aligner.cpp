@@ -3,13 +3,13 @@
 #include "AlignmentUtils.h"
 #include "Addons.h"
 #include "FileUtils.h"
-#include "TemplateProcessor.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <math.h>
+#include <json/json.h>
 
 #include <iostream>
 #include <fstream>
@@ -19,8 +19,7 @@
 	#define SHOW_MATCHES_WINDOW
 #endif
 
-#define MASK_CENTER_AMOUNT .41
-
+//#define MASK_CENTER_AMOUNT .41
 
 #ifdef OUTPUT_DEBUG_IMAGES
 	#include "NameGenerator.h"
@@ -30,36 +29,31 @@
 using namespace std;
 using namespace cv;
 
-//TODO: Replace this so the Template processor can be removed.
-class MaskGenerator : public TemplateProcessor
-{
-	private:
-	typedef TemplateProcessor super;
-	Mat markupImage;
+//Generate a mask that blocks out segments using the specified template.
+Mat generateMask(const Json::Value& templateRoot) {
+	Mat markupImage = Mat(templateRoot.get("height", 0).asInt(),
+	                      templateRoot.get("width", 0).asInt(),
+	                      CV_8UC1, Scalar::all(255));
 
-	public:
-	Mat generate(const string& templatePath){
-		bool rv = start(templatePath.c_str());
-		//Mat temp;	
-		//erode(markupImage, temp, Mat(), Point(-1,-1), 1);
-		return markupImage;
+	const Json::Value fields = templateRoot["fields"];
+
+	//Note: segments etc. are not inherited like in processor.
+	//I don't think that behavior is necessairy.
+
+	for ( size_t i = 0; i < fields.size(); i++ ) {
+		const Json::Value field = fields[i];
+		const Json::Value segments = field["segments"];
+		for ( size_t j = 0; j < segments.size(); j++ ) {
+			const Json::Value segment = segments[j];
+			Rect segRect( Point( segment.get("segment_x", INT_MIN ).asInt(),
+			                     segment.get("segment_y", INT_MIN).asInt()),
+			              Size( segment.get("segment_width", INT_MIN).asInt(),
+			                    segment.get("segment_height", INT_MIN).asInt()));
+			rectangle( markupImage, segRect.tl(), segRect.br(), Scalar::all(0), -1);
+		}
 	}
-	virtual Json::Value segmentFunction(const Json::Value& segment){
-		Rect segRect( Point( segment.get("x", INT_MIN ).asInt(),
-		                     segment.get("y", INT_MIN).asInt()),
-		              Size( segment.get("segment_width", INT_MIN).asInt(),
-		                    segment.get("segment_height", INT_MIN).asInt()));
-		rectangle( markupImage, segRect.tl(), segRect.br(), Scalar::all(0), -1);
-		return super::segmentFunction(segment);
-	}
-	virtual Json::Value formFunction(const Json::Value& templateRoot){
-		markupImage = Mat(templateRoot.get("height", 0).asInt(), templateRoot.get("width", 0).asInt(),
-		                  CV_8UC1, Scalar::all(255));
-		
-		return super::formFunction(templateRoot);
-	}
-	virtual ~MaskGenerator(){}
-};
+	return markupImage;
+}
 
 //This is from the OpenCV descriptor matcher example.
 void crossCheckMatching( Ptr<DescriptorMatcher>& descriptorMatcher,
@@ -128,18 +122,21 @@ void saveFeatures(  const string& featuresFile, const Size& templImageSize,
 }
 
 Aligner::Aligner(){
-	//STANDARD_AREA is a parameter because we don't know how big the image should be before we detect the template.
-	//All templates are expected be approximately the same size.
-
 	//With OpenCV form alignment can be broken apart into 3 components,
 	//feature detection, feature extraction, and feature matching.
-	//Here different combinations of components are configured:
+	//In each param set different combinations of components are configured:
 
 	//A few notes:
-	//The grid adapted feature detector is good for limiting the number of key-points,
+	//- The grid adapted feature detector is good for limiting the number of key-points,
 	//and ensuring they are reasonably well distributed around the image.
-	//BRIEF is fast but not scale/rotation invariant.
-	//SURF and SIFT have invariance but are slower and patented.
+	//- BRIEF is fast but not scale/rotation invariant.
+	//- SURF and SIFT have invariance but are slower and patented.
+	//- STANDARD_AREA is a parameter because we don't know how big the image should be before we detect the template.
+	//so it is resized to have the standard area.
+	//This also has the implicit assumption that templates all are are approximately the same size.
+
+	//IMPORTANT: Make sure you define ALWAYS_COMPUTE_TEMPLATE_FEATURES
+	//when trying new parameterizations, otherwise your cached features will be used.
 
 	#define PARAM_SET 6
 	#if PARAM_SET == 0
@@ -235,8 +232,8 @@ void Aligner::setImage( const cv::Mat& img ){
 	resize(currentImg, currentImgResized, sqrt(STANDARD_AREA / currentImg.size().area()) * currentImg.size(), 0, 0, INTER_AREA);
 	
 	trueEfficiencyScale = Point3d(  double(currentImgResized.cols) / img.cols,
-									double(currentImgResized.rows) / img.rows,
-									1.0);
+	                                double(currentImgResized.rows) / img.rows,
+	                                1.0);
 
 	#if 0
 		Mat temp;
@@ -296,38 +293,34 @@ void Aligner::loadFeatureData(const string& imagePath, const string& jsonPath, c
 		
 		Mat templImage, temp;
 		templImage = imread( imagePath, 0 );
-		if(templImage.empty())
+		if(templImage.empty()) {
 			CV_Error(CV_StsError, "Template image not found: " + imagePath);
+		}
 
-		//Read the template json and generate a mask:
-		//TODO: Generate the mask outside of this class?
-		MaskGenerator g;
-		Mat mask = g.generate(jsonPath);
-		if(mask.empty()) CV_Error(CV_StsError, "Could not create mask. There might be a problem with the template.");
-		/*
+		Json::Value templateRoot;
+		if( !parseJsonFromFile(jsonPath, templateRoot) ){
+			CV_Error(CV_StsError, "Could not read template.json: " + jsonPath);
+		}
+		//Resize the template image to the size specified in the template json.
+		//TODO: Get standard image size from average template image size?
+		templImageSize = Size( templateRoot.get("width", 0).asInt(),
+		                       templateRoot.get("height", 0).asInt());
+		
+		//I seem to get better performance without masking.
+		Mat mask = Mat();
+		//Mat mask = generateMask(templateRoot);
+		//debugShow(mask);
+
 		#ifdef MASK_CENTER_AMOUNT
-			Rect roi = resizeRect(Rect(Point(0,0), templImage.size()), MASK_CENTER_AMOUNT);
+			Rect roi = resizeRect(Rect(Point(0,0), templImageSize), MASK_CENTER_AMOUNT);
 			rectangle(mask, roi.tl(), roi.br(), Scalar::all(0), -1);
 		#endif
-		*/
 		
-		//Resize the template image to the mask size
-		//which is the size specified in the template json.
-		//TODO: Get standard image size from average template image size?
-		templImageSize = mask.size();
 		resize(templImage, temp, templImageSize, 0, 0, INTER_AREA);
 		templImage.release();
 		templImage = temp;
 		
 		//debugShow(templImage & mask);
-
-		/*
-		#ifdef DEBUG_ALIGN_IMAGE
-			cout << "Template image preprocessing:" << endl;
-		#endif
-		adaptiveThreshold(temp, templImage, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 9, 15);
-		equalizeHist(temp, templImage);
-		*/
 		
 		#ifdef DEBUG_ALIGN_IMAGE
 			cout << "Extracting keypoints from template image..." << endl;

@@ -59,22 +59,14 @@ using namespace zxing::qrcode;
 using namespace std;
 using namespace cv;
 
+//Serialize the JSON into an unstyled string.
+//See also: Json::Value::toStyledString
 const string stringify(const Json::Value& theJson){
-	/*
-	string result = theJson.toStyledString();
-	LOGI(result.c_str());
-	return result.substr(0, result.length() - 1).c_str();
-	*/
 	stringstream ss;
 	Json::FastWriter writer;
 	ss << writer.write( theJson );
-	//ss << "                        " << endl;
-	string writtenString = ss.str();
-	//string result = writtenString.substr(0, writtenString.length() - 10);
-	LOGI(writtenString.c_str());
-	return writtenString;
+	return ss.str();
 }
-
 //Iterates over a field's segments and items to determine it's value.
 Json::Value computeFieldValue(const Json::Value& field){
 	Json::Value output;
@@ -142,6 +134,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 	}
 	return output;
 }
+//Generate a marked up version of the form image that shows classifications and values.
 Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts) {
 	Mat markupImage;
 	cvtColor(inputImage, markupImage, CV_GRAY2RGB);
@@ -221,6 +214,7 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 	}
 	return markupImage;
 }
+//deprecated
 Json::Value minifyJsonOutput(const Json::Value& JsonOutput){
 	Json::Value minifiedOutput;
 	Json::Value minifiedOutputFields;
@@ -274,16 +268,17 @@ private:
 	ClassiferMap classifiers;
 
 	string templPath;
-	//string imageDir;
 
 	#ifdef TIME_IT
 		clock_t init;
 	#endif
 
-
-//NOTE: training_data_uri must be a directory with no leading or trailing slashes.
+//Creates a classifier based on the given JSON classifier specification.
+//Classifiers are cached in memory via the "classifiers" map. 
+//Trained classifier parameters are cached on the file system.
+//Cached data is keyed by the classifier's training_data_uri and dimensions.
 Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
-
+	//NOTE: training_data_uri must be a directory with no leading or trailing slashes.
 	const string& training_data_uri = classifier["training_data_uri"].asString();
 
 	Size acutal_classifier_size = SCALEPARAM * Size(classifier["classifier_width"].asInt(),
@@ -786,14 +781,18 @@ bool processForm(const string& outputPath, const string& jsonOutputPath, const s
 bool writeFormImage(const char* outputPath) {
 	return imwrite(outputPath, formImage);
 }
+//Loads feature data for the given template into memory.
+//This can be called multiple times, so multiple templates are loaded into memeory for detection.
 bool loadFeatureData(const char* templatePathArg) {
 	string templatePath = addSlashIfNeeded(templatePathArg);
 	aligner.loadFeatureData(templatePath + "form.jpg",
-							templatePath + "template.json",
-							templatePath + "cached_features.yml");
+	                        templatePath + "template.json",
+	                        templatePath + "cached_features.yml");
 
 	return true;
 }
+//Detect which form we are using from among the loaded feature data sets.
+//A return value of 0 indicates the first data loaded, 1 indicates the second, etc..
 int detectForm(){
 	int formIdx;
 	try{

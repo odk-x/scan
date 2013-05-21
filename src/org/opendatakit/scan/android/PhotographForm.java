@@ -18,8 +18,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 /**
- * PhotographForm launches the Android camera app
- * to capture a form image.
+ * PhotographForm launches the Android camera app to capture a form image.
  * It also creates a directory for data about the form to be stored.
  **/
 public class PhotographForm extends Activity {
@@ -61,7 +60,9 @@ public class PhotographForm extends Activity {
 		//Try to create an output folder
 		if(!outputPath.mkdirs()){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Could not create output folder ["+outputPath+"].\n There may be a problem with the device's storage.")
+			builder.setMessage("Could not create output folder [" + 
+								outputPath + 
+								"].\n There may be a problem with the device's storage.")
 			       .setCancelable(false)
 			       .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {

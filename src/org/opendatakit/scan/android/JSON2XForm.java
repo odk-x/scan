@@ -117,7 +117,8 @@ public class JSON2XForm extends Activity {
 			//////////////
 			int instanceId;
 			String instanceName = templateName + '_' + rootPhotoName;
-			File instanceDir = new File(Environment.getExternalStorageDirectory().getPath(), instanceName);
+			File instancesDir = new File(new File(Environment.getExternalStorageDirectory(), "odk"), "instances");
+			File instanceDir = new File(instancesDir, instanceName);
 			instanceDir.mkdirs();
 			String instanceFilePath = new File(instanceDir.getAbsolutePath(), instanceName + ".xml").getAbsolutePath();
 			String selection = "instanceFilePath = ?";

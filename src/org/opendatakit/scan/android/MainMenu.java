@@ -1,7 +1,6 @@
 package org.opendatakit.scan.android;
 
 import java.io.File;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -20,15 +19,12 @@ import android.widget.TextView;
 
 public class MainMenu extends Activity {
 
-	ProgressDialog pd;
-	SharedPreferences settings;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_menu); // Setup the UI
 
-		settings = PreferenceManager
+		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
 		try {
@@ -47,8 +43,16 @@ public class MainMenu extends Activity {
 			int storedVersionCode = settings.getInt("version", 0);
 			int appVersionCode = packInfo.versionCode;
 			if (appVersionCode == 0 || storedVersionCode < appVersionCode) {
-				pd = ProgressDialog.show(this, "Please wait...",
+				final ProgressDialog pd = ProgressDialog.show(this, "Please wait...",
 						"Extracting assets", true);
+				
+		    	final Handler handler = new Handler(new Handler.Callback() {
+		            public boolean handleMessage(Message message) {
+		            	pd.dismiss();
+						return true;
+		            }
+		    	});
+		    	
 				Thread thread = new Thread(new RunSetup(handler, settings,
 						getAssets(), appVersionCode));
 				thread.start();
@@ -138,10 +142,4 @@ public class MainMenu extends Activity {
 		startActivity(setIntent);
 	}
 
-	private Handler handler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			pd.dismiss();
-		}
-	};
 }

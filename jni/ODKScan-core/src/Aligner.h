@@ -14,6 +14,8 @@ class Aligner
 		#endif
 		std::vector<cv::KeyPoint> currentImgKeypoints;
 		cv::Mat currentImgDescriptors;
+
+		//The amount an image was actually rescaled factoring in rounding error.
 		cv::Point3d trueEfficiencyScale;
 	
 		cv::Ptr<cv::FeatureDetector> detector;
@@ -28,7 +30,7 @@ class Aligner
 		std::vector<cv::Size> templImageSizeVec;
 	
 		Aligner();
-		
+		//Load feature data for the given template, caching it to the given featuresFile
 		void loadFeatureData(const std::string& imagePath,
 		                     const std::string& jsonPath, const std::string& featuresFile) throw(cv::Exception);
 		

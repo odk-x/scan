@@ -82,7 +82,7 @@ public class ProcessInBG extends Service {
 	    	final String inputPath = ScanUtils.getPhotoPath(photoName);
 	    	final String outputPath = ScanUtils.getOutputPath(photoName);
 	    	final String[] templatePaths = extras.getStringArray("templatePaths");
-	    	final String calibrationPath = null;
+	    	//final String calibrationPath = null;
 	    	final int notificationId = (int) (Math.random() * 9999999);
 			final NotificationManager notificationManager = (NotificationManager) 
 	                getSystemService(Context.NOTIFICATION_SERVICE);
@@ -169,6 +169,7 @@ public class ProcessInBG extends Service {
 	    			final Processor mProcessor = new Processor(ScanUtils.appFolder);
 	    			Bundle outputData = new Bundle();
 	    			try {
+	    				//TODO: Pass the config JSON in with the bundle
 	    				JSONObject config = new JSONObject();
 	                    config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
 	                    config.put("inputImage", inputPath);
