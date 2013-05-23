@@ -9,7 +9,7 @@
 #include <json/json.h>
 
 /*
-This class implements bubble classification using OpenCV's support vector machine and PCA.
+This class does classification using OpenCV's support vector machine and PCA.
 */
 class PCA_classifier
 {
@@ -21,21 +21,8 @@ class PCA_classifier
 		
 		cv::PCA my_PCA;
 
-		//The weights Mat can be used to bias the classifier
-		//Each element corresponds to a classification.
-		cv::Mat weights;
-		
 		cv::Mat cMask;
-		
-		//The weighting and search window stuff might not be necessairy:
-		//If you aren't me I recommend ignoring it because it doesn't get used at the moment.
-		//cv::Size search_window;
 
-		//A matrix for precomputing gaussian weights for the search window
-		//cv::Mat gaussian_weights;
-
-		//void update_gaussian_weights();
-		
 		int getClassificationIdx(const std::string& filepath);
 		
 		void PCA_set_push_back(cv::Mat& PCA_set, const cv::Mat& img);

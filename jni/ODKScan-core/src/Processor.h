@@ -22,7 +22,7 @@ class Processor{
 		const std::string processViaJSON(const char* jsonString);
 		bool writeFormImage(const char* outputPath) const;
 
-		const std::string jniTest() const;
+		//This is just here for debugging jni issues
 		const std::string jniEchoTest(const char* str) const;
 	private:
 		class ProcessorImpl;

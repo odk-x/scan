@@ -7,7 +7,6 @@
 class Aligner
 {
 	private:
-
 		#ifdef SHOW_MATCHES_WINDOW
 			cv::Mat featureSource;
 			std::vector<cv::Mat> templateImages;

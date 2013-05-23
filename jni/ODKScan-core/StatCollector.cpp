@@ -13,7 +13,13 @@
 using namespace std;
 using namespace cv;
 
-
+Json::Value getCValue(const Json::Value& classification){
+	if(classification.isObject()){
+		return classification.get("value", false);
+	} else {
+		return classification;
+	}
+}
 //Iterates over a field's segments and items to determine it's value.
 //This is a copy of the function in processor.cpp
 Json::Value computeFieldValueCopy(const Json::Value& field){
@@ -23,31 +29,45 @@ Json::Value computeFieldValueCopy(const Json::Value& field){
 		const Json::Value segment = segments[i];
 		const Json::Value items = segment["items"];
 		if( items.isNull() ){
-			return Json::Value();
+			//If the segment already has a value,
+			//probably from a qrcode, use that.
+			return segment.get("value", Json::Value());
 		}
 		for ( size_t j = 0; j < items.size(); j++ ) {
 			const Json::Value classification = items[j].get("classification", false);
-			const Json::Value itemValue = items[j]["value"];
-			switch ( classification.type() )
+			Json::Value cValue;
+			if(classification.isObject()){
+				cValue = classification.get("value", false);
+			} else {
+				cValue = classification;
+			}
+			Json::Value itemValue = items[j]["value"];
+			switch ( cValue.type() )
 			{
 				case Json::stringValue:
 					//This case isn't used right now.
 					//It's for classifiers that picks up letters.
 					//The idea is to concatenate all the letters into a word.
 					output = Json::Value(output.asString() +
-						             classification.asString());
+						             cValue.asString());
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
+						if(!itemValue.isString()) {
+							//Hack to convert ints to strings.
+							string s = itemValue.toStyledString();
+							itemValue = Json::Value(s.substr(0, s.length() - 1));
+						}
 						//This case is for selects.
 						//The values of the filled (i.e. true) items
 						//are stored in a space delimited string.
-						if(classification.asBool()){
+						if(cValue.asBool()){
 							if( output.asString().length() == 0 ){
 								output = Json::Value(itemValue.asString());
 							}
 							else{
-								output = Json::Value(output.asString() + " " +
+								output = Json::Value(output.asString() +
+									     field.get("delimiter", " ").asString() +
 									     itemValue.asString());
 							}
 						}
@@ -62,10 +82,10 @@ Json::Value computeFieldValueCopy(const Json::Value& field){
 					//for a tally.
 				case Json::intValue:
 				case Json::uintValue:
-					output = Json::Value(output.asInt() + classification.asInt());
+					output = Json::Value(output.asInt() + cValue.asInt());
 				break;
 				case Json::realValue:
-					output = Json::Value(output.asDouble() + classification.asDouble());
+					output = Json::Value(output.asDouble() + cValue.asDouble());
 				break;
 				default:
 				break;
@@ -98,8 +118,8 @@ void StatCollector::compareItems(const Json::Value& foundSeg, const Json::Value&
 	}
 
 	for( size_t i = 0; i < foundItems.size(); i++){
-		bool found = foundItems[i]["classification"].asBool();
-		bool actual = actualItems[i]["classification"].asBool();
+		bool found = getCValue(foundItems[i]["classification"]).asBool();
+		bool actual = getCValue(actualItems[i]["classification"]).asBool();
 		
 		if(found && actual){
 			tp++;

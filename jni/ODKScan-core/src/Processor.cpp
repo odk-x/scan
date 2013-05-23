@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2012 University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 #include "configuration.h"
 #include "Processor.h"
 #include "FileUtils.h"
@@ -81,15 +96,21 @@ Json::Value computeFieldValue(const Json::Value& field){
 		}
 		for ( size_t j = 0; j < items.size(); j++ ) {
 			const Json::Value classification = items[j].get("classification", false);
+			Json::Value cValue;
+			if(classification.isObject()){
+				cValue = classification.get("value", false);
+			} else {
+				cValue = classification;
+			}
 			Json::Value itemValue = items[j]["value"];
-			switch ( classification.type() )
+			switch ( cValue.type() )
 			{
 				case Json::stringValue:
 					//This case isn't used right now.
 					//It's for classifiers that picks up letters.
 					//The idea is to concatenate all the letters into a word.
 					output = Json::Value(output.asString() +
-						             classification.asString());
+						             cValue.asString());
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
@@ -101,7 +122,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 						//This case is for selects.
 						//The values of the filled (i.e. true) items
 						//are stored in a space delimited string.
-						if(classification.asBool()){
+						if(cValue.asBool()){
 							if( output.asString().length() == 0 ){
 								output = Json::Value(itemValue.asString());
 							}
@@ -122,10 +143,10 @@ Json::Value computeFieldValue(const Json::Value& field){
 					//for a tally.
 				case Json::intValue:
 				case Json::uintValue:
-					output = Json::Value(output.asInt() + classification.asInt());
+					output = Json::Value(output.asInt() + cValue.asInt());
 				break;
 				case Json::realValue:
-					output = Json::Value(output.asDouble() + classification.asDouble());
+					output = Json::Value(output.asDouble() + cValue.asDouble());
 				break;
 				default:
 				break;
@@ -179,17 +200,18 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 				const Json::Value Item = items[k];
 				Point ItemLocation(jsonToPoint(Item["absolute_location"]));
 				Json::Value classification = Item["classification"];
-
-				if(classification.isBool()){
-					circle(markupImage, ItemLocation, 2, 	getColor(classification.asBool()), 1, CV_AA);
+				Json::Value cValue = classification["value"];
+				double confidence = abs(classification.get("confidence", 1.0).asDouble()) / 2.0;
+				
+				if(cValue.isBool()){
+					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asBool()) * confidence, 1, CV_AA);
 				}
-				else if(classification.isInt()){
-					circle(markupImage, ItemLocation, 2, 	getColor(classification.asInt()), 1, CV_AA);
+				else if(cValue.isInt()){
+					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asInt()) * confidence, 1, CV_AA);
 				}
 				else{
-					cout << "Don't know what this is: " << classification << endl;
+					cout << "Don't know what this is: " << cValue << endl;
 				}
-				
 			}
 		}
 		if(field.isMember("value")){
@@ -305,6 +327,8 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 		classifiers[key]->set_classifier_params(classifier);
 
 		try{
+			//Uncomment this to always retrain.
+			//throw new exception();
 			classifiers[key]->load(cachedDataPath);
 			#ifdef DEBUG_PROCESSOR
 				cout << "found cached classifier..." << endl;
@@ -394,7 +418,8 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		vector<Point2f> quad;
 		findSegment(segmentImg, segmentRect - expandedRect.tl(), quad);
 
-		if(testQuad(quad, segmentRect, .2)){
+		#define MAX_SIZE_VARIATION 0.4
+		if(testQuad(quad, segmentRect, MAX_SIZE_VARIATION)){
 			#ifdef DEBUG_PROCESSOR
 				//This makes a stream of dots so we can see how fast things are going.
 				//we get a ! when things go wrong.
@@ -1002,10 +1027,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 bool Processor::writeFormImage(const char* outputPath) const{
 	return processorImpl->writeFormImage(outputPath);
 }
-const string Processor::jniTest() const{
-	Json::Value result(Json::objectValue);
-	return "{\"stuff\":\"jni//ODKScan-core/src/Processor.cpp:331: error: (-1) Could not find classifier data: /mnt/sdcard/ODKScan/training_examples/square_checkboxes in function cv::Ptr<PCA_classifier>& Processor::ProcessorImpl::getClassifier(const Json::Value&)\n\"}";
-}
+
 const string Processor::jniEchoTest(const char* testStr) const{
 	Json::Value result(Json::objectValue);
 	result["stuff"] = testStr;

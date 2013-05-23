@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2012 University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 #include "configuration.h"
 #include "PCA_classifier.h"
 //#include "FileUtils.h"
@@ -24,11 +39,10 @@
 //   it won't give an error.
 #define USE_GET_RECT_SUB_PIX
 
-//#define USE_MASK
-//Using a mask seems to slightly help bubble alignment in the average case but cause some additional misses.
-
 //#define DISABLE_PCA
 //PCA definately does help but only by a few percent.
+
+//#define REPORT_CONFIDENCE
 
 using namespace std;
 using namespace cv;
@@ -42,37 +56,8 @@ int vectorFind(const vector<Tp>& vec, const Tp& element) {
 	}
 	return -1;
 }
-/*
-//This functions sets the values of the gaussian_wights Mat,
-//which can be used to weight bubble ratings when doing bubble alignment.
-//TODO: The gaussian intensity isn't correctly scaling...
-void PCA_classifier::update_gaussian_weights() {
-	float sigma = .5; //increasing decreases spread.
-
-	//This precomputes the gaussian for subbbubble alignment.
-	int height = search_window.height;
-	int width = search_window.width;
-	if(height == 0 || width == 0){
-		gaussian_weights.release();
-		return;
-	}
-	Mat v_gauss = getGaussianKernel(height, float(height) * sigma, CV_32F);
-	Mat h_gauss;
-	transpose(getGaussianKernel(width, float(width) * sigma, CV_32F), h_gauss);
-	v_gauss = repeat(v_gauss, 1, width);
-	h_gauss = repeat(h_gauss, height, 1);
-	Mat temp = v_gauss.mul(h_gauss);
-	double temp_max;
-	minMaxLoc(temp, NULL, &temp_max);
-	gaussian_weights = temp_max - temp + .001;//.001 is to avoid roundoff problems, it might not be necessiary.
-}
-void PCA_classifier::set_alignment_radius(int radius) {
-	search_window = Size(2*radius, 2*radius);
-	update_gaussian_weights();
-}
-*/
+//Currently this just sets the classification labels and default label.
 void PCA_classifier::set_classifier_params(const Json::Value& classifier_params_arg){
-	//TODO: Push more of the param setting into this function.
 	classifier_params = classifier_params_arg;
 }
 //Find the classification index correponding to the given filename
@@ -148,8 +133,6 @@ void PCA_classifier::load(const string& inputPath) throw(cv::Exception){
 	fs["PCAeigenvalues"] >> my_PCA.eigenvalues;
 	
 	classifications = readVector(fs, "classifications");
-	//search_window = exampleSize;
-	//update_gaussian_weights();
 	statClassifier->clear();
 	statClassifier->read(*fs, cvGetFileNodeByName(*fs, cvGetRootFileNode(*fs), "classifierData") );
 }
@@ -165,10 +148,6 @@ void PCA_classifier::PCA_set_add(Mat& PCA_set, vector<int>& trainingBubbleValues
 	}
 	Mat aptly_sized_example;
 	resize(example, aptly_sized_example, Size(exampleSize.width, exampleSize.height), 0, 0, INTER_AREA);
-
-	#ifdef USE_MASK
-		aptly_sized_example = aptly_sized_example & cMask;
-	#endif
 
 	#ifdef OUTPUT_EXAMPLES
 		string outfilename = filename.substr(filename.find_last_of("/"), filename.size() - filename.find_last_of("/"));
@@ -189,33 +168,10 @@ void PCA_classifier::PCA_set_add(Mat& PCA_set, vector<int>& trainingBubbleValues
 		}
 	}
 }
-//TODO: Add some code to print out the training set error.
 bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Size myExampleSize,
                                           int eigenvalues, bool flipExamples) {
 	statClassifier->clear();
-	weights = (Mat_<float>(3,1) << 1, 1, 1);//TODO: fix the weighting stuff 
 	exampleSize = myExampleSize;
-	//search_window = myExampleSize;
-	//update_gaussian_weights();
-
-	#ifdef USE_MASK
-		cMask = gaussian_weights < .002;
-		/*
-		namedWindow("outliers", CV_WINDOW_NORMAL);
-		imshow( "outliers", cMask );
-		
-		for(;;)
-		{
-		    char c = (char)waitKey(0);
-		    if( c == '\x1b' ) // esc
-		    {
-		    	cvDestroyWindow("inliers");
-		    	cvDestroyWindow("outliers");
-		        break;
-		    }
-		}
-		*/
-	#endif
 
 	Mat PCA_set;
 	vector<int> trainingBubbleValues;
@@ -223,28 +179,43 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 		PCA_set_add(PCA_set, trainingBubbleValues, examplePaths[i], flipExamples);
 	}
 
-	if(PCA_set.rows < eigenvalues) return false;//I'm not completely sure about this line.
+	//I think PCA breaks if there are too many eigenvalues.
+	if(PCA_set.rows < eigenvalues) return false;
 
 	my_PCA = PCA(PCA_set, Mat(), CV_PCA_DATA_AS_ROW, eigenvalues);
 	Mat comparisonVectors = my_PCA.project(PCA_set);
 	
-	Mat trainingBubbleValuesMat(1,1,CV_32SC1);
-	trainingBubbleValuesMat.at<int>(0) = trainingBubbleValues[0];
-	for(size_t i = 1; i < trainingBubbleValues.size(); i++){
-		trainingBubbleValuesMat.push_back( trainingBubbleValues[i] );
-	}
+	#ifdef REPORT_CONFIDENCE
+		int emptyClassIdx = vectorFind(classifications, string("empty"));
+		Mat trainingBubbleValuesMat = Mat(1,1, CV_32SC1);
+		trainingBubbleValuesMat.at<int>(0) = int(trainingBubbleValues[0] == emptyClassIdx);
+		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
+			trainingBubbleValuesMat.push_back( int(trainingBubbleValues[i] == emptyClassIdx) );
+		}
+		statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(),
+		                           Mat(), CvSVMParams(), 20, CvSVM::get_default_grid(CvSVM::C),
+		                           CvSVM::get_default_grid(CvSVM::GAMMA), CvSVM::get_default_grid(CvSVM::P),
+		                           CvSVM::get_default_grid(CvSVM::NU), CvSVM::get_default_grid(CvSVM::COEF),
+		                           CvSVM::get_default_grid(CvSVM::DEGREE));
 
-	#ifdef DISABLE_PCA
-		statClassifier->train_auto(PCA_set, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
 	#else
-		statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
+		Mat trainingBubbleValuesMat(1,1,CV_32SC1);
+		trainingBubbleValuesMat.at<int>(0) = trainingBubbleValues[0];
+		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
+			trainingBubbleValuesMat.push_back( trainingBubbleValues[i] );
+		}
+		#ifdef DISABLE_PCA
+			statClassifier->train_auto(PCA_set, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
+		#else
+			statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
+		#endif
 	#endif
 
 	return true;
 }
 //Rates a region of pixels in det_img_gray on how similar it is to the classifier's training examples.
 //A lower rating means it is more similar.
-//The rating is the  sum of squared difference of the queried pixels and their PCA back projection.
+//The rating is currently the sum of squared difference of the queried pixels and their PCA back projection.
 //Back projection tries to reconstruct a image/vector just using components of the PCA set (generated from the training data).
 //The theory is that if there is little difference between the reconstructed image and the original image
 //(as measured by the SSD) then the image is probably similar to some of the images used to generate the PCA set.
@@ -262,17 +233,23 @@ inline double PCA_classifier::rate_item(const Mat& det_img_gray, const Point& it
 		query_pixels = Mat::zeros(exampleSize, det_img_gray.type());
 		query_pixels(Rect(Point(0,0), window.size())) += det_img_gray(window);
 	#endif
-
-	#ifdef USE_MASK
-		query_pixels = query_pixels & cMask;
-	#endif
 	
 	query_pixels.reshape(0,1).convertTo(query_pixels, CV_32F);
+
+	#if 0
+		Scalar mean, stddev;
+		meanStdDev(query_pixels, mean, stddev);
+		return ( 1.0 / stddev.val[0]);
+	#endif
 
 	#ifdef NORMALIZE
 		normalize(query_pixels, query_pixels);
 	#endif
 	
+	#if 0
+		return ( 1.0 / abs(statClassifier->predict( my_PCA.project(query_pixels), true )));
+	#endif
+
 	pca_components = my_PCA.project(query_pixels);
 
 	#if 0
@@ -284,7 +261,7 @@ inline double PCA_classifier::rate_item(const Mat& det_img_gray, const Point& it
 
 	Mat out = my_PCA.backProject(pca_components) - query_pixels;
 
-	return sum(out.mul(out)).val[0];
+	return sum(out.mul(out)).val[0];//SSD
 }
 //This using a hill descending algorithm to find the location that minimizes the value of the rate bubble function.
 //It might only find a local instead of global minimum but it is much faster than a global search.
@@ -309,6 +286,7 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 					double initLocDistance = norm(loc - sofarCenter);
 					double rating = rate_item(det_img_gray, Point(i,j) + offset);
 					//This weights ratings to be higher the further they get from the seed location.
+					//Ratings need to be positive or it weights the wrong way.
 					rating *= MAX(1, initLocDistance);
 					
 					if(rating <= minDirVal){
@@ -329,53 +307,26 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 		iterations--;
 	}
 	#if 0
-	//This shows the examined pixels if it is on.
-	namedWindow("outliers", CV_WINDOW_NORMAL);
-	imshow( "outliers", sofar );
+		//This shows the examined pixels if it is on.
+		namedWindow("outliers", CV_WINDOW_NORMAL);
+		imshow( "outliers", sofar );
 	
-	for(;;)
-	{
-	    char c = (char)waitKey(0);
-	    if( c == '\x1b' ) // esc
-	    {
-	    	cvDestroyWindow("inliers");
-	    	cvDestroyWindow("outliers");
-	        break;
-	    }
-	}
+		for(;;)
+		{
+		    char c = (char)waitKey(0);
+		    if( c == '\x1b' ) // esc
+		    {
+		    	cvDestroyWindow("inliers");
+		    	cvDestroyWindow("outliers");
+			break;
+		    }
+		}
 	#endif
 	return loc + offset;
 }
-/*
-//minimize the rate_item function by checking all the locations in the search window.
-Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_location) const {
-	if(search_window.width == 0 || search_window.height == 0){
-		return seed_location;
-	}
-
-	Mat out(search_window, CV_32F);
-	Point offset = Point(seed_location.x - search_window.width/2,
-	                     seed_location.y - search_window.height/2);
-	
-	for(int i = 0; i < search_window.width; i++) {
-		for(int j = 0; j < search_window.height; j++) {
-			out.at<float>(j,i) = rate_item(det_img_gray, Point(i,j) + offset);
-		}
-	}
-	out = out.mul(gaussian_weights);
-	
-	Point min_location;
-	minMaxLoc(out, NULL,NULL, &min_location);
-	
-	return min_location + offset;
-}
-*/
-
-//Compare the specified bubble with all the training bubbles via PCA.
 Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& item_location) const {
-	int classificationIndex;	
+		
 	Mat query_pixels;
-	//cout << item_location << endl;
 	#ifdef USE_GET_RECT_SUB_PIX
 		getRectSubPix(det_img_gray, Size(exampleSize.width, exampleSize.height),
 		              item_location, query_pixels);
@@ -389,10 +340,6 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 		query_pixels(Rect(Point(0,0), window.size())) += det_img_gray(window);
 	#endif
 	
-	#ifdef USE_MASK
-		query_pixels = query_pixels & cMask;
-	#endif
-	
 	#ifdef OUTPUT_BUBBLE_IMAGES
 		string bubbleName = namer.get_unique_name("bubble_");
 		imwrite("bubble_images/" + bubbleName + ".jpg", query_pixels);
@@ -404,15 +351,32 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 	#ifdef NORMALIZE
 		normalize(query_pixels, query_pixels);
 	#endif
-	//cout << "svc: " << *statClassifier->get_support_vector(25) << endl;
-	//return 0;
-	//I'm segfaulting when statClassifier is called. The reason might have little to do with statClassifier->..
-	#ifdef DISABLE_PCA
-		classificationIndex = statClassifier->predict( query_pixels );
+
+	Json::Value output;
+
+	#ifdef REPORT_CONFIDENCE
+		double classifierRv;
+		#ifdef DISABLE_PCA
+			classifierRv = statClassifier->predict( query_pixels, true );
+		#else
+			classifierRv = statClassifier->predict( my_PCA.project(query_pixels), true );
+		#endif
+
+		string classification_label = classifications[int(classifierRv > 0)];
+		Json::Value default_classification = classifier_params.get("default_classification", 0);
+		output["confidence"] = classifierRv;
+		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
 	#else
-		classificationIndex = statClassifier->predict( my_PCA.project(query_pixels) );
+		int classificationIndex;
+		#ifdef DISABLE_PCA
+			classificationIndex = statClassifier->predict( query_pixels );
+		#else
+			classificationIndex = statClassifier->predict( my_PCA.project(query_pixels) );
+		#endif
+		string classification_label = classifications[classificationIndex];
+		Json::Value default_classification = classifier_params.get("default_classification", 0);
+		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
 	#endif
-	string classification_label = classifications[classificationIndex];
-	Json::Value default_classification = classifier_params.get("default_classification", 0);
-	return classifier_params["classification_map"].get(classification_label, default_classification);
+	return output;
 }
+

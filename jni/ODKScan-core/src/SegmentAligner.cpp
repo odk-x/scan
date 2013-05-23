@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2012 University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 #include "configuration.h"
 #include "Addons.h"
 #include "AlignmentUtils.h"
@@ -20,7 +36,6 @@ using namespace cv;
 
 // Try to distil the maximum quad (4 point contour) from a convex contour of many points.
 // if none is found maxQuad will not be altered.
-// TODO: Find out what happens when you try to simplify a contour that already has just 4 points.
 float maxQuadSimplify(vector <Point>& contour, vector<Point>& maxQuad, float current_approx_p){
 	
 	float area = 0;
@@ -165,34 +180,6 @@ void convertQuad(const vector< Point_<T> >& quad, vector< Point_<U> >& outQuad){
 		outQuad.push_back( Point_<U>(quad[i].x, quad[i].y) );
 	}
 }
-template <class T>
-Point_<T> getCorner(const Mat& img, const Rect&roi, const Mat& templ, const Point& offset){
-	#if 0
-		vector<Point2f> cornerVec;
-		goodFeaturesToTrack(img(roi), cornerVec, 1, .01, 0, Mat(), 3);
-		return Point_<T>(cornerVec[0].x + roi.x, cornerVec[0].y + roi.y);
-	#endif
-	Mat result(img.size(), CV_8U);
-	int method = 3962;//CV_TM_SQDIFF;
-	if(method == 3962){
-		createLinearFilter(templ.type(), templ.type(), 255 - templ)->apply(img, result);
-	}
-	else{
-		matchTemplate(img, templ, result, method);
-	}
-	
-	Point minLoc, maxLoc;
-	minMaxLoc(result, 0, 0, &minLoc, &maxLoc);
-	Point corner;
-	if(method == CV_TM_SQDIFF || method == CV_TM_SQDIFF_NORMED || method == 3962){
-		corner = minLoc;
-	}
-	else{
-		corner = maxLoc;
-	}
-	
-	return Point_<T>(corner.x + offset.x, corner.y + offset.y);
-}
 /*
 Pseudo-code description of findSegment:
 1.	Find lines along the edges of the bounding box
@@ -210,7 +197,6 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	//to choose the wrong line than with the contour method.
 	#define QUAD_FIND_INTERSECTION 0
 	#define QUAD_FIND_CONTOURS 1
-	#define QUAD_FIND_CORNERS 2 //Broken
 	
 	#define QUAD_FIND_MODE QUAD_FIND_INTERSECTION
 	
@@ -254,34 +240,6 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 		//quad = expandCorners(quad, EXPANSION_PERCENTAGE);
 		quad = orderCorners(quad);
 		convertQuad(quad, outQuad);
-	#elif QUAD_FIND_MODE == QUAD_FIND_CORNERS
-		vector< Point_<T> > quad;
-
-		Size quadrantSize = .5 * img.size();
-		Rect quadrant;
-		
-		Mat templ(Size(13,13), CV_8U, Scalar::all(255));
-		Size templSize = templ.size();
-		line( templ, Point(0, 0), Point(templSize.width, 0), Scalar::all(0), 2, 4);
-		line( templ, Point(0, 0), Point(0, templSize.height), Scalar::all(0), 2, 4);
-		quadrant = Rect(Point(0,0), quadrantSize);
-		quad.push_back(getCorner<T>(img(quadrant), roi, templ, quadrant.tl()));
-		Mat temp;
-		flip(templ, temp,0);
-		transpose(temp, templ);
-		quadrant = Rect(Point(img.cols/2,0), quadrantSize);
-		quad.push_back(getCorner<T>(img(quadrant), roi, templ,
-		                            quadrant.tl() + Point(templSize.width,0)));
-		flip(templ, temp,0);
-		transpose(temp, templ);
-		quadrant = Rect(Point(img.cols/2,img.rows/2), quadrantSize);
-		quad.push_back(getCorner<T>(img(quadrant), roi, templ,
-		                            quadrant.tl() + Point(templSize.width,templSize.height)));
-		flip(templ, temp,0);
-		transpose(temp, templ);
-		quadrant = Rect(Point(0,img.rows/2), quadrantSize);
-		quad.push_back(getCorner<T>(img(quadrant), roi, templ, quadrant.tl() + Point(0,templSize.height)));
-		outQuad = quad;
 	#endif
 	
 	//refineCorners(img, quad);
