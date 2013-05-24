@@ -520,21 +520,6 @@ SWIGEXPORT jboolean JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1write
 }
 
 
-SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1jniTest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  Processor *arg1 = (Processor *) 0 ;
-  std::string result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(Processor **)&jarg1; 
-  result = ((Processor const *)arg1)->jniTest();
-  jresult = jenv->NewStringUTF((&result)->c_str()); 
-  return jresult;
-}
-
-
 SWIGEXPORT jstring JNICALL Java_com_bubblebot_jni_bubblebotJNI_Processor_1jniEchoTest(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jstring jresult = 0 ;
   Processor *arg1 = (Processor *) 0 ;

@@ -27,11 +27,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 /**
  * PhotographForm launches the Android camera app to capture a form image.
  * It also creates a directory for data about the form to be stored.
@@ -43,11 +45,13 @@ public class PhotographForm extends Activity {
     private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
     private Intent afterPhotoTaken;
+	private Date activityCreateTime;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		activityCreateTime = new Date();
 		photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
 		Bundle extras = getIntent().getExtras();
 		if(extras == null) {
@@ -102,14 +106,48 @@ public class PhotographForm extends Activity {
 		if (requestCode == TAKE_PICTURE) {
 			finishActivity(TAKE_PICTURE);
 			if (resultCode == Activity.RESULT_OK) {
-				if( new File(ScanUtils.getPhotoPath(photoName)).exists() ) {
-					Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
-					//startActivity(intent);
-					startService(afterPhotoTaken);
+				
+				File destFile = new File(ScanUtils.getPhotoPath(photoName));
+				if( !destFile.exists() ) {
+					Toast.makeText(getApplicationContext(), "Could not save photo.", Toast.LENGTH_LONG).show();
+					finish();
+					return;
 				}
-				else{
-					Log.e(LOG_TAG, "Photo [" + photoName + "] could not be saved.");
+
+				Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
+				
+				//The android camera app saves an additional copy of the image.
+				//The following query is used to find it.
+				String[] projection = new String[]{
+				     MediaStore.Images.ImageColumns._ID,
+				     MediaStore.Images.ImageColumns.DATA,
+				     MediaStore.Images.ImageColumns.DATE_TAKEN};     
+
+				final Cursor cursor = managedQuery(
+				     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null,
+				     MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"); 
+
+				if(cursor != null && cursor.getCount() > 0){
+					cursor.moveToFirst();
+					Log.e(LOG_TAG, "[" + cursor.getString(0) + "]");
+					
+					File outfile = new File(cursor.getString(1));
+					if( !outfile.exists() || outfile.lastModified() < activityCreateTime.getTime() ) {
+						Toast.makeText(getApplicationContext(), "Could not find original photo duplicate.", Toast.LENGTH_LONG).show();
+					} else {
+						//Ideally this would just rename the photo to move it to the ODKScan folder,
+						//but that can fail in a number of ways.
+						//see: outfile.renameTo(new File(ScanUtils.getOutputPath(photoName)));
+						//So instead an extra photo is create in the ODKScan folder via the extra_output intent parameter
+						//and the original is deleted.
+
+						boolean success = outfile.delete();
+						if(!success){
+							Toast.makeText(getApplicationContext(), "Could not remove original photo duplicate from DCIM folder.", Toast.LENGTH_LONG).show();
+						}
+					}
 				}
+				startService(afterPhotoTaken);
 			}
 			else{
 				if(resultCode == Activity.RESULT_FIRST_USER){
@@ -122,6 +160,7 @@ public class PhotographForm extends Activity {
 			finish();
 		}
 	}
+	
 	@Override
 	protected void onDestroy() {
 		//Try to remove the forms directory if the photo couldn't be captured:

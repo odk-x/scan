@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2012 University of Washington
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.opendatakit.scan.android;
 
 import java.io.File;
@@ -35,8 +50,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 /**
- * This activity converts a ODKScan JSON file into a XForm for use with Collect
- * then returns a uri for the XForm instance as a result.
+ * This activity converts ODKScan JSON files into XForms and XForm instances for use with Collect.
+ * It returns a uri for the XForm instance as a result.
  */
 public class JSON2XForm extends Activity {
 	
@@ -56,7 +71,6 @@ public class JSON2XForm extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		try {
-			//Read in parameters from the intent's extras.
 			Bundle extras = getIntent().getExtras();
 
 			if(extras == null){ throw new Exception("No parameters specified"); }
@@ -70,7 +84,7 @@ public class JSON2XForm extends Activity {
 				templatePaths.add(templatePath);
 			}
 			String rootTemplatePath = templatePaths.get(0);
-			Log.i(LOG_TAG,"templatePaths : " + templatePaths);
+			//Log.i(LOG_TAG,"templatePaths : " + templatePaths);
 			
 			String photoName = extras.getString("photoName");
 			if(photoName == null){ throw new Exception("jsonOutPath is null"); }
@@ -84,7 +98,6 @@ public class JSON2XForm extends Activity {
 			Log.i(LOG_TAG,"photoNames : " + photoNames);
 			
 			String templateName = new File(rootTemplatePath).getName();
-			//String jsonPath = new File(rootTemplatePath, "template.json").getPath();
 			String xFormPath = new File(rootTemplatePath, templateName + ".xml").getPath();
 
 			ContentResolver myContentResolver = getContentResolver();
@@ -139,7 +152,11 @@ public class JSON2XForm extends Activity {
 				insertValues.put("displayName", instanceName);
 				insertValues.put("instanceFilePath", instanceFilePath);
 				insertValues.put("jrFormId", jrFormId);
-				Uri insertResult = getContentResolver().insert(
+				ContentResolver contentResolver = getContentResolver();
+				if(contentResolver == null) {
+					throw new Exception("Could not get content resolver. Please try again.");
+				}
+				Uri insertResult = contentResolver.insert(
 						COLLECT_INSTANCES_CONTENT_URI, insertValues);
 				instanceId = Integer.valueOf(insertResult.getLastPathSegment());
 			}
@@ -167,7 +184,13 @@ public class JSON2XForm extends Activity {
 			alert.show();
 		}
 	}
-	
+	/**
+	 * Check if any of the provided file paths
+	 * were modified after the given date.
+	 * @param templatePaths
+	 * @param lastModified
+	 * @return
+	 */
 	private boolean anyModifiedAfter(ArrayList<String> templatePaths,
 			long lastModified) {
 		for (String tp : templatePaths){

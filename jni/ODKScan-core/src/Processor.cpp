@@ -209,6 +209,13 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 				else if(cValue.isInt()){
 					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asInt()) * confidence, 1, CV_AA);
 				}
+				else if(cValue.isString()){
+
+					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
+						FONT_HERSHEY_SIMPLEX, 0.8, Scalar::all(0), 3, CV_AA);
+					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
+						FONT_HERSHEY_SIMPLEX, 0.8, boxColor, 2, CV_AA);
+				}
 				else{
 					cout << "Don't know what this is: " << cValue << endl;
 				}
@@ -303,20 +310,15 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 	//NOTE: training_data_uri must be a directory with no leading or trailing slashes.
 	const string& training_data_uri = classifier["training_data_uri"].asString();
 
-	Size acutal_classifier_size = SCALEPARAM * Size(classifier["classifier_width"].asInt(),
+	Size scaled_classifier_size = SCALEPARAM * Size(classifier["classifier_width"].asInt(),
 	                                                classifier["classifier_height"].asInt());
 	ostringstream ss;
-	ss << acutal_classifier_size.height << 'x' << acutal_classifier_size.width;
+	ss << scaled_classifier_size.height << 'x' << scaled_classifier_size.width;
 	string key(training_data_uri + ss.str());
 
 	ClassiferMap::iterator it = classifiers.find(key);
-/*
-	#ifdef DEBUG_PROCESSOR
-		cout << "erasing old classifier (if it exisits)" << endl;
-		if( it != classifiers.end() ) cout << "erased: " << classifiers.erase(key) << endl;
-		cout << "erased" << endl;
-	#endif
-*/
+
+	//If the classifier is not loaded into memory...
 	if( it == classifiers.end() ) {
 		//PCA_classifier classifier = classifiers[key];
 		classifiers[key] = Ptr<PCA_classifier>(new PCA_classifier);
@@ -353,13 +355,13 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 			#endif
 			*/
 
+			//TODO: Move more of this code into the PCA classifier class.
 			const Json::Value advanced = classifier.get("advanced", Json::Value());
 			bool success = classifiers[key]->train_PCA_classifier( filepaths,
-				                                               acutal_classifier_size,
+				                                               scaled_classifier_size,
 				                                               advanced.get("eigenvalues", 9).asInt(),
 			                                                       advanced.get("flip_training_data", true).asBool());
 			if( !success ) {
-				//TODO: A better error message here when the training data isn't found would be a big help.
 				LOGI("\n\nCould not train classifier.\n\n");
 				return classifiers[key];
 			}
@@ -594,8 +596,8 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	}
 
 	#ifdef OUTPUT_BUBBLE_IMAGES
-		namer.setPrefix(field.get("classifier", Json::Value()).get("training_data_uri", "na").asString());
-		//namer.setPrefix(field.get("label", "unlabeled").asString());
+		//namer.setPrefix(field.get("classifier", Json::Value()).get("training_data_uri", "na").asString());
+		namer.setPrefix(field.get("label", "unlabeled").asString());
 	#endif
 
 	for ( size_t j = 0; j < segments.size(); j++ ) {

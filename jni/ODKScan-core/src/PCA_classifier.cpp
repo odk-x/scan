@@ -15,7 +15,6 @@
  */
 #include "configuration.h"
 #include "PCA_classifier.h"
-//#include "FileUtils.h"
 #include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
@@ -41,8 +40,6 @@
 
 //#define DISABLE_PCA
 //PCA definately does help but only by a few percent.
-
-//#define REPORT_CONFIDENCE
 
 using namespace std;
 using namespace cv;
@@ -185,8 +182,10 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 	my_PCA = PCA(PCA_set, Mat(), CV_PCA_DATA_AS_ROW, eigenvalues);
 	Mat comparisonVectors = my_PCA.project(PCA_set);
 	
-	#ifdef REPORT_CONFIDENCE
-		int emptyClassIdx = vectorFind(classifications, string("empty"));
+	//If there is a negative_label do two class classification and report confidence.
+	if(classifier_params.isMember("negative_label")) {
+		int emptyClassIdx = vectorFind(classifications, 
+		                               classifier_params.get("negative_label", "empty").asString());
 		Mat trainingBubbleValuesMat = Mat(1,1, CV_32SC1);
 		trainingBubbleValuesMat.at<int>(0) = int(trainingBubbleValues[0] == emptyClassIdx);
 		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
@@ -198,7 +197,7 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 		                           CvSVM::get_default_grid(CvSVM::NU), CvSVM::get_default_grid(CvSVM::COEF),
 		                           CvSVM::get_default_grid(CvSVM::DEGREE));
 
-	#else
+	} else {
 		Mat trainingBubbleValuesMat(1,1,CV_32SC1);
 		trainingBubbleValuesMat.at<int>(0) = trainingBubbleValues[0];
 		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
@@ -209,7 +208,7 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 		#else
 			statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
 		#endif
-	#endif
+	}
 
 	return true;
 }
@@ -276,7 +275,7 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 
 	Point loc = Point(sofarCenter);
 	
-	double minDirVal = 100.;
+	double minDirVal = 100.0;
 	while( iterations > 0 ){
 		Point minDir(0,0);
 		for(int i = loc.x-1; i <= loc.x+1; i++) {
@@ -341,8 +340,7 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 	#endif
 	
 	#ifdef OUTPUT_BUBBLE_IMAGES
-		string bubbleName = namer.get_unique_name("bubble_");
-		imwrite("bubble_images/" + bubbleName + ".jpg", query_pixels);
+		Mat dbg_img = query_pixels.clone();
 	#endif
 	
 	query_pixels.convertTo(query_pixels, CV_32F);
@@ -354,7 +352,7 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 
 	Json::Value output;
 
-	#ifdef REPORT_CONFIDENCE
+	if(classifier_params.isMember("negative_label")) {
 		double classifierRv;
 		#ifdef DISABLE_PCA
 			classifierRv = statClassifier->predict( query_pixels, true );
@@ -366,7 +364,7 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 		Json::Value default_classification = classifier_params.get("default_classification", 0);
 		output["confidence"] = classifierRv;
 		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
-	#else
+	} else {
 		int classificationIndex;
 		#ifdef DISABLE_PCA
 			classificationIndex = statClassifier->predict( query_pixels );
@@ -376,6 +374,11 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 		string classification_label = classifications[classificationIndex];
 		Json::Value default_classification = classifier_params.get("default_classification", 0);
 		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
+	}
+	#ifdef OUTPUT_BUBBLE_IMAGES
+		//string bubbleName = output["value"].asString() + "_" + namer.get_unique_name("");
+		string bubbleName = namer.get_unique_name("_");
+		imwrite("bubble_images/" + bubbleName + ".jpg", dbg_img);
 	#endif
 	return output;
 }

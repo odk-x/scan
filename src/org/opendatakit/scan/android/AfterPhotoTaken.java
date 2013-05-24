@@ -40,6 +40,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
+ * @deprecated using ProcessInBG instead.
  * This activity starts the form processor and provides user feedback by
  * displaying progress dialogs and the alignment results.
  */

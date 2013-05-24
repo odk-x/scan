@@ -34,7 +34,7 @@ public class MainMenu extends Activity {
 			PackageInfo packInfo = getPackageManager().getPackageInfo(
 					getPackageName(), 0);
 			{
-				// dynamically construct the main screen header string
+				// dynamically construct the main screen version string
 				TextView mainMenuMessageLabel = (TextView) findViewById(R.id.version_display);
 				mainMenuMessageLabel.setText("version:\n"
 						+ packInfo.versionName);
@@ -113,6 +113,10 @@ public class MainMenu extends Activity {
 		});
 	}
 
+	/**
+	 * Throw an excpetion is there is no storage or not enough space.
+	 * @throws Exception
+	 */
 	private void checkSDCard() throws Exception {
 		// http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
 		String state = Environment.getExternalStorageState();
@@ -134,8 +138,8 @@ public class MainMenu extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		// This override is needed in order to avoid going back to the
-		// AfterPhotoTaken activity
+		// This override is used in order to avoid going back to the
+		// AfterPhotoTaken activity.
 		Intent setIntent = new Intent(Intent.ACTION_MAIN);
 		setIntent.addCategory(Intent.CATEGORY_HOME);
 		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

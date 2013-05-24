@@ -23,7 +23,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 /**
- * This activity displays the image of a processed form
+ * This activity displays the image of a processed form.
  */
 public class DisplayProcessedForm extends Activity {
 
@@ -39,7 +39,7 @@ public class DisplayProcessedForm extends Activity {
 
 	private Intent collectIntent;
 	
-	// Set up the UI and load the processed image
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,6 +52,7 @@ public class DisplayProcessedForm extends Activity {
 			}
 			photoName = extras.getString("photoName");
 			/*
+			//Immediately start collect.
 			if (extras.getBoolean("startCollect", false)) {
 				Intent dataIntent = new Intent();
 				dataIntent.putExtra("start", true);
@@ -59,19 +60,21 @@ public class DisplayProcessedForm extends Activity {
 				return;
 			}
 			*/
+			
 			templatePath = ScanUtils.getTemplatePath(photoName);
 			if(!(new File(templatePath, "template.json")).exists()){
 				throw new Exception("The form template is missing.");
 			}
 			
 			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");
+			
 			//How multi-page forms are handled:
 			//If there is a nextPage directory in the template directory 
 			//Scan will assume it is processing a multipage form
 			//where the template for the next page is in the nextPage directory.
 			//In the extras, the prevTemplatePaths and prevPhotoPaths arrays are passed through
 			//subsequent invocations of the Scan activities in order to store
-			//information about the previous pages used to combine them into an xform.
+			//so they can be combined into a single xform on the final invocation.
 			final File nextPageTemplatePath = new File(templatePath, "nextPage");
 			morePagesToScan = nextPageTemplatePath.exists();
 			if(morePagesToScan){
@@ -116,7 +119,7 @@ public class DisplayProcessedForm extends Activity {
 						//collectIntent is still null if Collect not installed.
 						if(collectIntent != null) {
 							if(collectIntent.getData() == null) {
-								saveToCollect(0);
+								exportToCollect(0);
 							}
 						}
 						
@@ -132,8 +135,10 @@ public class DisplayProcessedForm extends Activity {
 						//collectIntent is still null if Collect not installed.
 						if(collectIntent != null) {
 							if(collectIntent.getData() == null) {
-								saveToCollect(1);
+								exportToCollect(1);
 							} else {
+								//The scan data has already been exported
+								//so just start collect.
 								startActivity(collectIntent);
 							}
 						}
@@ -162,14 +167,20 @@ public class DisplayProcessedForm extends Activity {
 			alert.show();
 		}
 	}
+	/**
+	 * Creates an intent for launching collect.
+	 * May return null if collect is not installed.
+	 * @return
+	 */
 	public Intent makeCollectIntent() {
-		// Initialize the intent that will start collect and use it to see if
-		// collect is installed.
+		// Initialize the intent that will start collect.
 		Intent intent = new Intent();
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setComponent(new ComponentName("org.odk.collect.android",
 				"org.odk.collect.android.activities.FormEntryActivity"));
+		
+		//Use the intent to see if collect is installed.
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
 			// ////////////
@@ -197,6 +208,7 @@ public class DisplayProcessedForm extends Activity {
 			alert.show();
 			return null;
 		}
+		
 		intent.setAction(Intent.ACTION_EDIT);
 		
 		//Start indicates that the form should be launched from the first question
@@ -212,8 +224,13 @@ public class DisplayProcessedForm extends Activity {
 		builder.setCancelable(false);
 		return builder.create();
 	}
-	
-	public void saveToCollect(int requestCode) {
+	/**
+	 * Exports the Scan JSON data to collect.
+	 * If the requestCode is 1 collect will be launched
+	 * after the export activity returns a result.
+	 * @param requestCode
+	 */
+	public void exportToCollect(int requestCode) {
 		showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
 		createInstanceIntent.putExtras(extras);

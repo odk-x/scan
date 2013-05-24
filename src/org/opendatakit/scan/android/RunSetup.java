@@ -37,7 +37,7 @@ public class RunSetup implements Runnable {
 		new File(ScanUtils.getOutputDirPath()).mkdirs();
 		
 		try {
-			//Creates a .nomedia file to prevent the images from showing up in he gallery.
+			//Creates a .nomedia file to prevent the images from showing up in the gallery.
 			new File(ScanUtils.appFolder + ".nomedia").createNewFile();
 			
 			File trainingExamplesDir =  new File(ScanUtils.getTrainingExampleDirPath());

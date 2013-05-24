@@ -43,7 +43,7 @@ import java.util.LinkedList;
  * It creates a notification that it's processing an image and updates it when it completes.
  */
 public class ProcessInBG extends Service {
-	//Android has an IntentService class which fits the queing requirement nicely
+	//Android has an IntentService class which fits the queuing requirement nicely
 	//but I'm not using it because it seems like it will be easier to deal with the 
 	//notifications for enqueued jobs this way.
 	/*
@@ -65,6 +65,7 @@ public class ProcessInBG extends Service {
 	/**
 	 * Start the next job on the queue is there
 	 * aren't too many threads running.
+	 * Stop the serverice if there are no threads left.
 	 */
 	public void updateProcessingQueue(){
 		if(threads < 1){
@@ -93,11 +94,11 @@ public class ProcessInBG extends Service {
 			
 			//Create an output directory for the segments
 			new File(ScanUtils.getOutputPath(photoName), "segments").mkdirs();
-			
 	    	final String inputPath = ScanUtils.getPhotoPath(photoName);
 	    	final String outputPath = ScanUtils.getOutputPath(photoName);
 	    	final String[] templatePaths = extras.getStringArray("templatePaths");
 	    	//final String calibrationPath = null;
+	    	
 	    	final int notificationId = (int) (Math.random() * 9999999);
 			final NotificationManager notificationManager = (NotificationManager) 
 	                getSystemService(Context.NOTIFICATION_SERVICE);
@@ -146,6 +147,8 @@ public class ProcessInBG extends Service {
 		    	        String errorMessage = result.optString("errorMessage");
 		    	        if(errorMessage.length() == 0) {
 			    	        try {
+			    	        	//Write the name of the template used to the filesystem.
+			    	        	//TODO: This could probably be changed so that it is included in the output.json.
 			    	        	ScanUtils.setTemplatePath(photoName, result.optString("templatePath"));
 			    	        } catch (IOException e) {
 			    	        	Toast.makeText(context, "Error: Couldn't write template name to file system.", Toast.LENGTH_LONG).show();
@@ -180,11 +183,11 @@ public class ProcessInBG extends Service {
 	    	Runnable pRunner = new Runnable() {
 	    		public void run() {
 	    			//The JNI object that connects to the ODKScan-core code.
-	    			//TODO: I don't like that the appFolder is needed here...
-	    			final Processor mProcessor = new Processor(ScanUtils.appFolder);
+	    			final Processor mProcessor = new Processor();//ScanUtils.appFolder
 	    			Bundle outputData = new Bundle();
 	    			try {
 	    				//TODO: Pass the config JSON in with the bundle
+	    				//		So that it can be called by external intents just to do alignment.
 	    				JSONObject config = new JSONObject();
 	                    config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
 	                    config.put("inputImage", inputPath);

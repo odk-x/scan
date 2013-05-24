@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opendatakit.scan.android"
-    android:versionCode="52"
-    android:versionName="0.52" >
+    android:versionCode="53"
+    android:versionName="0.53" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -25,6 +25,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
     </uses-permission>
 
+    
     <application
         android:icon="@drawable/icon"
         android:label="ODK Scan"
