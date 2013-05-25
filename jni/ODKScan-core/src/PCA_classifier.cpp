@@ -377,7 +377,7 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 	}
 	#ifdef OUTPUT_BUBBLE_IMAGES
 		//string bubbleName = output["value"].asString() + "_" + namer.get_unique_name("");
-		string bubbleName = namer.get_unique_name("_fh_");
+		string bubbleName = namer.get_unique_name("_");
 		imwrite("bubble_images/" + bubbleName + ".jpg", dbg_img);
 	#endif
 	return output;

@@ -63,6 +63,16 @@ All segments are output into the `segments` folder of the output directory regar
 so it should be easy to add a stage to the processing pipeline that handles a new type like barcode.
 Segment objects in the output JSON have an `image_path` field that could help with this.
 
+## Adding new training data:
+
+Training images can added by dropping them into the assets/training_examples/classifier_name directory.
+When scan uses a set of training examples it caches the classifier data in their folder in a .yml file,
+so when adding new training examples you will need to delete the yml files.
+You don't need to worry about the size of the images, only the aspect ratio.
+They will be resized and stretched to the dimensions specified in the template json's classifier properties.
+Also in the classifier properties, you can set which classifier to use
+by specifying its directory for the training_data_uri property.
+
 Source file information
 =======================
 

@@ -295,7 +295,7 @@ public class JSON2XForm extends Activity {
         		instance.addChild(Node.ELEMENT, fieldElement);
         		continue;
         	}
-			String fieldName = field.getString("name");
+			String fieldName = slugify(field.getString("name"));
         	JSONArray segments = field.optJSONArray("segments");
         	if(segments == null){
         		segments = new JSONArray();
@@ -410,8 +410,8 @@ public class JSON2XForm extends Activity {
 		for(int i = 0; i < fieldsLength; i++){
 			JSONObject field = fields.getJSONObject(i);
 			if(field.has("name")){
-				fieldNames[i] = field.getString("name");
-				fieldLabels[i] = field.optString("label", field.getString("name"));
+				fieldNames[i] = slugify(field.getString("name"));
+				fieldLabels[i] = field.optString("label", fieldNames[i]);
 			}
 			else{
 				Log.i(LOG_TAG, "Field " + i + " has no name.");
@@ -578,4 +578,14 @@ public class JSON2XForm extends Activity {
         writer.write("</h:html>");
         writer.close();
     }
+    /**
+     * Transform name strings into valid xform instance tag names.
+     * @param string
+     * @return
+     */
+	private static String slugify(String string) {
+		//Replace spaces with underscores and add a
+		//prefix in case the string begins with a number.
+		return "q_" + string.replace(" ", "_");
+	}
 }

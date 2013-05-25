@@ -578,7 +578,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
 	catch(...){
-		LOGI(("Could not output segment to: " + segmentOutPath+segmentName).c_str());
+		LOGI(("Could not output segment to: " + segmentOutPath + segmentName).c_str());
 	}
 	return segmentJsonOut;
 }
