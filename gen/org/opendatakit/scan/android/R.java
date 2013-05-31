@@ -78,50 +78,53 @@ containing a value of this type.
         /**  For Main Screen 
  For Main Screen 
          */
-        public static final int Health_Center=0x7f06000a;
+        public static final int Health_Center=0x7f060009;
         /**  Instructions 
  Instructions 
          */
-        public static final int Instructions1=0x7f060019;
-        public static final int Instructions2=0x7f06001a;
-        public static final int Instructions3=0x7f06001b;
-        public static final int Instructions4=0x7f06001c;
-        public static final int InstructionsButton=0x7f06000e;
-        public static final int ScanButton=0x7f06001d;
-        public static final int SettingsButton=0x7f06000f;
-        public static final int ViewFormsButton=0x7f06000d;
-        public static final int after_photo_taken_activity=0x7f060007;
-        public static final int aligning_form=0x7f060012;
-        public static final int app_description=0x7f060001;
-        public static final int app_name=0x7f060000;
-        public static final int bubble_instructions_activity=0x7f060004;
-        public static final int bubble_process_activity=0x7f060002;
+        public static final int Instructions1=0x7f060018;
+        public static final int Instructions2=0x7f060019;
+        public static final int Instructions3=0x7f06001a;
+        public static final int Instructions4=0x7f06001b;
+        public static final int InstructionsButton=0x7f06000d;
+        public static final int ScanButton=0x7f06001c;
+        public static final int SettingsButton=0x7f06000e;
+        public static final int ViewFormsButton=0x7f06000c;
+        public static final int after_photo_taken_activity=0x7f060006;
+        public static final int aligning_form=0x7f060011;
+        /** 
+<string name="app_name">ODK Scan</string>
+
+         */
+        public static final int app_description=0x7f060000;
+        public static final int bubble_instructions_activity=0x7f060003;
+        public static final int bubble_process_activity=0x7f060001;
         /**  For Preferences 
  For Preferences 
          */
-        public static final int calibrate=0x7f060008;
-        public static final int could_not_register=0x7f060014;
-        public static final int display_data=0x7f060017;
-        public static final int display_processed_data_activity=0x7f060006;
-        public static final int display_processed_form_activity=0x7f060005;
-        public static final int doFormDetection=0x7f060009;
-        public static final int main_menu=0x7f060018;
+        public static final int calibrate=0x7f060007;
+        public static final int could_not_register=0x7f060013;
+        public static final int display_data=0x7f060016;
+        public static final int display_processed_data_activity=0x7f060005;
+        public static final int display_processed_form_activity=0x7f060004;
+        public static final int doFormDetection=0x7f060008;
+        public static final int main_menu=0x7f060017;
         /**  DisplayProcessedForm 
          */
-        public static final int next_page=0x7f060015;
+        public static final int next_page=0x7f060014;
         /**  AfterPhotoTaken 
  AfterPhotoTaken 
          */
-        public static final int process_form=0x7f060010;
-        public static final int processing_form=0x7f060013;
-        public static final int retake_photo=0x7f060011;
+        public static final int process_form=0x7f06000f;
+        public static final int processing_form=0x7f060012;
+        public static final int retake_photo=0x7f060010;
         /**  Popup menu 
  Popup menu 
          */
-        public static final int save_data=0x7f060016;
-        public static final int scan_new_form=0x7f06000c;
-        public static final int the_current_health_center_is=0x7f06000b;
-        public static final int view_bubble_forms_activity=0x7f060003;
+        public static final int save_data=0x7f060015;
+        public static final int scan_new_form=0x7f06000b;
+        public static final int the_current_health_center_is=0x7f06000a;
+        public static final int view_bubble_forms_activity=0x7f060002;
     }
     public static final class style {
         public static final int APTButton=0x7f070002;

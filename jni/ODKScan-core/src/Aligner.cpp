@@ -304,7 +304,7 @@ void Aligner::loadFeatureData(const string& imagePath, const string& jsonPath, c
 		LOGI("Creating new feature data:");
 		
 		if(detector.empty() || descriptorExtractor.empty())
-			CV_Error(CV_StsError, "Cound not create detector/extractor.");
+			CV_Error(CV_StsError, "Counld not create detector/extractor.");
 		
 		Mat templImage, temp;
 		templImage = imread( imagePath, 0 );
@@ -321,9 +321,10 @@ void Aligner::loadFeatureData(const string& imagePath, const string& jsonPath, c
 		templImageSize = Size( templateRoot.get("width", 0).asInt(),
 		                       templateRoot.get("height", 0).asInt());
 		
-		//I seem to get better performance without masking.
-		Mat mask = Mat();
-		//Mat mask = generateMask(templateRoot);
+		//When a picture can be aligned without masking,
+		//the mask seems to make the alignment slightly less precise.
+		//However, some pictures are not correctly aligned when masking is not used.
+		Mat mask = generateMask(templateRoot);
 		//debugShow(mask);
 
 		#ifdef MASK_CENTER_AMOUNT
@@ -366,8 +367,11 @@ void Aligner::loadFeatureData(const string& imagePath, const string& jsonPath, c
 	templImageSizeVec.push_back(templImageSize);
 }
 size_t Aligner::detectForm() const throw(cv::Exception) {
-	//TODO: Make this code unterrible
-	LOGI("Detect from");
+	//TODO: This code was whipped up in a hurry,
+	//and will probably not do a very good job telling the difference
+	//between similar forms.
+	//It could also be much faster if it used a cached classifier.
+	LOGI("Detecting form...");
 	Ptr<DescriptorMatcher> descriptorMatcher = DescriptorMatcher::create( MATCHER_TYPE );
 	size_t formIdx = 0;
 	size_t previousBest = 0;
@@ -375,7 +379,6 @@ size_t Aligner::detectForm() const throw(cv::Exception) {
 	if(numForms == 0) CV_Error(CV_StsError, "No templates loaded.");
 	
 	for(size_t i = 0; i < numForms; i++){
-		LOGI("Detect from for loop");
 		vector<DMatch> filteredMatches;
 		size_t inliers = 0;
 		crossCheckMatching( descriptorMatcher, currentImgDescriptors, templDescriptorsVec[i], filteredMatches);

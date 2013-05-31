@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -51,19 +53,12 @@ public class DisplayProcessedForm extends Activity {
 				throw new Exception("This activity must be lauched with a photoName specified in the extras.");
 			}
 			photoName = extras.getString("photoName");
-			/*
-			//Immediately start collect.
-			if (extras.getBoolean("startCollect", false)) {
-				Intent dataIntent = new Intent();
-				dataIntent.putExtra("start", true);
-				startCollect(dataIntent);
-				return;
-			}
-			*/
 			
-			templatePath = ScanUtils.getTemplatePath(photoName);
-			if(!(new File(templatePath, "template.json")).exists()){
-				throw new Exception("The form template is missing.");
+			templatePath = extras.getString("templatePath");
+			if(templatePath == null){
+				//Since the template path is not in the extras we'll try to get it from the json output.
+				JSONObject outputJSON = JSONUtils.parseFileToJSONObject(ScanUtils.getOutputPath(photoName));
+				outputJSON.getString("templatePath");
 			}
 			
 			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");

@@ -482,8 +482,8 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		avgDelta *= 1.0 / items.size();
 
 		for (size_t i = 0; i < locations.size(); i++) {
-			//Draw a circle centered at the average delta, with the radius porportional to the alignment_radius.
-			//If the bubble's delta does not fall within that cirlce it is a runaway.
+			//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
+			//If the bubble's delta does not fall within that circle it is a runaway.
 			if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
 				locations[i] = locations[i] - deltas[i] + avgDelta;
 			}
@@ -567,6 +567,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		              intToStr(extendedSegment.get("index", 0).asInt()) + ".jpg";
 
 		/*
+		//Mark-up the segment image with classification results.
 		rectangle(segment_out, expectedBubbleLocs[i] - .5 * classifier_size,
 		          expectedBubbleLocs[i] + .5 * classifier_size,
 		          colors[bubbleVals[i]]);
@@ -639,6 +640,7 @@ Json::Value formFunction(const Json::Value& templateRoot){
 	outForm["fields"] = outFields;
 	outForm["form_scale"] = SCALEPARAM;
 	outForm["timestamp"] = currentDateTime();
+	outForm["templatePath"] = templPath;
 	outForm.removeMember("items");
 	outForm.removeMember("classifier");
 	return outForm;
@@ -898,7 +900,7 @@ const string Processor::scanAndMarkup(const char* outputPath) {
 		return e.what();
 	}
 	catch (...) {
-	    return "Unknown expection.";
+	    return "Unknown exception.";
 	}
 }
 /**
@@ -1021,7 +1023,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 		return stringify(result);
 	}
 	catch (...) {
-		result["errorMessage"] = "Unknown expection.";
+		result["errorMessage"] = "Unknown exception.";
 		return stringify(result);
 	}
 	return stringify(result);

@@ -18,7 +18,6 @@ package org.opendatakit.scan.android;
 import java.io.IOException;
 import java.util.Date;
 
-import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.scan.android.RunProcessor.Mode;
 
 import android.app.Activity;

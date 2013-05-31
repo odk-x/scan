@@ -18,9 +18,12 @@ package org.opendatakit.scan.android;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.droidparts.preference.MultiSelectListPreference;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,59 +47,81 @@ public class PhotographForm extends Activity {
 	private String photoName;
     private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
-    private Intent afterPhotoTaken;
+    private Intent processPhoto;
 	private Date activityCreateTime;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		try{
+			activityCreateTime = new Date();
+			photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+			
+			Bundle extras = getIntent().getExtras();
+			if(extras == null) {
+				extras = new Bundle();
+			}
+			if(extras.containsKey("photoName")){
+				photoName = extras.getString("photoName");
+			}
+			if(!extras.containsKey("templatePaths")){
+				SharedPreferences settings = PreferenceManager
+						.getDefaultSharedPreferences(getApplicationContext());
+				Log.d(LOG_TAG, "Captured photo: ");
+				String[] templatePaths = MultiSelectListPreference
+						.fromPersistedPreferenceValue(settings.getString(
+								"select_templates", ""));
+				extras.putStringArray("templatePaths", templatePaths);
+			}
+			
+	    	String inputPath = ScanUtils.getPhotoPath(photoName);
+	    	String outputPath = ScanUtils.getOutputPath(photoName);
+	    	String[] templatePaths = extras.getStringArray("templatePaths");
+	    	
+			JSONObject config = new JSONObject();
+	        config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
+	        config.put("inputImage", inputPath);
+	        config.put("outputDirectory", outputPath);
+	        config.put("templatePaths", new JSONArray(Arrays.asList(templatePaths)));
+	        
+			processPhoto = new Intent(this, ProcessInBG.class);
+			processPhoto.putExtras(extras);
+			processPhoto.putExtra("photoName", photoName);
+	        processPhoto.putExtra("config", config.toString());
 
-		activityCreateTime = new Date();
-		photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
-		Bundle extras = getIntent().getExtras();
-		if(extras == null) {
-			extras = new Bundle();
-		}
-		if(extras.containsKey("photoName")){
-			photoName = extras.getString("photoName");
-		}
-		if(!extras.containsKey("templatePaths")){
-			SharedPreferences settings = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext());
-			Log.d(LOG_TAG, "Captured photo: ");
-			String[] templatePaths = MultiSelectListPreference
-					.fromPersistedPreferenceValue(settings.getString(
-							"select_templates", ""));
-			extras.putStringArray("templatePaths", templatePaths);
-		}
-		
-		//afterPhotoTaken = new Intent(getApplication(), AfterPhotoTaken.class);
-		afterPhotoTaken = new Intent(this, ProcessInBG.class);
-		afterPhotoTaken.putExtras(extras);
-		afterPhotoTaken.putExtra("photoName", photoName);
-		
-		File outputPath = new File(ScanUtils.getOutputPath(photoName));
-		//Try to create an output folder
-		if(!outputPath.mkdirs()){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Could not create output folder [" + 
-								outputPath + 
-								"].\n There may be a problem with the device's storage.")
-			       .setCancelable(false)
-			       .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-			           public void onClick(DialogInterface dialog, int id) {
-			                dialog.cancel();
-			                finish();
-			           }
-			       });
-			AlertDialog alert = builder.create();
-			alert.show();
-		} else {
+			//Try to create an output folder
+			boolean createSuccess = new File(outputPath).mkdirs();
+			if(!createSuccess){
+				new Exception("Could not create output folder [" + 
+						outputPath + 
+						"].\n There may be a problem with the device's storage.");
+			}
+			//Create an output directory for the segments
+			boolean segDirSuccess = new File(outputPath, "segments").mkdirs();
+			if(!segDirSuccess){
+				new Exception("Could not create output folder for segments.");
+			}
+			
 			Uri imageUri = Uri.fromFile( new File(ScanUtils.getPhotoPath(photoName)) );
 			Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			startActivityForResult(intent, TAKE_PICTURE);
+			
+		} catch (Exception e) {
+			//Display an error dialog if something goes wrong.
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(e.toString())
+			.setCancelable(false)
+			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					setResult(RESULT_CANCELED);
+					finish();
+				}
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
 		}
 	}
 	@Override
@@ -129,25 +154,27 @@ public class PhotographForm extends Activity {
 
 				if(cursor != null && cursor.getCount() > 0){
 					cursor.moveToFirst();
-					Log.e(LOG_TAG, "[" + cursor.getString(0) + "]");
 					
 					File outfile = new File(cursor.getString(1));
 					if( !outfile.exists() || outfile.lastModified() < activityCreateTime.getTime() ) {
-						Toast.makeText(getApplicationContext(), "Could not find original photo duplicate.", Toast.LENGTH_LONG).show();
+						Toast.makeText(getApplicationContext(),
+								"Could not find original photo duplicate.",
+								Toast.LENGTH_LONG).show();
 					} else {
 						//Ideally this would just rename the photo to move it to the ODKScan folder,
 						//but that can fail in a number of ways.
 						//see: outfile.renameTo(new File(ScanUtils.getOutputPath(photoName)));
 						//So instead an extra photo is create in the ODKScan folder via the extra_output intent parameter
 						//and the original is deleted.
-
 						boolean success = outfile.delete();
 						if(!success){
-							Toast.makeText(getApplicationContext(), "Could not remove original photo duplicate from DCIM folder.", Toast.LENGTH_LONG).show();
+							Toast.makeText(getApplicationContext(),
+									"Could not remove original photo duplicate from DCIM folder.",
+									Toast.LENGTH_LONG).show();
 						}
 					}
 				}
-				startService(afterPhotoTaken);
+				startService(processPhoto);
 			}
 			else{
 				if(resultCode == Activity.RESULT_FIRST_USER){

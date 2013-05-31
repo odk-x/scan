@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opendatakit.scan.android"
-    android:versionCode="54"
-    android:versionName="0.54" >
+    android:versionCode="60"
+    android:versionName="0.60" >
 
     <uses-sdk
         android:minSdkVersion="7"

@@ -66,12 +66,28 @@ Segment objects in the output JSON have an `image_path` field that could help wi
 ## Adding new training data:
 
 Training images can added by dropping them into the assets/training_examples/classifier_name directory.
+The part of the image's filename before the first "_" is it's label.
+All the training images should be jpgs.
 When scan uses a set of training examples it caches the classifier data in their folder in a .yml file,
 so when adding new training examples you will need to delete the yml files.
 You don't need to worry about the size of the images, only the aspect ratio.
 They will be resized and stretched to the dimensions specified in the template json's classifier properties.
 Also in the classifier properties, you can set which classifier to use
 by specifying its directory for the training_data_uri property.
+
+### Training tips:
+
+1. When OUTPUT_BUBBLE_IMAGES is defined in configuration.h all the classified images
+will be dumped to the bubble_images folder. These can be used as training images.
+They will be named by the field they are in. If you create a training form
+with where the fields have the same name as the type of object you fill them in with
+you can avoid labeling the training images.
+
+2. Sometimes pruning your training set can produce better results.
+Removing training images that are not well aligned usually helps.
+
+3. Use training data with varying the lighting and camera conditions.
+It can make a big difference whether you hold the camera in your hand, or position it on a stand.
 
 Source file information
 =======================

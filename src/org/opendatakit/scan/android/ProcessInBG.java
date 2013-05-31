@@ -15,7 +15,6 @@
  */
 package org.opendatakit.scan.android;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,10 +31,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -57,27 +52,28 @@ public class ProcessInBG extends Service {
 	/**
 	 * This process is a singleton. Every time an activity "starts" it
 	 * a new runnable is created to do the processing code and added to this queue.
-	 * This makes it so the runnables can be throttled (rather than all try to run in parallel)
+	 * This makes it so the runnables can be throttled
+	 * (rather than all of them trying to run in parallel)
 	 * so they don't end up thrashing or causing other issues due to resource limitations.
 	 */
-	private LinkedList<Runnable> processingQueue = new LinkedList<Runnable>();
-	private int threads = 0;
+	private LinkedList<Thread> processingQueue = new LinkedList<Thread>();
+	private Thread activeThread;
 	/**
 	 * Start the next job on the queue is there
 	 * aren't too many threads running.
-	 * Stop the serverice if there are no threads left.
+	 * Stop the service if there are no threads left.
 	 */
-	public void updateProcessingQueue(){
-		if(threads < 1){
-			Runnable nextJob = processingQueue.poll();
-			if(nextJob == null && threads == 0){
+	public synchronized void updateProcessingQueue(){
+		Log.i(LOG_TAG, "Active thread: " + (activeThread != null));
+		if(activeThread == null) {
+			Thread nextJob = processingQueue.poll();
+			if(nextJob == null){
 				stopSelf();
 				return;
 			}
-			Thread thread = new Thread(nextJob);
-			//thread.setPriority(Thread.MAX_PRIORITY);
-			thread.start();
-			threads++;
+			//nextJob.setPriority(Thread.MAX_PRIORITY);
+			nextJob.start();
+			activeThread = nextJob;
 		}
 	}
 	
@@ -89,15 +85,12 @@ public class ProcessInBG extends Service {
 			if (extras == null) {
 				throw new Exception("Missing extras in intent.");
 			}
+			//final String photoName = extras.getString("photoName");
+			final String configJSON = extras.getString("config");
+			if (configJSON == null) {
+				throw new Exception("config property is not in extras.");
+			}
 
-			final String photoName = extras.getString("photoName");
-			
-			//Create an output directory for the segments
-			new File(ScanUtils.getOutputPath(photoName), "segments").mkdirs();
-	    	final String inputPath = ScanUtils.getPhotoPath(photoName);
-	    	final String outputPath = ScanUtils.getOutputPath(photoName);
-	    	final String[] templatePaths = extras.getStringArray("templatePaths");
-	    	//final String calibrationPath = null;
 	    	
 	    	final int notificationId = (int) (Math.random() * 9999999);
 			final NotificationManager notificationManager = (NotificationManager) 
@@ -123,17 +116,24 @@ public class ProcessInBG extends Service {
 	         */
 	    	final Handler handler = new Handler(new Handler.Callback() {
 	            public boolean handleMessage(Message message) {
-	            	threads--;
-	            	updateProcessingQueue();
 	            	Bundle messageData = message.getData();
-	            	JSONObject result = null;
 	            	
-					try {
-						result = new JSONObject(messageData.getString("result"));
-					} catch (JSONException e) {
-						Log.i(LOG_TAG, "Unparsable JSON: " + messageData.getString("result"));
-					}
-
+	            	JSONObject result = new JSONObject();
+	            	String errorMessage = "";
+	            	
+	            	if(messageData != null) {
+						try {
+							result = new JSONObject(messageData.getString("result"));
+							errorMessage = result.optString("errorMessage");
+						} catch (JSONException e) {
+							Log.i(LOG_TAG, "Unparsable JSON: " + messageData.getString("result"));
+						}
+	            	} else {
+	            		messageData = new Bundle();
+	            		Toast.makeText(context,
+	    	        			"Error: Empty data bundle given to handler.",
+	    	        			Toast.LENGTH_LONG).show();
+	            	}
 	    	        CharSequence contentTitle = "ODK Scan";
 	    	        
 					//Assume an error for the default notification.
@@ -143,24 +143,13 @@ public class ProcessInBG extends Service {
 	    	        long when = System.currentTimeMillis();
 	    	        Intent notificationIntent = new Intent(context, DisplayStatus.class);
 	    	        
-	    	        if(result != null) {
-		    	        String errorMessage = result.optString("errorMessage");
-		    	        if(errorMessage.length() == 0) {
-			    	        try {
-			    	        	//Write the name of the template used to the filesystem.
-			    	        	//TODO: This could probably be changed so that it is included in the output.json.
-			    	        	ScanUtils.setTemplatePath(photoName, result.optString("templatePath"));
-			    	        } catch (IOException e) {
-			    	        	Toast.makeText(context, "Error: Couldn't write template name to file system.", Toast.LENGTH_LONG).show();
-							}
-		    	        	contentText = "Successfully processed image!";
-		    	        	tickerText = contentText;
-		    	        	icon = android.R.drawable.stat_notify_more;
-		    	        	notificationIntent = new Intent(context, DisplayProcessedForm.class);
-		    	        }
-	            	} else {
-	            		Toast.makeText(context, "Error: Scan result is null.", Toast.LENGTH_LONG).show();
-	            	}
+	    	        if(errorMessage.length() == 0) {
+	    	        	extras.putString("templatePath", result.optString("templatePath"));
+	    	        	contentText = "Successfully processed image!";
+	    	        	tickerText = contentText;
+	    	        	icon = android.R.drawable.stat_notify_more;
+	    	        	notificationIntent = new Intent(context, DisplayProcessedForm.class);
+	    	        }
 	    	        
 	    	        //Pass along the data from the intent that started this service.
 	    	        notificationIntent.putExtras(extras);
@@ -176,39 +165,34 @@ public class ProcessInBG extends Service {
 	    	        
 					notificationManager.notify(notificationId , notification);
 	    	        
+					Log.i(LOG_TAG, "Finished active thread status: " + activeThread.getState());
+					activeThread = null;
+	            	updateProcessingQueue();
+					
 					return true;
 	            }
 	    	});
-
-	    	Runnable pRunner = new Runnable() {
-	    		public void run() {
+	    	
+	    	Thread pThread = new Thread(new Runnable() {
+	    		public void run() {	
 	    			//The JNI object that connects to the ODKScan-core code.
 	    			final Processor mProcessor = new Processor();//ScanUtils.appFolder
 	    			Bundle outputData = new Bundle();
-	    			try {
-	    				//TODO: Pass the config JSON in with the bundle
-	    				//		So that it can be called by external intents just to do alignment.
-	    				JSONObject config = new JSONObject();
-	                    config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
-	                    config.put("inputImage", inputPath);
-	                    config.put("outputDirectory", outputPath);
-	                    config.put("templatePaths", new JSONArray(Arrays.asList(templatePaths)));
-	                    Log.i(LOG_TAG, config.toString());
-	    				String result = mProcessor.processViaJSON(config.toString());
-						outputData.putString("result", result);
-	    			} catch (JSONException e) {
-	    				Log.i(LOG_TAG, "Error adding property to config.");
-	    			}
+                    Log.i(LOG_TAG, configJSON);
+    				String result = mProcessor.processViaJSON(configJSON);
+					outputData.putString("result", result);
 	    			Message msg = new Message();
 	    			msg.setData(outputData);
 	    			handler.sendMessage(msg);
 	    		}
-	    	};
-	    	processingQueue.offer(pRunner);
+	    	});
+	    	
+	    	processingQueue.offer(pThread);
 	    	updateProcessingQueue();
 	    	
 		} catch (Exception e) {
-			Log.i(LOG_TAG, "BG procesing exception.");
+			Log.e(LOG_TAG, "Background processing exception!");
+			Log.e(LOG_TAG, e.toString());
 		}
 		return startid;
 	}

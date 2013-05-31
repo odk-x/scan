@@ -130,6 +130,7 @@ public class ScanUtils {
 	 * @return the template path used to aligned/process the photo or null if
 	 *         the template file can't be opened or doesn't exist
 	 * @throws Exception
+	 * @deprecated
 	 */
 	public static String getTemplatePath(String photoName) throws Exception {
 		if (new File(getOutputPath(photoName)).exists()) {
@@ -152,6 +153,7 @@ public class ScanUtils {
 	 * @param photoName
 	 * @param templatePath
 	 * @throws IOException
+	 * @deprecated
 	 */
 	public static void setTemplatePath(String photoName, String templatePath)
 			throws IOException {
