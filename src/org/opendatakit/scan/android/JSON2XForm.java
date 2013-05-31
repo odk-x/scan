@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -229,9 +230,10 @@ public class JSON2XForm extends Activity {
     }
 	/**
 	 * Generates an instance of an xform at xFormPath from the JSON output file
+	 * @throws Exception 
 	 */
 	private void jsonOut2XFormInstance(ArrayList<String> photoNames, String xFormPath, File instanceDir, String instanceName)
-			throws JSONException, IOException, XmlPullParserException {
+			throws Exception {
 		//////////////
 	    Log.i(LOG_TAG, "Reading the xform...");
 	    //////////////
@@ -295,7 +297,7 @@ public class JSON2XForm extends Activity {
         		instance.addChild(Node.ELEMENT, fieldElement);
         		continue;
         	}
-			String fieldName = slugify(field.getString("name"));
+			String fieldName = validate(field.getString("name"));
         	JSONArray segments = field.optJSONArray("segments");
         	if(segments == null){
         		segments = new JSONArray();
@@ -372,10 +374,9 @@ public class JSON2XForm extends Activity {
      * It builds it as a string which really isn't the best way to go.
      * @param templatePaths
      * @param outputPath
-     * @throws IOException
-     * @throws JSONException 
+     * @throws Exception 
      */
-    public static void buildXForm(ArrayList<String> templatePaths, String outputPath) throws IOException, JSONException {
+    public static void buildXForm(ArrayList<String> templatePaths, String outputPath) throws Exception {
     	String title = new File(templatePaths.get(0)).getName();
     	String id = title;
     	JSONArray initFields = new JSONArray();
@@ -410,7 +411,7 @@ public class JSON2XForm extends Activity {
 		for(int i = 0; i < fieldsLength; i++){
 			JSONObject field = fields.getJSONObject(i);
 			if(field.has("name")){
-				fieldNames[i] = slugify(field.getString("name"));
+				fieldNames[i] = validate(field.getString("name"));
 				fieldLabels[i] = field.optString("label", fieldNames[i]);
 			}
 			else{
@@ -579,13 +580,14 @@ public class JSON2XForm extends Activity {
         writer.close();
     }
     /**
-     * Transform name strings into valid xform instance tag names.
-     * @param string
-     * @return
+     * Check that the string is a valid xml tag
+     * @throws Exception 
      */
-	private static String slugify(String string) {
-		//Replace spaces with underscores and add a
-		//prefix in case the string begins with a number.
-		return "q_" + string.replace(" ", "_");
+	private static String validate(String string) throws Exception {
+		if(Pattern.matches("[a-zA-Z][a-zA-Z_0-9]*", string)){
+			return string;
+		} else {
+			throw new Exception("Field name cannot be used in xform: " + string);
+		}
 	}
 }
