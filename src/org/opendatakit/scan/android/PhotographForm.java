@@ -78,6 +78,8 @@ public class PhotographForm extends Activity {
 	    	String outputPath = ScanUtils.getOutputPath(photoName);
 	    	String[] templatePaths = extras.getStringArray("templatePaths");
 	    	
+	    	//This is the configuration JSON passed into ODKScan-core
+	    	//see: https://github.com/UW-ICTD/ODKScan-core/blob/master/processViaJSON.md
 			JSONObject config = new JSONObject();
 	        config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
 	        config.put("inputImage", inputPath);
@@ -142,7 +144,7 @@ public class PhotographForm extends Activity {
 				Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
 				
 				//The android camera app saves an additional copy of the image.
-				//The following query is used to find it.
+				//The following query is used to find it and remove it.
 				String[] projection = new String[]{
 				     MediaStore.Images.ImageColumns._ID,
 				     MediaStore.Images.ImageColumns.DATA,

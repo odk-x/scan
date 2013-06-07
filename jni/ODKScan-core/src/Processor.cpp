@@ -285,11 +285,10 @@ class Processor::ProcessorImpl
 {
 public:
 	string trainingDataPath;
-private:
 	Mat formImage;
-
 	Aligner aligner;
-
+private:
+	
 	Json::Value root;
 	//Json::Value JsonOutput;
 
@@ -917,7 +916,8 @@ It expects a JSON string like this:
 	"templatePath" : "",
 	"templatePaths" : [],
 	"calibrationFilePath" : "",
-	"trainingDataDirectory" : "training_examples/"
+	"trainingDataDirectory" : "training_examples/",
+	"detectOrientation" : false
 }
 You only need to specify the inputImage, outputDirectory and templatePath(s).
 The JSON above contains all the default values.
@@ -955,7 +955,8 @@ const string Processor::processViaJSON(const char* jsonString) {
 			return stringify(result);
 		}
 		string outputDirectory = config["outputDirectory"].asString();
-		processorImpl->loadFormImage(config["inputImage"].asString().c_str(), config.get("calibrationFilePath", "").asString().c_str());
+		processorImpl->loadFormImage(config["inputImage"].asString().c_str(),
+		                             config.get("calibrationFilePath", "").asString().c_str());
 
 		int formIdx = 0;
 
@@ -993,12 +994,32 @@ const string Processor::processViaJSON(const char* jsonString) {
 			return stringify(result);
 		}
 
+
+
 		if(config.get("alignForm", true).asBool()){
 			string alignedFormOutputPath = config.get("alignedFormOutputPath",
 					addSlashIfNeeded(outputDirectory) + "aligned.jpg").asString();
 			if(!processorImpl->alignForm(alignedFormOutputPath.c_str(), (size_t)formIdx)){
-				result["errorMessage"] = "Could not align form.";
-				return stringify(result);
+				if(config.get("detectOrientation", true).asBool()){
+					//Sometimes the form is upside-down in photographs.
+					//This is especially liable to happen with landscape pictures.
+					//Some alignment algorithms can handle this case, but the one 
+					//being used at the moment BRIEF, usually cannot.
+					//So I've added some code here to optionally spend extra cycles
+					//trying to figure out which way is up.
+					Mat tmp;
+					flip(processorImpl->formImage, tmp, -1);
+					processorImpl->formImage = tmp;
+					processorImpl->aligner.setImage(tmp);
+					if(!processorImpl->alignForm(alignedFormOutputPath.c_str(), (size_t)formIdx)){
+						result["errorMessage"] = "Could not align form.";
+						return stringify(result);
+					}
+				}
+				else {
+					result["errorMessage"] = "Could not align form.";
+					return stringify(result);
+				}
 			}
 		}
 		if(config.get("processForm", true).asBool()){

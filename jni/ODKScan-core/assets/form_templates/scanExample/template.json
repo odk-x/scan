@@ -1,0 +1,2919 @@
+{
+  "height": 1088,
+  "width": 832,
+  "classifier": {
+    "classification_map": {
+      "empty": false
+    },
+    "default_classification": true,
+    "training_data_uri": "bubbles",
+    "classifier_height": 16,
+    "classifier_width": 14,
+    "alignment_radius": 2,
+    "advanced": {
+      "flip_training_data": true
+    }
+  },
+  "fields": [
+    {
+      "type": "qrcode",
+      "name": "qrcode",
+      "param": "This text is encoded in the QR code.",
+      "__rowNum__": 3,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 35.625,
+          "segment_y": 90.625,
+          "segment_width": 106,
+          "segment_height": 106
+        }
+      ],
+      "label": ""
+    },
+    {
+      "type": "int",
+      "name": "stay",
+      "label": "Length of Stay (days):",
+      "default": 2,
+      "__originalType__": "integer",
+      "__rowNum__": 4,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 35.625,
+          "segment_y": 256.625,
+          "segment_width": 106,
+          "segment_height": 28
+        }
+      ]
+    },
+    {
+      "type": "string",
+      "name": "name",
+      "label": "Name:",
+      "param": "14",
+      "__combineSegments__": true,
+      "delimiter": "",
+      "__rowNum__": 6,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 165.625,
+          "segment_y": 106.625,
+          "segment_width": 328,
+          "segment_height": 514,
+          "items": [
+            {
+              "item_x": 31,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 31,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 31,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 31,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 31,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 31,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 31,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 31,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 31,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 31,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 31,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 31,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 31,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 31,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 31,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 31,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 31,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 31,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 31,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 31,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 31,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 31,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 31,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 31,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 31,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 31,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 31,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 53,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 53,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 53,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 53,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 53,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 53,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 53,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 53,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 53,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 53,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 53,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 53,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 53,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 53,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 53,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 53,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 53,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 53,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 53,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 53,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 53,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 53,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 53,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 53,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 53,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 53,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 53,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 75,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 75,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 75,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 75,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 75,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 75,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 75,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 75,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 75,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 75,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 75,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 75,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 75,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 75,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 75,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 75,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 75,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 75,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 75,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 75,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 75,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 75,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 75,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 75,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 75,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 75,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 75,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 97,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 97,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 97,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 97,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 97,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 97,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 97,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 97,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 97,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 97,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 97,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 97,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 97,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 97,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 97,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 97,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 97,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 97,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 97,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 97,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 97,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 97,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 97,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 97,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 97,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 97,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 97,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 119,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 119,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 119,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 119,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 119,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 119,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 119,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 119,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 119,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 119,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 119,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 119,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 119,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 119,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 119,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 119,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 119,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 119,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 119,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 119,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 119,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 119,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 119,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 119,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 119,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 119,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 119,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 141,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 141,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 141,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 141,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 141,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 141,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 141,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 141,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 141,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 141,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 141,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 141,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 141,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 141,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 141,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 141,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 141,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 141,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 141,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 141,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 141,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 141,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 141,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 141,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 141,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 141,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 141,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 163,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 163,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 163,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 163,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 163,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 163,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 163,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 163,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 163,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 163,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 163,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 163,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 163,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 163,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 163,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 163,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 163,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 163,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 163,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 163,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 163,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 163,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 163,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 163,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 163,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 163,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 163,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 185,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 185,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 185,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 185,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 185,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 185,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 185,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 185,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 185,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 185,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 185,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 185,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 185,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 185,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 185,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 185,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 185,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 185,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 185,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 185,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 185,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 185,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 185,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 185,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 185,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 185,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 185,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 207,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 207,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 207,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 207,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 207,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 207,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 207,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 207,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 207,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 207,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 207,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 207,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 207,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 207,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 207,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 207,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 207,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 207,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 207,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 207,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 207,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 207,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 207,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 207,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 207,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 207,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 207,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 229,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 229,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 229,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 229,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 229,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 229,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 229,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 229,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 229,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 229,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 229,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 229,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 229,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 229,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 229,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 229,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 229,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 229,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 229,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 229,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 229,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 229,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 229,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 229,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 229,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 229,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 229,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 251,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 251,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 251,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 251,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 251,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 251,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 251,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 251,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 251,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 251,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 251,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 251,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 251,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 251,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 251,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 251,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 251,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 251,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 251,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 251,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 251,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 251,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 251,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 251,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 251,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 251,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 251,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 273,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 273,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 273,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 273,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 273,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 273,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 273,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 273,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 273,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 273,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 273,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 273,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 273,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 273,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 273,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 273,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 273,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 273,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 273,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 273,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 273,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 273,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 273,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 273,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 273,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 273,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 273,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 295,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 295,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 295,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 295,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 295,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 295,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 295,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 295,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 295,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 295,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 295,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 295,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 295,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 295,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 295,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 295,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 295,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 295,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 295,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 295,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 295,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 295,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 295,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 295,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 295,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 295,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 295,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            },
+            {
+              "item_x": 317,
+              "item_y": 31.09375,
+              "label": " ",
+              "value": " "
+            },
+            {
+              "item_x": 317,
+              "item_y": 49.09375,
+              "label": "a",
+              "value": "a"
+            },
+            {
+              "item_x": 317,
+              "item_y": 67.09375,
+              "label": "b",
+              "value": "b"
+            },
+            {
+              "item_x": 317,
+              "item_y": 85.09375,
+              "label": "c",
+              "value": "c"
+            },
+            {
+              "item_x": 317,
+              "item_y": 103.09375,
+              "label": "d",
+              "value": "d"
+            },
+            {
+              "item_x": 317,
+              "item_y": 121.09375,
+              "label": "e",
+              "value": "e"
+            },
+            {
+              "item_x": 317,
+              "item_y": 139.09375,
+              "label": "f",
+              "value": "f"
+            },
+            {
+              "item_x": 317,
+              "item_y": 157.09375,
+              "label": "g",
+              "value": "g"
+            },
+            {
+              "item_x": 317,
+              "item_y": 175.09375,
+              "label": "h",
+              "value": "h"
+            },
+            {
+              "item_x": 317,
+              "item_y": 193.09375,
+              "label": "i",
+              "value": "i"
+            },
+            {
+              "item_x": 317,
+              "item_y": 211.09375,
+              "label": "j",
+              "value": "j"
+            },
+            {
+              "item_x": 317,
+              "item_y": 229.09375,
+              "label": "k",
+              "value": "k"
+            },
+            {
+              "item_x": 317,
+              "item_y": 247.09375,
+              "label": "l",
+              "value": "l"
+            },
+            {
+              "item_x": 317,
+              "item_y": 265.09375,
+              "label": "m",
+              "value": "m"
+            },
+            {
+              "item_x": 317,
+              "item_y": 283.09375,
+              "label": "n",
+              "value": "n"
+            },
+            {
+              "item_x": 317,
+              "item_y": 301.09375,
+              "label": "o",
+              "value": "o"
+            },
+            {
+              "item_x": 317,
+              "item_y": 319.09375,
+              "label": "p",
+              "value": "p"
+            },
+            {
+              "item_x": 317,
+              "item_y": 337.09375,
+              "label": "q",
+              "value": "q"
+            },
+            {
+              "item_x": 317,
+              "item_y": 355.09375,
+              "label": "r",
+              "value": "r"
+            },
+            {
+              "item_x": 317,
+              "item_y": 373.09375,
+              "label": "s",
+              "value": "s"
+            },
+            {
+              "item_x": 317,
+              "item_y": 391.09375,
+              "label": "t",
+              "value": "t"
+            },
+            {
+              "item_x": 317,
+              "item_y": 409.09375,
+              "label": "u",
+              "value": "u"
+            },
+            {
+              "item_x": 317,
+              "item_y": 427.09375,
+              "label": "v",
+              "value": "v"
+            },
+            {
+              "item_x": 317,
+              "item_y": 445.09375,
+              "label": "w",
+              "value": "w"
+            },
+            {
+              "item_x": 317,
+              "item_y": 463.09375,
+              "label": "x",
+              "value": "x"
+            },
+            {
+              "item_x": 317,
+              "item_y": 481.09375,
+              "label": "y",
+              "value": "y"
+            },
+            {
+              "item_x": 317,
+              "item_y": 499.09375,
+              "label": "z",
+              "value": "z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "int",
+      "name": "roomNum",
+      "label": "Room Number:",
+      "param": "2",
+      "__combineSegments__": true,
+      "delimiter": "",
+      "__rowNum__": 9,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 516.625,
+          "segment_y": 165.625,
+          "segment_width": 61,
+          "segment_height": 208,
+          "items": [
+            {
+              "item_x": 28,
+              "item_y": 31.09375,
+              "label": "0",
+              "value": 0
+            },
+            {
+              "item_x": 28,
+              "item_y": 49.09375,
+              "label": "1",
+              "value": 1
+            },
+            {
+              "item_x": 28,
+              "item_y": 67.09375,
+              "label": "2",
+              "value": 2
+            },
+            {
+              "item_x": 28,
+              "item_y": 85.09375,
+              "label": "3",
+              "value": 3
+            },
+            {
+              "item_x": 28,
+              "item_y": 103.09375,
+              "label": "4",
+              "value": 4
+            },
+            {
+              "item_x": 28,
+              "item_y": 121.09375,
+              "label": "5",
+              "value": 5
+            },
+            {
+              "item_x": 28,
+              "item_y": 139.09375,
+              "label": "6",
+              "value": 6
+            },
+            {
+              "item_x": 28,
+              "item_y": 157.09375,
+              "label": "7",
+              "value": 7
+            },
+            {
+              "item_x": 28,
+              "item_y": 175.09375,
+              "label": "8",
+              "value": 8
+            },
+            {
+              "item_x": 28,
+              "item_y": 193.09375,
+              "label": "9",
+              "value": 9
+            },
+            {
+              "item_x": 50,
+              "item_y": 31.09375,
+              "label": "0",
+              "value": 0
+            },
+            {
+              "item_x": 50,
+              "item_y": 49.09375,
+              "label": "1",
+              "value": 1
+            },
+            {
+              "item_x": 50,
+              "item_y": 67.09375,
+              "label": "2",
+              "value": 2
+            },
+            {
+              "item_x": 50,
+              "item_y": 85.09375,
+              "label": "3",
+              "value": 3
+            },
+            {
+              "item_x": 50,
+              "item_y": 103.09375,
+              "label": "4",
+              "value": 4
+            },
+            {
+              "item_x": 50,
+              "item_y": 121.09375,
+              "label": "5",
+              "value": 5
+            },
+            {
+              "item_x": 50,
+              "item_y": 139.09375,
+              "label": "6",
+              "value": 6
+            },
+            {
+              "item_x": 50,
+              "item_y": 157.09375,
+              "label": "7",
+              "value": 7
+            },
+            {
+              "item_x": 50,
+              "item_y": 175.09375,
+              "label": "8",
+              "value": 8
+            },
+            {
+              "item_x": 50,
+              "item_y": 193.09375,
+              "label": "9",
+              "value": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "string",
+      "name": "address",
+      "label": "Home Address:",
+      "rows": 4,
+      "__originalType__": "text",
+      "__rowNum__": 10,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 516.625,
+          "segment_y": 416.625,
+          "segment_width": 279,
+          "segment_height": 76
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "mon_chores",
+      "label": "Monday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 15,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 30.625,
+          "segment_y": 673.625,
+          "segment_width": 94,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "tues_chores",
+      "label": "Tuesday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 16,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 143.625,
+          "segment_y": 673.625,
+          "segment_width": 93,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "wed_chores",
+      "label": "Wed. Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 17,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 255.625,
+          "segment_y": 673.625,
+          "segment_width": 93,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "thurs_chores",
+      "label": "Thursday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 18,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 367.625,
+          "segment_y": 673.625,
+          "segment_width": 94,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "fri_chores",
+      "label": "Friday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 19,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 480.625,
+          "segment_y": 673.625,
+          "segment_width": 94,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "sat_chores",
+      "label": "Saturday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 20,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 593.625,
+          "segment_y": 673.625,
+          "segment_width": 94,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "name": "sun_chores",
+      "label": "Sunday Chores",
+      "constraint": "count-selected(.) = 1",
+      "required": true,
+      "param": "chores",
+      "__originalType__": "select_multiple",
+      "classifier": {
+        "classification_map": {
+          "empty": false
+        },
+        "default_classification": true,
+        "training_data_uri": "square_checkboxes",
+        "classifier_height": 16,
+        "classifier_width": 14,
+        "alignment_radius": 2,
+        "advanced": {
+          "flip_training_data": true
+        }
+      },
+      "__rowNum__": 21,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 706.625,
+          "segment_y": 673.625,
+          "segment_width": 94,
+          "segment_height": 138,
+          "items": [
+            {
+              "item_x": 11,
+              "item_y": 27.5,
+              "label": "Wash dishes",
+              "value": "dishes"
+            },
+            {
+              "item_x": 11,
+              "item_y": 55.5,
+              "label": "Sweep patio",
+              "value": "sweep"
+            },
+            {
+              "item_x": 11,
+              "item_y": 83.5,
+              "label": "Cook dinner",
+              "value": "cook"
+            },
+            {
+              "item_x": 11,
+              "item_y": 127.5,
+              "label": "Program roomba",
+              "value": "roomba"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "string",
+      "name": "comments",
+      "label": "Comments:",
+      "__originalType__": "text",
+      "__rowNum__": 23,
+      "segments": [
+        {
+          "align_segment": true,
+          "segment_x": 25.625,
+          "segment_y": 860.625,
+          "segment_width": 780,
+          "segment_height": 28
+        }
+      ]
+    }
+  ]
+}

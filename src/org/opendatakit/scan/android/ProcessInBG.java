@@ -51,8 +51,8 @@ public class ProcessInBG extends Service {
 	
 	/**
 	 * This process is a singleton. Every time an activity "starts" it
-	 * a new runnable is created to do the processing code and added to this queue.
-	 * This makes it so the runnables can be throttled
+	 * a new thread is created to do the processing code and added to this queue.
+	 * This makes it so the number of active threads can be throttled
 	 * (rather than all of them trying to run in parallel)
 	 * so they don't end up thrashing or causing other issues due to resource limitations.
 	 */

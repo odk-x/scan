@@ -43,7 +43,6 @@ There's a good chance you will run into some problems, but many can be solved si
 1. From the top menu bar go to Project->Clean.
 2. In the Package Explorer, right click on the project and select refresh.
 
-
 Calling the via by intent
 =========================
 
@@ -56,6 +55,18 @@ i.putExtra("templatePath", "/sdcard/ODKScan/form_templates/example");
 i.putExtra("outputPath", "/sdcard/ODKScan/output/taken_2013-03-25_12-46-21/output.jpg");
 startActivity(i);
 ```
+
+Architecture
+============
+
+The initial training data and form texmplates are included in the assets folder.
+When a new version of the app is first launched they are installed into the ODKScan directory by RunSetup.
+
+The processing pipeline includes 3 main components:
+
+* PhotographForm launches the camera app to get a picture of the form, removes duplicates photos and launches the processing services.
+* ProcessInBG is a service that runs the ODKScan-core cord in background threads, outside of the activity, and creates notifications when it is complete.
+* DisplayProcessedForm displays the marked-up form image and allows the user to save the data to ODK Collect. It is launched from the notifications ProcessInBG creates.
 
 Source tree information
 =======================

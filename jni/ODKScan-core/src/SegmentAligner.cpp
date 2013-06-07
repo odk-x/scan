@@ -120,7 +120,7 @@ void findLines(const Mat& img, Point_<T>& start, Point_<T>& end, const Rect& roi
 	//The greater param is the more results are weighted towards the orginal position.
 	//When decreasing this watch out for prompts with lines close to the borders (e.g. bub_* prompts).
 	//There is a trade-off because lowering the param yield better alignments when it doesn't pick up the wrong line.
-	double param = 0.2;
+	double param = 0.4;
 
 	float maxSsdFromMidpoint = 2*range*range;
 	

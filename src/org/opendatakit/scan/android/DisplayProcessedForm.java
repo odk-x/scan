@@ -41,7 +41,6 @@ public class DisplayProcessedForm extends Activity {
 
 	private Intent collectIntent;
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -266,15 +265,6 @@ public class DisplayProcessedForm extends Activity {
 		// Handle item selection
 		Intent intent;
 		int itemId = item.getItemId();
-		/*
-		if (itemId == R.id.exportToODK) {
-			Log.i(LOG_TAG, "Using template: " + templatePath);
-			Intent dataIntent = new Intent();
-			dataIntent.putExtra("start", true);
-			startCollect(dataIntent);
-			return true;
-		}
-		*/
 		if (itemId == R.id.scanNewForm) {
 			intent = new Intent(getApplication(), PhotographForm.class);
 			startActivity(intent);

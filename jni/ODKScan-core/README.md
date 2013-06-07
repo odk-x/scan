@@ -89,6 +89,12 @@ Removing training images that are not well aligned usually helps.
 3. Use training data with varying the lighting and camera conditions.
 It can make a big difference whether you hold the camera in your hand, or position it on a stand.
 
+## Additional developer info:
+
+[JSONFormat.md](JSONFormat.md)
+
+[processViaJSON.md](processViaJSON.md)
+
 Source file information
 =======================
 
