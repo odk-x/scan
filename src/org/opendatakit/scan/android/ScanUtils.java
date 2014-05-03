@@ -41,6 +41,29 @@ public class ScanUtils {
 	public static final boolean DebugMode = false;
 
 	public static final String appFolder = Environment.getExternalStorageDirectory().getPath() + "/ODKScan/";
+	
+	public static final String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+	
+	public static String getAppFormDirPath(String appName, String formId) {
+		return  extStorageDir + "/opendatakit/" + appName + "/tables/" + formId + "/forms/" + formId + "/";
+	}
+	
+	public static String getAppInstancesDirPath(String appName, String formId) {
+		return extStorageDir + "/opendatakit/" + appName + "/tables/" + formId +  "/instances/"; 
+	}
+	
+	public static String getSurveyUri(String formId) {
+		return "content://org.opendatakit.common.android.provider.forms/survey/" + formId + "/#instanceId=";
+	}
+	
+	public static String getXlsxConverterUri() {
+		return "http:///localhost:8635/survey/xlsxconverter/conversion.html";
+	}
+	
+	public static String getAppRelativeInstancesDirPath(String formId, String instancesDir) 
+	{
+		return "/tables/" + formId + "/instances/" + instancesDir + "/";
+	}
 
 	public static String getOutputDirPath() {
 		return  appFolder + "output/";

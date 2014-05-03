@@ -26,22 +26,50 @@
 	   	    android:id="@+id/saveBtn"
 	   	    android:layout_weight="1"
 	   	    android:layout_height="match_parent"
-	   	    android:text="Save">
+	   	    android:text="@string/collect_save"
+	   	    android:textSize="14sp">
 		</Button>
 		<Button
 		    style="@style/APTButton"
 	   	    android:id="@+id/transcribeBtn"
 	   	    android:layout_weight="1"
 	   	    android:layout_height="match_parent"
-	   	    android:text="Transcribe">
+	   	    android:text="@string/collect_transcribe"
+	   	    android:textSize="14sp">
+		</Button>
+		
+		<!-- CAL: For now have another set of buttons for Survey than for Collect
+			This may change later -->
+		<Button
+		    style="@style/APTButton"
+	   	    android:id="@+id/saveSurveyBtn"
+	   	    android:layout_weight="1"
+	   	    android:layout_height="match_parent"
+	   	    android:text="@string/survey_save"
+	   	    android:textSize="14sp">
+		</Button>
+		<Button
+		    style="@style/APTButton"
+	   	    android:id="@+id/transcribeSurveyBtn"
+	   	    android:layout_weight="1"
+	   	    android:layout_height="match_parent"
+	   	    android:text="@string/survey_transcribe"
+	   	    android:textSize="14sp" >
 		</Button>
 	</LinearLayout>
 
    	
-	<WebView  xmlns:android="http://schemas.android.com/apk/res/android"
+	<WebView
 	   android:id="@+id/webview2"
 	   android:layout_width="fill_parent"
 	   android:layout_height="fill_parent"
 	   android:background="#000000"
 	   android:scrollbars="none"/>
+	
+	<WebView
+        android:id="@+id/webview3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="gone" />
 </LinearLayout>

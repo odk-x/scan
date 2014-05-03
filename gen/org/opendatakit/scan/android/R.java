@@ -9,8 +9,8 @@ package org.opendatakit.scan.android;
 
 public final class R {
     public static final class array {
-        public static final int select_templates_default_entries=0x7f050000;
-        public static final int select_templates_default_values=0x7f050001;
+        public static final int select_templates_default_entries=0x7f070000;
+        public static final int select_templates_default_values=0x7f070001;
     }
     public static final class attr {
         /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
@@ -32,35 +32,39 @@ containing a value of this type.
     }
     public static final class drawable {
         public static final int bad_picture=0x7f020000;
-        public static final int good_picture=0x7f020001;
-        public static final int icon=0x7f020002;
-        public static final int odk_scan_logo=0x7f020003;
-        public static final int stand_example=0x7f020004;
+        public static final int form_logo=0x7f020001;
+        public static final int good_picture=0x7f020002;
+        public static final int icon=0x7f020003;
+        public static final int odk_scan_logo=0x7f020004;
+        public static final int stand_example=0x7f020005;
     }
     public static final class id {
-        public static final int InstructionsButton=0x7f09000b;
-        public static final int ScanButton=0x7f090009;
-        public static final int SettingsButton=0x7f09000c;
-        public static final int ViewFormsButton=0x7f09000a;
-        public static final int createdTime=0x7f090008;
-        public static final int failureContainer=0x7f090004;
-        public static final int failureMessage=0x7f090005;
-        public static final int myLinearLayout=0x7f090000;
-        public static final int nextPageBtn=0x7f09000e;
-        public static final int photoStatus=0x7f090006;
-        public static final int process_button=0x7f090002;
-        public static final int retake_button=0x7f090001;
-        public static final int saveBtn=0x7f090010;
-        public static final int save_transcribe=0x7f09000f;
-        public static final int scanNewForm=0x7f090015;
-        public static final int startOver=0x7f090016;
-        public static final int statusContainer=0x7f090013;
-        public static final int statusMessage=0x7f090014;
-        public static final int templateName=0x7f090007;
-        public static final int transcribeBtn=0x7f090011;
-        public static final int version_display=0x7f09000d;
-        public static final int webview=0x7f090003;
-        public static final int webview2=0x7f090012;
+        public static final int InstructionsButton=0x7f0a000b;
+        public static final int ScanButton=0x7f0a0009;
+        public static final int SettingsButton=0x7f0a000c;
+        public static final int ViewFormsButton=0x7f0a000a;
+        public static final int createdTime=0x7f0a0008;
+        public static final int failureContainer=0x7f0a0004;
+        public static final int failureMessage=0x7f0a0005;
+        public static final int myLinearLayout=0x7f0a0000;
+        public static final int nextPageBtn=0x7f0a000e;
+        public static final int photoStatus=0x7f0a0006;
+        public static final int process_button=0x7f0a0002;
+        public static final int retake_button=0x7f0a0001;
+        public static final int saveBtn=0x7f0a0010;
+        public static final int saveSurveyBtn=0x7f0a0012;
+        public static final int save_transcribe=0x7f0a000f;
+        public static final int scanNewForm=0x7f0a0018;
+        public static final int startOver=0x7f0a0019;
+        public static final int statusContainer=0x7f0a0016;
+        public static final int statusMessage=0x7f0a0017;
+        public static final int templateName=0x7f0a0007;
+        public static final int transcribeBtn=0x7f0a0011;
+        public static final int transcribeSurveyBtn=0x7f0a0013;
+        public static final int version_display=0x7f0a000d;
+        public static final int webview=0x7f0a0003;
+        public static final int webview2=0x7f0a0014;
+        public static final int webview3=0x7f0a0015;
     }
     public static final class layout {
         public static final int after_photo_taken=0x7f030000;
@@ -72,64 +76,265 @@ containing a value of this type.
         public static final int status=0x7f030006;
     }
     public static final class menu {
-        public static final int mscan_menu=0x7f080000;
+        public static final int mscan_menu=0x7f090000;
+    }
+    public static final class raw {
+        public static final int license=0x7f050000;
     }
     public static final class string {
         /**  For Main Screen 
  For Main Screen 
          */
-        public static final int Health_Center=0x7f060009;
+        public static final int Health_Center=0x7f0600a1;
         /**  Instructions 
  Instructions 
          */
-        public static final int Instructions1=0x7f060018;
-        public static final int Instructions2=0x7f060019;
-        public static final int Instructions3=0x7f06001a;
-        public static final int Instructions4=0x7f06001b;
-        public static final int InstructionsButton=0x7f06000d;
-        public static final int ScanButton=0x7f06001c;
-        public static final int SettingsButton=0x7f06000e;
-        public static final int ViewFormsButton=0x7f06000c;
-        public static final int after_photo_taken_activity=0x7f060006;
-        public static final int aligning_form=0x7f060011;
+        public static final int Instructions1=0x7f0600b4;
+        public static final int Instructions2=0x7f0600b5;
+        public static final int Instructions3=0x7f0600b6;
+        public static final int Instructions4=0x7f0600b7;
+        public static final int InstructionsButton=0x7f0600a5;
+        public static final int ScanButton=0x7f0600b8;
+        public static final int SettingsButton=0x7f0600a6;
+        public static final int ViewFormsButton=0x7f0600a4;
+        public static final int accept_location=0x7f060000;
+        public static final int access_error=0x7f060054;
+        public static final int activity_not_found=0x7f060001;
+        public static final int added_on_date_at_time=0x7f06006b;
+        public static final int admin_access_settings=0x7f06007d;
+        public static final int admin_password_changed=0x7f060086;
+        public static final int admin_password_disabled=0x7f060087;
+        public static final int admin_password_incorrect=0x7f060089;
+        public static final int admin_password_mismatch=0x7f060088;
+        public static final int admin_preferences=0x7f06007c;
+        public static final int after_photo_taken_activity=0x7f06009e;
+        public static final int aligning_form=0x7f0600a9;
         /** 
 <string name="app_name">ODK Scan</string>
 
          */
-        public static final int app_description=0x7f060000;
-        public static final int bubble_instructions_activity=0x7f060003;
-        public static final int bubble_process_activity=0x7f060001;
+        public static final int app_description=0x7f060098;
+        public static final int app_name=0x7f060002;
+        public static final int app_url=0x7f060047;
+        public static final int bubble_instructions_activity=0x7f06009b;
+        public static final int bubble_process_activity=0x7f060099;
         /**  For Preferences 
  For Preferences 
          */
-        public static final int calibrate=0x7f060007;
-        public static final int could_not_register=0x7f060013;
-        public static final int display_data=0x7f060016;
-        public static final int display_processed_data_activity=0x7f060005;
-        public static final int display_processed_form_activity=0x7f060004;
-        public static final int doFormDetection=0x7f060008;
-        public static final int main_menu=0x7f060017;
+        public static final int calibrate=0x7f06009f;
+        public static final int cancel=0x7f060003;
+        public static final int cancel_location=0x7f060004;
+        public static final int change_font_size=0x7f060050;
+        public static final int change_formlist_url=0x7f060049;
+        public static final int change_language=0x7f060005;
+        public static final int change_password=0x7f060006;
+        public static final int change_protocol=0x7f06004b;
+        public static final int change_server=0x7f06007a;
+        public static final int change_server_url=0x7f060007;
+        public static final int change_splash_path=0x7f060046;
+        public static final int change_submission_url=0x7f06004c;
+        public static final int change_username=0x7f060008;
+        public static final int change_username_default=0x7f06007b;
+        public static final int change_view=0x7f060068;
+        public static final int click_to_web=0x7f06003e;
+        public static final int client=0x7f06003f;
+        public static final int collect_save=0x7f0600af;
+        public static final int collect_transcribe=0x7f0600b0;
+        public static final int could_not_register=0x7f0600ab;
+        public static final int default_completed=0x7f060009;
+        public static final int default_completed_summary=0x7f06000a;
+        public static final int default_odk_formlist=0x7f060052;
+        public static final int default_odk_submission=0x7f060053;
+        public static final int default_server_url=0x7f06000b;
+        public static final int default_splash_path=0x7f060043;
+        public static final int delete_confirm=0x7f06000c;
+        public static final int delete_file=0x7f06000d;
+        public static final int delete_no=0x7f06000e;
+        public static final int delete_yes=0x7f06000f;
+        public static final int disksync_in_progress=0x7f060073;
+        public static final int display_data=0x7f0600b2;
+        public static final int display_processed_data_activity=0x7f06009d;
+        public static final int display_processed_form_activity=0x7f06009c;
+        public static final int doFormDetection=0x7f0600a0;
+        public static final int download=0x7f060010;
+        public static final int download_forms_result=0x7f060011;
+        public static final int download_in_progress=0x7f060072;
+        public static final int downloading_data=0x7f060012;
+        public static final int enter_admin_password=0x7f06008a;
+        public static final int enter_data_button=0x7f060013;
+        public static final int enter_new_password=0x7f060084;
+        public static final int error_occured=0x7f060014;
+        public static final int expanding_expansion_files=0x7f060090;
+        public static final int expanding_file=0x7f060093;
+        public static final int expansion_complete=0x7f060091;
+        public static final int expansion_failed=0x7f060095;
+        public static final int expansion_progress=0x7f060094;
+        public static final int expansion_unzipping=0x7f060092;
+        public static final int fetching_file=0x7f060015;
+        public static final int fetching_manifest=0x7f06005b;
+        public static final int file_delete_in_progress=0x7f060018;
+        public static final int file_deleted_error=0x7f060016;
+        public static final int file_deleted_ok=0x7f060017;
+        public static final int file_fetch_failed=0x7f06005a;
+        public static final int finished_disk_scan=0x7f060019;
+        public static final int font_size=0x7f06004f;
+        public static final int font_size_extra_large=0x7f060063;
+        public static final int font_size_extra_small=0x7f060067;
+        public static final int font_size_large=0x7f060064;
+        public static final int font_size_medium=0x7f060065;
+        public static final int font_size_small=0x7f060066;
+        public static final int form_download_progress=0x7f060059;
+        public static final int form_download_unzipping=0x7f060074;
+        public static final int form_load_error=0x7f06008d;
+        public static final int form_scan_starting=0x7f060051;
+        public static final int formlist_url=0x7f06004d;
+        public static final int found_in_menu=0x7f06008b;
+        public static final int general_preferences=0x7f06003d;
+        public static final int get_forms=0x7f06001b;
+        public static final int get_location=0x7f06001c;
+        public static final int getting_location=0x7f06001a;
+        public static final int go_to_location=0x7f060048;
+        public static final int google_account=0x7f06005e;
+        public static final int invalid_form_id=0x7f060097;
+        public static final int list_failed_with_error=0x7f06001e;
+        public static final int load_remote_form_error=0x7f06001f;
+        public static final int loading_video=0x7f060096;
+        public static final int location_accuracy=0x7f060021;
+        public static final int location_provider_accuracy=0x7f060020;
+        public static final int main_menu=0x7f0600b3;
+        public static final int manage_files=0x7f060022;
+        public static final int manifest_server_error=0x7f060055;
+        public static final int manifest_tag_error=0x7f060058;
+        public static final int mark_as_finalized_summary=0x7f060083;
+        public static final int mark_as_finished=0x7f060077;
+        public static final int media_save_failed=0x7f06006f;
         /**  DisplayProcessedForm 
          */
-        public static final int next_page=0x7f060014;
+        public static final int next_page=0x7f0600ac;
+        public static final int no_connection=0x7f060024;
+        public static final int no_formdef_json=0x7f060076;
+        public static final int no_forms_uploaded=0x7f06005d;
+        public static final int no_items_display=0x7f060025;
+        public static final int no_items_display_forms=0x7f060026;
+        public static final int no_items_display_instances=0x7f060027;
+        public static final int no_manifest=0x7f060075;
+        public static final int noselect_error=0x7f060023;
+        public static final int not_yet_sent=0x7f060070;
+        public static final int ok=0x7f060028;
+        public static final int parse_openrosa_formlist_failed=0x7f060029;
+        public static final int password=0x7f06002a;
+        public static final int please_wait=0x7f06002b;
+        public static final int please_wait_long=0x7f06002c;
         /**  AfterPhotoTaken 
  AfterPhotoTaken 
          */
-        public static final int process_form=0x7f06000f;
-        public static final int processing_form=0x7f060012;
-        public static final int retake_photo=0x7f060010;
+        public static final int process_form=0x7f0600a7;
+        public static final int processing_form=0x7f0600aa;
+        public static final int protocol=0x7f06004a;
+        public static final int provider_disabled_error=0x7f06001d;
+        public static final int refresh=0x7f06002d;
+        public static final int retake_photo=0x7f0600a8;
+        public static final int review_data=0x7f06002e;
+        public static final int review_data_button=0x7f06002f;
+        public static final int root_element_error=0x7f060056;
+        public static final int root_namespace_error=0x7f060057;
+        public static final int save_as=0x7f060081;
+        public static final int save_as_summary=0x7f060082;
         /**  Popup menu 
  Popup menu 
          */
-        public static final int save_data=0x7f060015;
-        public static final int scan_new_form=0x7f06000b;
-        public static final int the_current_health_center_is=0x7f06000a;
-        public static final int view_bubble_forms_activity=0x7f060002;
+        public static final int save_data=0x7f0600b1;
+        public static final int save_mid=0x7f06007f;
+        public static final int save_mid_summary=0x7f060080;
+        public static final int scan_new_form=0x7f0600a3;
+        public static final int searching_for_expansion_files=0x7f06008f;
+        public static final int select_another_image=0x7f060044;
+        public static final int selected_google_account_text=0x7f06005f;
+        public static final int send_data=0x7f060031;
+        public static final int send_data_button=0x7f060032;
+        public static final int send_selected_data=0x7f060033;
+        /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+         */
+        public static final int sending_failed_on_date_at_time=0x7f06006d;
+        public static final int sending_items=0x7f060030;
+        /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+         */
+        public static final int sent_on_date_at_time=0x7f06006c;
+        public static final int server_auth_credentials=0x7f060034;
+        public static final int server_platform_google_forms=0x7f060061;
+        public static final int server_platform_odk_aggregate=0x7f060060;
+        public static final int server_platform_other=0x7f060062;
+        public static final int server_preferences=0x7f060037;
+        public static final int server_requires_auth=0x7f060035;
+        public static final int server_url=0x7f060036;
+        public static final int shortcut_name=0x7f06008c;
+        public static final int show_sent_and_unsent_forms=0x7f060069;
+        public static final int show_splash=0x7f060040;
+        public static final int show_splash_summary=0x7f060041;
+        public static final int show_unsent_forms=0x7f06006a;
+        public static final int splash_path=0x7f060042;
+        public static final int submission_url=0x7f06004e;
+        public static final int success=0x7f06005c;
+        public static final int survey_save=0x7f0600ad;
+        public static final int survey_transcribe=0x7f0600ae;
+        public static final int the_current_health_center_is=0x7f0600a2;
+        public static final int toggle_selected=0x7f060038;
+        public static final int upload_in_progress=0x7f06008e;
+        public static final int uploading_data=0x7f060039;
+        public static final int url_error=0x7f06003a;
+        public static final int use_odk_default=0x7f060045;
+        public static final int user_access_form_entry=0x7f06007e;
+        public static final int user_access_main_menu=0x7f060078;
+        public static final int user_access_preferences=0x7f060079;
+        public static final int username=0x7f06003b;
+        public static final int verify_new_password=0x7f060085;
+        /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
+         */
+        public static final int version=0x7f06006e;
+        public static final int view_bubble_forms_activity=0x7f06009a;
+        public static final int view_hierarchy=0x7f06003c;
+        public static final int xforms_file_exists=0x7f060071;
     }
     public static final class style {
-        public static final int APTButton=0x7f070002;
-        public static final int StandardButton=0x7f070001;
-        public static final int StandardFont=0x7f070000;
+        public static final int APTButton=0x7f080002;
+        public static final int StandardButton=0x7f080001;
+        public static final int StandardFont=0x7f080000;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;
@@ -161,7 +366,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:checkAll
+          @attr name org.opendatakit.scan.android:checkAll
         */
         public static final int ListPreferenceMultiSelect_checkAll = 0;
         /**
@@ -175,7 +380,7 @@ containing a value of this type.
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:separator
+          @attr name org.opendatakit.scan.android:separator
         */
         public static final int ListPreferenceMultiSelect_separator = 1;
     };

@@ -26,12 +26,16 @@
 <!-- AfterPhotoTaken -->
 <string name="process_form">Process Form</string>
 <string name="retake_photo">Retake Photo</string>
-<string name="aligning_form">Aligning form...</string>
-<string name="processing_form">Processing form...</string>
+<string name="aligning_form">Aligning form &#8230;</string>
+<string name="processing_form">Processing form &#8230;</string>
 <string name="could_not_register">Sorry, the form could not be registered.</string>
 
 <!-- DisplayProcessedForm -->
 <string name="next_page">Scan Next Page</string>
+<string name="survey_save">Survey Save</string>
+<string name="survey_transcribe">Survey Transcribe</string>
+<string name="collect_save">Collect Save</string>
+<string name="collect_transcribe">Collect Transcribe</string>
 
 <!-- Popup menu -->
 <string name="save_data">Save Data</string>

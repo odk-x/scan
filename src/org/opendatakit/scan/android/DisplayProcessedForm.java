@@ -41,6 +41,8 @@ public class DisplayProcessedForm extends Activity {
 
 	private Intent collectIntent;
 	
+	private Intent surveyIntent;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -138,6 +140,41 @@ public class DisplayProcessedForm extends Activity {
 						}
 					}
 				});
+				Button saveSurveyData = (Button) findViewById(R.id.saveSurveyBtn);
+				saveSurveyData.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Log.i(LOG_TAG, "Using template: " + templatePath);
+						if(surveyIntent == null) {
+							surveyIntent = makeSurveyIntent();
+						} 
+						//surveyIntent is still null if Survey not installed.
+						if(surveyIntent != null) {
+							if(surveyIntent.getData() == null) {
+								exportToSurvey(2);
+							}
+						}
+						
+					}
+				});
+				Button transcribeSurveyData = (Button) findViewById(R.id.transcribeSurveyBtn);
+				transcribeSurveyData.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						Log.i(LOG_TAG, "Using template: " + templatePath);
+						if(surveyIntent == null) {
+							surveyIntent = makeSurveyIntent();
+						}
+						//surveyIntent is still null if Survey not installed.
+						if(surveyIntent != null) {
+							if(surveyIntent.getData() == null) {
+								exportToSurvey(3);
+							} else {
+								//The scan data has already been exported
+								//so just start Survey.
+								startActivity(surveyIntent);
+							}
+						}
+					}
+				});
 			}
 
 			ScanUtils.displayImageInWebView(
@@ -211,10 +248,63 @@ public class DisplayProcessedForm extends Activity {
 		return intent;
 	}
 
+	/**
+	 * Creates an intent for launching survey.
+	 * May return null if survey is not installed.
+	 * @return
+	 */
+	public Intent makeSurveyIntent() {
+		// Initialize the intent that will start Survey.
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setComponent(new ComponentName("org.opendatakit.survey.android",
+				"org.opendatakit.survey.android.activities.MainMenuActivity"));
+		
+		//Use the intent to see if survey is installed.
+		PackageManager packMan = getPackageManager();
+		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
+			// ////////////
+			Log.i(LOG_TAG, "Survey is not installed.");
+			// ////////////		
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("ODK Survey was not found on this device.")
+					.setCancelable(false)
+					// Take this out until Survey is available on the Google Play Store
+					//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
+					//	public void onClick(DialogInterface dialog,
+					//			int id) {
+					//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
+					//	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
+					//		startActivity(goToMarket);
+					//		dialog.cancel();
+					//	}
+					//})
+					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int id) {
+							dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+			return null;
+		}
+		
+		intent.setAction(Intent.ACTION_EDIT);
+		
+		//Start indicates that the form should be launched from the first question
+		//rather than the prompt list.
+		// Not sure if this start parameter is still necessary in Survey
+		intent.putExtra("start", true);
+		return intent;
+	}
+	
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Exporting to Collect...");
+		builder.setTitle("Exporting...");
 		builder.setCancelable(false);
 		return builder.create();
 	}
@@ -232,23 +322,56 @@ public class DisplayProcessedForm extends Activity {
 		createInstanceIntent.putExtra("photoName", photoName);
 		startActivityForResult(createInstanceIntent, requestCode);
 	}
+	
+	/**
+	 * Exports the Scan JSON data to Survey.
+	 * If the requestCode is 3 Survey will be launched
+	 * after the export activity returns a result.
+	 * @param requestCode
+	 */
+	public void exportToSurvey(int requestCode) {
+		showDialog(0);
+		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
+		createInstanceIntent.putExtras(extras);
+		createInstanceIntent.putExtra("templatePath", templatePath);
+		createInstanceIntent.putExtra("photoName", photoName);
+		startActivityForResult(createInstanceIntent, requestCode);
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		dismissDialog(0);
+		// Changed the code to only launch intents if the result was ok
 		if (resultCode == Activity.RESULT_OK) {
-			Button saveData = (Button) findViewById(R.id.saveBtn);
-			saveData.setEnabled(false);
-			saveData.setText("saved");
-			collectIntent.putExtras(data);
-			collectIntent.setData(data.getData());
+			if (requestCode == 0 || requestCode == 1) {
+				Button saveData = (Button) findViewById(R.id.saveBtn);
+				saveData.setEnabled(false);
+				saveData.setText("saved");
+				collectIntent.putExtras(data);
+				collectIntent.setData(data.getData());
+			}
+			
+			if (requestCode == 2 || requestCode == 3) {
+				Button saveSurveyData = (Button) findViewById(R.id.saveSurveyBtn);
+				saveSurveyData.setEnabled(false);
+				saveSurveyData.setText("saved");
+				surveyIntent.putExtras(data);
+				surveyIntent.setData(data.getData());
+			}
+			
+			if (requestCode == 1) {
+				//dismissDialog(0);
+				Log.i(LOG_TAG, "Starting Collect...");	
+				startActivity(collectIntent);
+			}
+			
+			if (requestCode == 3) {
+				//dismissDialog(1);
+				Log.i(LOG_TAG, "Starting Survey...");	
+				startActivity(surveyIntent);
+			}
 		}
-		if (requestCode == 1) {
-			// ////////////
-			Log.i(LOG_TAG, "Starting Collect...");
-			// ////////////		
-			startActivity(collectIntent);
-		}
+
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 

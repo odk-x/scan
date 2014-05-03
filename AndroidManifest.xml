@@ -24,9 +24,11 @@
     
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
     </uses-permission>
-
     
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name="org.opendatakit.scan.android.Scan"
         android:icon="@drawable/icon"
         android:label="ODK Scan"
         android:theme="@android:style/Theme.Light" >
@@ -43,6 +45,12 @@
         <activity
             android:name="JSON2XForm"
             android:screenOrientation="portrait" >
+        </activity>
+        <!-- CAL: Added to be able to translate the Scan code to JSON -->
+        <activity
+            android:name="JSON2SurveyJSON"
+            android:screenOrientation="portrait" 
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
         </activity>
         <activity
             android:name="PhotographForm"
