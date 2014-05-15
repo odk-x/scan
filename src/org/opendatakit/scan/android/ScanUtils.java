@@ -38,31 +38,36 @@ public class ScanUtils {
 	private ScanUtils() {
 	}
 
+	public static final String appName = "tables";
 	public static final boolean DebugMode = false;
 
 	public static final String appFolder = Environment.getExternalStorageDirectory().getPath() + "/ODKScan/";
 	
 	public static final String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 	
-	public static String getAppFormDirPath(String appName, String formId) {
+	public static final String getAppNameForSurvey() {
+		return appName;
+	}
+	
+	public static String getAppFormDirPath(String formId) {
 		return  extStorageDir + "/opendatakit/" + appName + "/tables/" + formId + "/forms/" + formId + "/";
 	}
 	
-	public static String getAppInstancesDirPath(String appName, String formId) {
+	public static String getAppInstancesDirPath(String formId) {
 		return extStorageDir + "/opendatakit/" + appName + "/tables/" + formId +  "/instances/"; 
 	}
 	
 	public static String getSurveyUri(String formId) {
-		return "content://org.opendatakit.common.android.provider.forms/survey/" + formId + "/#instanceId=";
+		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=";
 	}
 	
 	public static String getXlsxConverterUri() {
-		return "http:///localhost:8635/survey/xlsxconverter/conversion.html";
+		return "http:///localhost:8635/" + appName + "/xlsxconverter/conversion.html";
 	}
 	
 	public static String getAppRelativeInstancesDirPath(String formId, String instancesDir) 
 	{
-		return "/tables/" + formId + "/instances/" + instancesDir + "/";
+		return "tables/" + formId + "/instances/" + instancesDir + "/";
 	}
 
 	public static String getOutputDirPath() {

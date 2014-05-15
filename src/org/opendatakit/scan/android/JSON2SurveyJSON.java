@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendatakit.common.android.database.DataModelDatabaseHelper;
 import org.opendatakit.common.android.database.DataModelDatabaseHelperFactory;
+import org.opendatakit.common.android.utilities.ODKDatabaseUserDefinedTypes;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 
 import android.app.Activity;
@@ -47,8 +48,6 @@ public class JSON2SurveyJSON extends Activity{
 	private static final String scanOutputDir = "scan_output_directory";
 	
 	private static String formId;
-	
-	private static final String surveyAppName = "survey";
 	
 	private static final String customCssFileNameStr = "customStyles.css";
 	
@@ -112,7 +111,7 @@ public class JSON2SurveyJSON extends Activity{
 
 		//String templateName = new File(rootTemplatePath).getName();
 		//String directoryForFormDef = extStoreStr + surveyDirStr + tablesDirStr + formId + fileSeparatorStr + formsDirStr + formId;
-		String directoryForFormDef = ScanUtils.getAppFormDirPath(surveyAppName, formId);
+		String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
 		File formDefFile = new File(directoryForFormDef, "formDef.json");
 
 		// If the form does exist already, there could be a versioning issue
@@ -180,11 +179,11 @@ public class JSON2SurveyJSON extends Activity{
 				// Add column for field 
 				String type = field.getString("type").toUpperCase(Locale.US);
 				if (type.equals("INT")){
-					columns.put(fieldName, "integer");
+					columns.put(fieldName, ODKDatabaseUserDefinedTypes.INTEGER);
 				} else if (type.equals("FLOAT")){
-					columns.put(fieldName, "float");
+					columns.put(fieldName, ODKDatabaseUserDefinedTypes.NUMBER);
 				} else {
-					columns.put(fieldName, "string");
+					columns.put(fieldName, ODKDatabaseUserDefinedTypes.STRING);
 				}
 			}
 			
@@ -202,7 +201,7 @@ public class JSON2SurveyJSON extends Activity{
 		ContentValues tablesValues = new ContentValues();
 		
 		// Is there a better place to get the Survey application name?
-		DataModelDatabaseHelper dbh = DataModelDatabaseHelperFactory.getDbHelper(this, surveyAppName);
+		DataModelDatabaseHelper dbh = DataModelDatabaseHelperFactory.getDbHelper(this, ScanUtils.getAppNameForSurvey());
 		SQLiteDatabase db = dbh.getWritableDatabase();
 		
 		String tableName = formId;
@@ -267,7 +266,7 @@ public class JSON2SurveyJSON extends Activity{
 			String dirId = null;
 			StringBuilder cssStr = new StringBuilder();
 			//String cssDir = extStoreStr + surveyDirStr + tablesDirStr  + formId + fileSeparatorStr+ formsDirStr + formId; 
-			String cssDir = ScanUtils.getAppFormDirPath(surveyAppName, formId);
+			String cssDir = ScanUtils.getAppFormDirPath(formId);
 			
 			// Get the screen size in case we need to 
 			// write out a css file
@@ -284,7 +283,7 @@ public class JSON2SurveyJSON extends Activity{
 			    dirId = "uuid-" + uuidStr;
 			    
 				//dirToMake = new File(extStoreStr + surveyDirStr + tablesDirStr  + formId + fileSeparatorStr+ instancesDirStr + dirId);
-			    dirToMake = new File(ScanUtils.getAppInstancesDirPath(surveyAppName, formId) + dirId);
+			    dirToMake = new File(ScanUtils.getAppInstancesDirPath(formId) + dirId);
 				dirToMake.mkdirs();
 				
 				File customCssFile = new File(cssDir + customCssFileNameStr);
@@ -431,7 +430,7 @@ public class JSON2SurveyJSON extends Activity{
 	public void javascriptCallFinished(String val) {
 		Log.i(LOG_TAG, "The formDef.json from xlsxconverter is" + val);
 		//writeOutToFile(extStoreStr + surveyDirStr + tablesDirStr  + formId + fileSeparatorStr + formsDirStr + formId, "formDef.json", val);
-		writeOutToFile(ScanUtils.getAppFormDirPath(surveyAppName, formId), "formDef.json", val);
+		writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
 		createSurveyInstance();
 	}
 	
