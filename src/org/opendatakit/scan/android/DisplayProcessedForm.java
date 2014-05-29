@@ -170,7 +170,10 @@ public class DisplayProcessedForm extends Activity {
 							} else {
 								//The scan data has already been exported
 								//so just start Survey.
-								startActivity(surveyIntent);
+								boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
+								if (surveyInstalled) {
+									startActivity(surveyIntent);
+								}
 							}
 						}
 					}
@@ -198,6 +201,7 @@ public class DisplayProcessedForm extends Activity {
 			alert.show();
 		}
 	}
+	
 	/**
 	 * Creates an intent for launching collect.
 	 * May return null if collect is not installed.
@@ -259,10 +263,26 @@ public class DisplayProcessedForm extends Activity {
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.setComponent(new ComponentName("org.opendatakit.survey.android",
-				"org.opendatakit.survey.android.activities.MainMenuActivity"));
+		
+		intent.setAction(Intent.ACTION_EDIT);
+		
+		//Start indicates that the form should be launched from the first question
+		//rather than the prompt list.
+		// Not sure if this start parameter is still necessary in Survey
+		intent.putExtra("start", true);
+		return intent;
+	}
+	
+	/**
+	 * Creates an intent for launching survey.
+	 * May return null if survey is not installed.
+	 * @return
+	 */
+	public boolean checkForSurveyInstallation(Intent intent) {
+		boolean installed = true;
 		
 		//Use the intent to see if survey is installed.
+		//this assumes that you have action and data specified
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
 			// ////////////
@@ -289,16 +309,10 @@ public class DisplayProcessedForm extends Activity {
 					});
 			AlertDialog alert = builder.create();
 			alert.show();
-			return null;
+			installed = false;
 		}
 		
-		intent.setAction(Intent.ACTION_EDIT);
-		
-		//Start indicates that the form should be launched from the first question
-		//rather than the prompt list.
-		// Not sure if this start parameter is still necessary in Survey
-		intent.putExtra("start", true);
-		return intent;
+		return installed;
 	}
 	
 	@Override
@@ -367,8 +381,11 @@ public class DisplayProcessedForm extends Activity {
 			
 			if (requestCode == 3) {
 				//dismissDialog(1);
-				Log.i(LOG_TAG, "Starting Survey...");	
-				startActivity(surveyIntent);
+				Log.i(LOG_TAG, "Starting Survey...");
+				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
+				if (surveyInstalled) {
+					startActivity(surveyIntent);
+				}
 			}
 		}
 
