@@ -547,6 +547,11 @@ public class JSON2SurveyJSON extends Activity{
 		JSONArray choicesList = new JSONArray();
 		JSONArray modelList = new JSONArray();
 		
+		// Add _row_num to the survey worksheet
+		// to enable table of contents
+		int rowNum = 1;
+		String rowName = "__rowNum__";
+		
         for(int i = 0; i < fieldsLength; i++){
         	JSONObject field = fields.getJSONObject(i);
         	
@@ -555,6 +560,7 @@ public class JSON2SurveyJSON extends Activity{
         		if (segments.length() > 0) {
         			JSONObject begScreen = new JSONObject();
         			begScreen.put("clause", "begin screen");
+        			begScreen.put(rowName, rowNum++);
         			surveyList.put(begScreen);
         		}
 	        	for(int j = 0; j < segments.length(); j++){
@@ -562,6 +568,7 @@ public class JSON2SurveyJSON extends Activity{
 	        		String imageName = field.getString("name") + "_image_" + j;
 	        		imagePrompt.put("name", imageName);
 	        		imagePrompt.put("type", "read_only_image");
+	        		imagePrompt.put(rowName, rowNum++);
 	        		surveyList.put(imagePrompt);
 	        	}
         	}
@@ -585,6 +592,7 @@ public class JSON2SurveyJSON extends Activity{
         		}
         		prompt.put("name", field.getString("name"));
         		prompt.put("type", "integer");
+        		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
         	} else if (type.equals("string") || type.equals("input")) {
         		String label = field.optString("label");
@@ -593,6 +601,7 @@ public class JSON2SurveyJSON extends Activity{
         		}
         		prompt.put("name", field.getString("name"));
         		prompt.put("type", "text");
+        		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
         	} else if (type.equals("select") || type.equals("select1")) {
         		String label = field.optString("label");
@@ -605,6 +614,7 @@ public class JSON2SurveyJSON extends Activity{
         		if (!param.equals("")) {
         			prompt.put("values_list", param);
         		}
+        		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
         		
         		// Get the items from the first segment.
@@ -650,12 +660,14 @@ public class JSON2SurveyJSON extends Activity{
         		}
         		prompt.put("name", field.getString("name"));
         		prompt.put("type", "text");
+        		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
         	}
         	if(segments != null){
         		if (segments.length() > 0) {
         			JSONObject endScreen = new JSONObject();
         			endScreen.put("clause", "end screen");
+        			endScreen.put(rowName, rowNum++);
         			surveyList.put(endScreen);
         		}
         	}
@@ -679,7 +691,7 @@ public class JSON2SurveyJSON extends Activity{
 		jsonOutputString = surveyJson.toString();
 		
 		// Write JSON that is sent to xlsxconverter to a file for inspection
-	    //writeOutToFile(extStoreStr+"/opendatakit/survey/xlsxconverter/", "intermediate.json", jsonOutputString);	
+		// writeOutToFile(ScanUtils.getAppFormDirPath("example"), "intermediate.json", jsonOutputString);	
 		
         return jsonOutputString;
     }
