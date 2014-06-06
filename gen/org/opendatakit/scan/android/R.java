@@ -94,7 +94,6 @@ containing a value of this type.
         public static final int Instructions3=0x7f0600b6;
         public static final int Instructions4=0x7f0600b7;
         public static final int InstructionsButton=0x7f0600a5;
-        public static final int ScanButton=0x7f0600b8;
         public static final int SettingsButton=0x7f0600a6;
         public static final int ViewFormsButton=0x7f0600a4;
         public static final int accept_location=0x7f060000;

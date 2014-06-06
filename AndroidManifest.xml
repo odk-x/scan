@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opendatakit.scan.android"
-    android:versionCode="70"
-    android:versionName="0.70" >
+    android:versionCode="121"
+    android:versionName="2.0" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -95,10 +95,6 @@
         <activity
             android:name="AppSettings"
             android:label="Settings" >
-        </activity>
-        <activity
-            android:name="org.droidparts.preference.MultiSelectListPreference"
-            android:label="MultiSelectListPreference" >
         </activity>
         
         <service

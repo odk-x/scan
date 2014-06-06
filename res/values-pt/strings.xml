@@ -12,7 +12,6 @@
     <!-- For Main Screen -->
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">a unidade sanitaria e:</string>
-    <string name="ScanButton">scanar nova ficha</string>
     <string name="ViewFormsButton">ver imagens</string>
     <string name="InstructionsButton">instruncoes</string>
     <string name="SettingsButton">definicoes</string>

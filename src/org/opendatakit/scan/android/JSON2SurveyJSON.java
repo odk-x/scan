@@ -89,7 +89,8 @@ public class JSON2SurveyJSON extends Activity{
 		
 		// Set the formId to use for this newly created form
     	formId = new File(templatePaths.get(0)).getName();
-		
+    	formId = "scan_" + formId;
+    	
 		String photoName = extras.getString("photoName");
 		if(photoName == null){ try {
 			throw new Exception("jsonOutPath is null");
@@ -462,7 +463,7 @@ public class JSON2SurveyJSON extends Activity{
     	
     	String jsonOutputString = "";
     	String title = new File(templatePaths.get(0)).getName();
-    	String id = title;
+    	String id = "scan_" + title;
     	
     	JSONArray initFields = new JSONArray();
 		for(String templatePath : templatePaths){
