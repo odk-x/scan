@@ -26,6 +26,7 @@ import org.opendatakit.common.android.database.DataModelDatabaseHelper;
 import org.opendatakit.common.android.database.DataModelDatabaseHelperFactory;
 import org.opendatakit.common.android.utilities.ODKDatabaseUserDefinedTypes;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
+import org.opendatakit.common.android.utilities.ODKFileUtils;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -34,7 +35,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -281,11 +281,9 @@ public class JSON2SurveyJSON extends Activity{
 				// manufacture a rowId for this record...
 				// for directory name to store the image files
 			    rowId = "uuid:" + uuidStr;
-			    dirId = "uuid-" + uuidStr;
 			    
-				//dirToMake = new File(extStoreStr + surveyDirStr + tablesDirStr  + formId + fileSeparatorStr+ instancesDirStr + dirId);
-			    dirToMake = new File(ScanUtils.getAppInstancesDirPath(formId) + dirId);
-				dirToMake.mkdirs();
+			    dirToMake = new File(ODKFileUtils.getInstanceFolder(ScanUtils.getAppNameForSurvey(), formId, rowId)); 
+			    dirId = dirToMake.getAbsolutePath().substring(dirToMake.getAbsolutePath().lastIndexOf("/")+1);
 				
 				File customCssFile = new File(cssDir + customCssFileNameStr);
 				if (!customCssFile.exists()) {
@@ -328,7 +326,7 @@ public class JSON2SurveyJSON extends Activity{
 					//---Copy segment image to the correct survey directory------
 					InputStream fis = new FileInputStream(imagePath);
 					File outputPicFile = new File(dirToMake.getAbsolutePath(),
-							imageFileSubstr + "-" + dirId + imageFileExt);
+							imageFileSubstr + "_" + dirId + imageFileExt);
 					FileOutputStream fos = new FileOutputStream(outputPicFile.getAbsolutePath());
 					// Transfer bytes from in to out
 					byte[] buf = new byte[1024];
