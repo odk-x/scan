@@ -384,10 +384,14 @@ public class JSON2SurveyJSON extends Activity{
  				}
 				// Add the data for field 
 				if(field.has("value")){
-					if (field.getString("type").equals("int")) {
+					if (field.getString("type").equals("int") || field.getString("type").equals("tally")) {
 						tablesValues.put(field.getString("name"), field.getInt("value"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getInt("value"));
-					} else {
+					// This will need to be addressed correctly	
+					} else if (field.getString("type").equals("select_many")) {
+						tablesValues.put(field.getString("name"), field.getString("value"));
+						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
+					}else {
 						tablesValues.put(field.getString("name"), field.getString("value"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
 					}
@@ -637,11 +641,73 @@ public class JSON2SurveyJSON extends Activity{
 	                    	JSONObject item = items.getJSONObject(j);
 	                    	JSONObject choice = new JSONObject();
 	                    	choice.put("choice_list_name", param);
-	                    	choice.put("data_value", item.getString("value"));
+	                    	// Not sure of the best way to deal with this currently!!
+	                    	if (item.has("value")) {
+	                    		choice.put("data_value", item.getString("value"));
 	                    	
-	                    	String itemLabel = item.optString("label");
-	                    	itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
-	                    	choice.put("display.text", itemLabel);
+	                    		String itemLabel = item.optString("label");
+	                    		itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
+	                    		choice.put("display.text", itemLabel);
+	                    	} else {
+	                    		choice.put("data_value", ""+j);
+	                    		choice.put("display.text", ""+j);
+	                    	}
+	                    	choicesList.put(choice);
+	                    }
+	        		}
+            	}
+                
+        	} else if (type.equals("select_many")) {
+        		// Issues here regarding what happens if user does not specify
+        		// options for the items? - I think the form builder should
+        		// at least assign these numbers?
+        		String label = field.optString("label");
+        		if (!label.equals("")) {
+        			prompt.put("display.text", label);
+        		} 
+        		prompt.put("name", field.getString("name"));
+        		prompt.put("type", "select_multiple");
+        		String param = field.optString("param");
+        		if (!param.equals("")) {
+        			prompt.put("values_list", param);
+        		}
+        		prompt.put(rowName, rowNum++);
+        		surveyList.put(prompt);
+        		
+        		// Get the items from the first segment.
+        		boolean addChoiceList = true;
+            	if (choicesList.length() > 0) {
+            		for (int k = 0; k < choicesList.length(); k++) {
+            			JSONObject ch = choicesList.getJSONObject(k);
+            			String chList = ch.getString("choice_list_name");
+            			if (chList.equals(param)) {
+            				// If we already have this choice list, 
+            				// don't add it again!!
+            				addChoiceList = false;
+            			}
+            		}
+            	}
+            	if (segments != null && addChoiceList) {
+	        		JSONObject segment = segments.optJSONObject(0);
+	        		if (segment != null) {
+	        			JSONArray items = segment.getJSONArray("items");
+	        			for(int j = 0; j < items.length(); j++){
+	                    	JSONObject item = items.getJSONObject(j);
+	                    	JSONObject choice = new JSONObject();
+	                    	choice.put("choice_list_name", param);
+	                    	// Not sure of the best way to deal with value conversion
+	                    	// should this use gridValues?  Figure out what the numbers of each are?
+	                    	
+	                    	if (item.has("value")) {
+	                    		choice.put("data_value", item.getString("value"));
+	                    	
+	                    		String itemLabel = item.optString("label");
+	                    		itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
+	                    		choice.put("display.text", itemLabel);
+	                    	} else {
+	                    		choice.put("data_value", ""+j);
+	                    		choice.put("display.text", ""+j);
+	                    	}
 	                    	choicesList.put(choice);
 	                    }
 	        		}
@@ -659,6 +725,28 @@ public class JSON2SurveyJSON extends Activity{
         		}
         		prompt.put("name", field.getString("name"));
         		prompt.put("type", "text");
+        		prompt.put(rowName, rowNum++);
+        		surveyList.put(prompt);
+        	// New types added
+        	} else if (type.equals("box")) {
+	    		String label = field.optString("label");
+	    		String param = field.optString("param");
+	    		if (!label.equals("")) {
+	    			prompt.put("display.text", label);
+	    		} else if (!param.equals("")) {
+	    			prompt.put("display.text", param);
+	    		}
+	    		prompt.put("name", field.getString("name"));
+	    		prompt.put("type", "text");
+	    		prompt.put(rowName, rowNum++);
+	    		surveyList.put(prompt);
+	    	} else if (type.equals("tally")) {
+        		String label = field.optString("label");
+        		if (!label.equals("")) {
+        			prompt.put("display.text", label);
+        		}
+        		prompt.put("name", field.getString("name"));
+        		prompt.put("type", "integer");
         		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
         	}
@@ -690,7 +778,7 @@ public class JSON2SurveyJSON extends Activity{
 		jsonOutputString = surveyJson.toString();
 		
 		// Write JSON that is sent to xlsxconverter to a file for inspection
-		// writeOutToFile(ScanUtils.getAppFormDirPath("example"), "intermediate.json", jsonOutputString);	
+		writeOutToFile(ScanUtils.getAppFormDirPath("example"), "intermediate.json", jsonOutputString);	
 		
         return jsonOutputString;
     }

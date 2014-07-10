@@ -159,9 +159,11 @@ public class PhotographForm extends Activity {
 					
 					File outfile = new File(cursor.getString(1));
 					if( !outfile.exists() || outfile.lastModified() < activityCreateTime.getTime() ) {
-						Toast.makeText(getApplicationContext(),
+						// Removing this message as it is confusing to the user
+						/*Toast.makeText(getApplicationContext(),
 								"Could not find original photo duplicate.",
-								Toast.LENGTH_LONG).show();
+								Toast.LENGTH_LONG).show();*/
+						Log.d(LOG_TAG, "Could not find original photo duplicate.");
 					} else {
 						//Ideally this would just rename the photo to move it to the ODKScan folder,
 						//but that can fail in a number of ways.
