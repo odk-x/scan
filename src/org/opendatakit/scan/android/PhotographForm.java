@@ -60,6 +60,7 @@ public class PhotographForm extends Activity {
 			Bundle extras = getIntent().getExtras();
 			if(extras == null) {
 				extras = new Bundle();
+				Log.i("SCAN", "No bundle");
 			}
 			if(extras.containsKey("photoName")){
 				photoName = extras.getString("photoName");
@@ -72,6 +73,13 @@ public class PhotographForm extends Activity {
 						.fromPersistedPreferenceValue(settings.getString(
 								"select_templates", ""));
 				extras.putStringArray("templatePaths", templatePaths);
+				
+				if (templatePaths.length > 0)
+				{
+					String[] parts = templatePaths[0].split("/");
+					String templateName = parts[parts.length-1];
+					photoName = templateName + "_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+				}
 			}
 			
 	    	String inputPath = ScanUtils.getPhotoPath(photoName);

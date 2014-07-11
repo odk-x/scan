@@ -5,7 +5,7 @@
 
 <string name="app_description">Scan and process bubble forms</string>
 <string name="bubble_process_activity">Processing Scanned Form</string>
-<string name="view_bubble_forms_activity">View Scanned Forms</string>
+<string name="view_bubble_forms_activity">View Forms</string>
 <string name="bubble_instructions_activity">Instructions</string>
 <string name="display_processed_form_activity">Display Processed Form</string>
 <string name="display_processed_data_activity">Display Processed Data</string>
@@ -19,7 +19,7 @@
 <string name="Health_Center">Health Center</string>
 <string name="the_current_health_center_is">The current health center is:</string>
 <string name="scan_new_form">Scan New Form</string>
-<string name="ViewFormsButton">View Images</string>
+<string name="ViewFormsButton">View Scanned Forms</string>
 <string name="InstructionsButton">Instructions</string>
 <string name="SettingsButton">Settings</string>
 

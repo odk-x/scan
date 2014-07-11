@@ -8,6 +8,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,7 +20,6 @@ import android.widget.TextView;
 
 /**
  * This activity displays a list of previously scanned forms.
- * WARNING: Currently is it not used and it is not being maintained.
  **/
 public class ViewScannedForms extends ListActivity {
 
@@ -32,7 +32,7 @@ public class ViewScannedForms extends ListActivity {
 		super.onCreate(savedInstanceState);
 
 		File dir = new File(ScanUtils.getOutputDirPath());
-
+		
 		photoNames = dir.list(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return (new File(dir, name)).isDirectory();
@@ -48,7 +48,7 @@ public class ViewScannedForms extends ListActivity {
 						: createView(parent);
 
 				String photoName = photoNames[position];
-
+								
 				TextView photoStatus = (TextView) view
 						.findViewById(R.id.photoStatus);
 				if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
@@ -63,15 +63,28 @@ public class ViewScannedForms extends ListActivity {
 				TextView nameView = (TextView) view
 						.findViewById(R.id.templateName);
 
-				try {
+				String[] parts = photoName.split("_");
+				String templateName = parts[0];
+				
+				if (templateName != null && templateName.length() != 0) {
+					nameView.setText(templateName);
+				}
+				
+				//ND restructuring to try and put view scanned forms back in
+				/*try {
 					String templatePath = ScanUtils.getTemplatePath(photoName);
+					Log.i("SCAN", "templatePath " + templatePath);
+					
 					String templateName = new File(templatePath).getName();
+					Log.i("SCAN", "templateName " + templateName);
+					
 					if (templateName != null && templateName.length() != 0) {
 						nameView.setText(templateName);
 					}
 				} catch (Exception e) {
 					// no-op
-				}
+					Log.i("SCAN", "BOO ");
+				}*/
 
 				TextView type = (TextView) view.findViewById(R.id.createdTime);
 				type.setText(new Date(new File(ScanUtils
@@ -101,12 +114,12 @@ public class ViewScannedForms extends ListActivity {
 					Intent intent = new Intent(getApplication(),
 							DisplayProcessedForm.class);
 					intent.putExtra("photoName", photoName);
-					// intent.putExtra("startCollect", true);
 					startActivity(intent);
-				} else if (new File(ScanUtils.getAlignedPhotoPath(photoName))
+				} 
+				//This is old and should never be called
+				else if (new File(ScanUtils.getAlignedPhotoPath(photoName))
 						.exists()) {
-					Intent intent = new Intent(getApplication(),
-							AfterPhotoTaken.class);
+					Intent intent = new Intent(getApplication(), AfterPhotoTaken.class);
 					intent.putExtra("photoName", photoName);
 					intent.putExtra("preAligned", true);
 					startActivity(intent);
