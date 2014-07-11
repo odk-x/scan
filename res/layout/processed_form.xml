@@ -22,6 +22,7 @@
 		android:paddingTop="4dp" android:paddingLeft="4dp"
 		android:paddingRight="4dp" android:layout_gravity="center_horizontal|bottom|left">
 		<Button
+		    android:visibility="gone"
 		    style="@style/APTButton"
 	   	    android:id="@+id/saveBtn"
 	   	    android:layout_weight="1"
@@ -30,6 +31,7 @@
 	   	    android:textSize="14sp">
 		</Button>
 		<Button
+		    android:visibility="gone"
 		    style="@style/APTButton"
 	   	    android:id="@+id/transcribeBtn"
 	   	    android:layout_weight="1"

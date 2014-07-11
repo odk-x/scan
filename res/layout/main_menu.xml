@@ -26,8 +26,7 @@
 	    style="@style/StandardButton"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:text="@string/ViewFormsButton"
-	    android:visibility="gone">
+	    android:text="@string/ViewFormsButton" >
 
 	</Button>
 
