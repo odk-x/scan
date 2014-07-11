@@ -153,7 +153,7 @@ Aligner::Aligner(){
 	//IMPORTANT: Make sure you define ALWAYS_COMPUTE_TEMPLATE_FEATURES
 	//when trying new parameterizations, otherwise your cached features will be used.
 
-	#define PARAM_SET 6
+	#define PARAM_SET 1
 	#if PARAM_SET == 0
 		detector = Ptr<FeatureDetector>(
 			new GridAdaptedFeatureDetector(
