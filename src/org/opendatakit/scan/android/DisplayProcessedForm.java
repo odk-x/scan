@@ -60,6 +60,7 @@ public class DisplayProcessedForm extends Activity {
 				//Since the template path is not in the extras we'll try to get it from the json output.
 				JSONObject outputJSON = JSONUtils.parseFileToJSONObject(ScanUtils.getOutputPath(photoName) + "output.json");
 				outputJSON.getString("templatePath");
+				//templatePath = outputJSON.getString("templatePath");
 			}
 			
 			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");
