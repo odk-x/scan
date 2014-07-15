@@ -53,10 +53,12 @@ int vectorFind(const vector<Tp>& vec, const Tp& element) {
 	}
 	return -1;
 }
+
 //Currently this just sets the classification labels and default label.
 void PCA_classifier::set_classifier_params(const Json::Value& classifier_params_arg){
 	classifier_params = classifier_params_arg;
 }
+
 //Find the classification index correponding to the given filename
 int PCA_classifier::getClassificationIdx(const string& filepath) {
 	int nameIdx = filepath.find_last_of("/");
@@ -75,6 +77,7 @@ int PCA_classifier::getClassificationIdx(const string& filepath) {
 	
 	return classificationIdx;
 }
+
 //Add an image Mat to a PCA_set performing the 
 //necessairy reshaping and type conversion.
 void PCA_classifier::PCA_set_push_back(Mat& PCA_set, const Mat& img) {
@@ -91,6 +94,7 @@ void PCA_classifier::PCA_set_push_back(Mat& PCA_set, const Mat& img) {
 		PCA_set.push_back(PCA_set_row.reshape(0,1));
 	}
 }
+
 //Serialize a vector to the given filestream.
 template <class Tp>
 void writeVector(FileStorage& fs, const string& label, const vector<Tp>& vec) {
@@ -100,6 +104,7 @@ void writeVector(FileStorage& fs, const string& label, const vector<Tp>& vec) {
 	}
 	fs << "]";
 }
+
 //Note this only reads string vectors
 vector<string> readVector(FileStorage& fs, const string& label) {
 	FileNode fn = fs[label];
@@ -111,6 +116,7 @@ vector<string> readVector(FileStorage& fs, const string& label) {
 	}
 	return vec;
 }
+
 void PCA_classifier::save(const string& outputPath) const throw(cv::Exception){
 	FileStorage fs(outputPath, FileStorage::WRITE);
 	fs << "exampleSizeWidth" << exampleSize.width;
@@ -121,6 +127,7 @@ void PCA_classifier::save(const string& outputPath) const throw(cv::Exception){
 	writeVector(fs, "classifications", classifications);
 	statClassifier->write(*fs, "classifierData" );
 }
+
 void PCA_classifier::load(const string& inputPath) throw(cv::Exception){
 	FileStorage fs(inputPath, FileStorage::READ);
 	fs["exampleSizeWidth"] >> exampleSize.width;
@@ -135,6 +142,7 @@ void PCA_classifier::load(const string& inputPath) throw(cv::Exception){
 }
 //Loads a image with the specified filename and adds it to the PCA set.
 //Classifications are inferred from the filename and added to training_bubble_values.
+
 void PCA_classifier::PCA_set_add(Mat& PCA_set, vector<int>& trainingBubbleValues, const string& filename, bool flipExamples) {
 
 	//if( !isImage(filename) ) return;
@@ -165,6 +173,7 @@ void PCA_classifier::PCA_set_add(Mat& PCA_set, vector<int>& trainingBubbleValues
 		}
 	}
 }
+
 bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Size myExampleSize,
                                           int eigenvalues, bool flipExamples) {
 	statClassifier->clear();
@@ -212,6 +221,7 @@ bool PCA_classifier::train_PCA_classifier(const vector<string>& examplePaths, Si
 
 	return true;
 }
+
 //Rates a region of pixels in det_img_gray on how similar it is to the classifier's training examples.
 //A lower rating means it is more similar.
 //The rating is currently the sum of squared difference of the queried pixels and their PCA back projection.
@@ -262,6 +272,7 @@ inline double PCA_classifier::rate_item(const Mat& det_img_gray, const Point& it
 
 	return sum(out.mul(out)).val[0];//SSD
 }
+
 //This using a hill descending algorithm to find the location that minimizes the value of the rate bubble function.
 //It might only find a local instead of global minimum but it is much faster than a global search.
 Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_location, double alignment_radius) const {
@@ -323,6 +334,7 @@ Point PCA_classifier::align_item(const Mat& det_img_gray, const Point& seed_loca
 	#endif
 	return loc + offset;
 }
+
 Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& item_location) const {
 		
 	Mat query_pixels;

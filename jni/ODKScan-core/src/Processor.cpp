@@ -82,6 +82,7 @@ const string stringify(const Json::Value& theJson){
 	ss << writer.write( theJson );
 	return ss.str();
 }
+
 //Iterates over a field's segments and items to determine it's value.
 Json::Value computeFieldValue(const Json::Value& field){
 	Json::Value output;
@@ -281,6 +282,11 @@ const std::string currentDateTime() {
     strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
     return buf;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 class Processor::ProcessorImpl
 {
 public:
@@ -374,6 +380,7 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 	}
 	return classifiers[key];
 }
+
 Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& extendedSegment) {
 	Mat segmentImg;
 	vector <Point> segBubbleLocs;
@@ -582,6 +589,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	}
 	return segmentJsonOut;
 }
+
 Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentProperties){
 	Json::Value extendedField = Json::Value(parentProperties);
 	extend(extendedField, field);
@@ -625,6 +633,7 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	outField.removeMember("classifier");
 	return outField;
 }
+
 Json::Value formFunction(const Json::Value& templateRoot){
 	const Json::Value fields = templateRoot["fields"];
 	Json::Value outForm = Json::Value(templateRoot);
@@ -659,6 +668,7 @@ bool setTemplate(const char* templatePathArg) {
 	//root["template_path"] = templPath;
 	return success;
 }
+
 bool loadFormImage(const char* imagePath, const char* calibrationFilePath) {
 	#ifdef DEBUG_PROCESSOR
 		LOGI("loading form image...");
@@ -718,6 +728,7 @@ bool loadFormImage(const char* imagePath, const char* calibrationFilePath) {
 	#endif
 	return true;
 }
+
 bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 	#ifdef DEBUG_PROCESSOR
 		LOGI("aligning form...");
@@ -758,6 +769,7 @@ bool alignForm(const char* alignedImageOutputPath, size_t formIdx) {
 	#endif
 	return writeFormImage(alignedImageOutputPath);
 }
+
 bool processForm(const string& outputPath, const string& jsonOutputPath, const string& markedupImagePath, bool minifyJson) {
 	#ifdef  DEBUG_PROCESSOR
 		LOGI("Processing form");
@@ -805,10 +817,12 @@ bool processForm(const string& outputPath, const string& jsonOutputPath, const s
 	#endif
 	return true;
 }
+
 //Writes the form image to a file.
 bool writeFormImage(const char* outputPath) {
 	return imwrite(outputPath, formImage);
 }
+
 //Loads feature data for the given template into memory.
 //This can be called multiple times, so multiple templates are loaded into memeory for detection.
 bool loadFeatureData(const char* templatePathArg) {
@@ -819,6 +833,7 @@ bool loadFeatureData(const char* templatePathArg) {
 
 	return true;
 }
+
 //Detect which form we are using from among the loaded feature data sets.
 //A return value of 0 indicates the first data loaded, 1 indicates the second, etc..
 int detectForm(){
@@ -836,18 +851,23 @@ int detectForm(){
 }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /* This stuff hooks the Processor class up to the implementation class: */
 Processor::Processor() : processorImpl(new ProcessorImpl()){
 	processorImpl->trainingDataPath = "training_examples/";
 	LOGI("Processor successfully constructed.");
 }
+
 Processor::Processor(const char* appRootDir) : processorImpl(new ProcessorImpl()){
 	processorImpl->trainingDataPath = addSlashIfNeeded(appRootDir) + "training_examples/";
 	LOGI("Processor successfully constructed.");
 }
+
 bool Processor::loadFormImage(const char* imagePath, const char* calibrationFilePath){
 	return processorImpl->loadFormImage(imagePath, calibrationFilePath);
 }
+
 bool Processor::loadFeatureData(const char* templatePath){
 	try{
 		return processorImpl->loadFeatureData(templatePath);
@@ -857,12 +877,15 @@ bool Processor::loadFeatureData(const char* templatePath){
 		return false;
 	}
 }
+
 int Processor::detectForm(){
 	return processorImpl->detectForm();
 }
+
 bool Processor::setTemplate(const char* templatePath){
 	return processorImpl->setTemplate(templatePath);
 }
+
 bool Processor::alignForm(const char* alignedImageOutputPath, int formIdx){
 	if(formIdx < 0) return false;
 	try{
@@ -872,6 +895,7 @@ bool Processor::alignForm(const char* alignedImageOutputPath, int formIdx){
 	    return false;
 	}
 }
+
 bool Processor::processForm(const char* outputPath, bool minifyJson) {
 	try{
 		string normalizedOutDir = addSlashIfNeeded(outputPath);
@@ -882,6 +906,7 @@ bool Processor::processForm(const char* outputPath, bool minifyJson) {
 	    return false;
 	}
 }
+
 const string Processor::scanAndMarkup(const char* outputPath) {
 	try{
 		string normalizedOutDir = addSlashIfNeeded(outputPath);
@@ -902,7 +927,9 @@ const string Processor::scanAndMarkup(const char* outputPath) {
 	    return "Unknown exception.";
 	}
 }
+
 /**
+
 processViaJSON tries to  mimic a restful client-server interface.
 It expects a JSON string like this:
 {
@@ -1049,6 +1076,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 	}
 	return stringify(result);
 }
+
 bool Processor::writeFormImage(const char* outputPath) const{
 	return processorImpl->writeFormImage(outputPath);
 }
