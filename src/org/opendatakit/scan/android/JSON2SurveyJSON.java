@@ -357,7 +357,7 @@ public class JSON2SurveyJSON extends Activity{
 					mapObject.put("uriFragment", ScanUtils.getAppRelativeInstancesDirPath(formId, dirId) + outputPicFile.getName());
 					mapObject.put("contentType", "image/jpg");
 					String picJsonStr = objectMapper.writeValueAsString(mapObject);
-					tablesValues.put(imageName, picJsonStr);
+					addStringValueToTableContentValue(tablesValues, imageName, picJsonStr);
 					
 					// Add styling for this image in the css file if no css file is found
 					if (writeOutCustomCss) {
@@ -389,10 +389,10 @@ public class JSON2SurveyJSON extends Activity{
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getInt("value"));
 					// This will need to be addressed correctly	
 					} else if (field.getString("type").equals("select_many")) {
-						tablesValues.put(field.getString("name"), field.getString("value"));
+						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("value"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
 					}else {
-						tablesValues.put(field.getString("name"), field.getString("value"));
+						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("value"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
 					}
 				} else if(field.has("default")){
@@ -400,7 +400,7 @@ public class JSON2SurveyJSON extends Activity{
 						tablesValues.put(field.getString("name"), field.getInt("default"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getInt("default"));
 					} else {
-						tablesValues.put(field.getString("name"), field.getString("default"));
+						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("default"));
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("default"));
 					}
 				}
@@ -428,6 +428,13 @@ public class JSON2SurveyJSON extends Activity{
 		resultData.setData(Uri.parse(uriStr));
 		setResult(RESULT_OK, resultData);
 		finish();
+	}
+	
+	public void addStringValueToTableContentValue(ContentValues tableValue, String key, String value)
+	{
+		if (value != "") {
+			tableValue.put(key, value);
+		}
 	}
 	
 	public void javascriptCallFinished(String val) {
@@ -545,7 +552,7 @@ public class JSON2SurveyJSON extends Activity{
 		formSurveyObj.put("display.title", id);
 		settingsList.put(formSurveyObj);
 		
-		// Fill out the settings Sheet first
+		// Create other worksheets
 		JSONArray surveyList = new JSONArray();
 		JSONArray choicesList = new JSONArray();
 		JSONArray modelList = new JSONArray();
@@ -606,7 +613,7 @@ public class JSON2SurveyJSON extends Activity{
         		prompt.put("type", "text");
         		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
-        	} else if (type.equals("select") || type.equals("select1")) {
+        	} else if (type.equals("select") || type.equals("select1") || type.equals("select_many")) {
         		String label = field.optString("label");
         		if (!label.equals("")) {
         			prompt.put("display.text", label);
@@ -616,6 +623,10 @@ public class JSON2SurveyJSON extends Activity{
         		String param = field.optString("param");
         		if (!param.equals("")) {
         			prompt.put("values_list", param);
+        		} else {
+        			param = field.getString("name") + "_choices";
+        			prompt.put("values_list", param);
+        			
         		}
         		prompt.put(rowName, rowNum++);
         		surveyList.put(prompt);
@@ -638,6 +649,7 @@ public class JSON2SurveyJSON extends Activity{
 	        		if (segment != null) {
 	        			JSONArray items = segment.getJSONArray("items");
 	                    for(int j = 0; j < items.length(); j++){
+	                    	// This is the old way of doing this with param
 	                    	JSONObject item = items.getJSONObject(j);
 	                    	JSONObject choice = new JSONObject();
 	                    	choice.put("choice_list_name", param);
@@ -649,64 +661,13 @@ public class JSON2SurveyJSON extends Activity{
 	                    		itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
 	                    		choice.put("display.text", itemLabel);
 	                    	} else {
-	                    		choice.put("data_value", ""+j);
-	                    		choice.put("display.text", ""+j);
-	                    	}
-	                    	choicesList.put(choice);
-	                    }
-	        		}
-            	}
-                
-        	} else if (type.equals("select_many")) {
-        		// Issues here regarding what happens if user does not specify
-        		// options for the items? - I think the form builder should
-        		// at least assign these numbers?
-        		String label = field.optString("label");
-        		if (!label.equals("")) {
-        			prompt.put("display.text", label);
-        		} 
-        		prompt.put("name", field.getString("name"));
-        		prompt.put("type", "select_multiple");
-        		String param = field.optString("param");
-        		if (!param.equals("")) {
-        			prompt.put("values_list", param);
-        		}
-        		prompt.put(rowName, rowNum++);
-        		surveyList.put(prompt);
-        		
-        		// Get the items from the first segment.
-        		boolean addChoiceList = true;
-            	if (choicesList.length() > 0) {
-            		for (int k = 0; k < choicesList.length(); k++) {
-            			JSONObject ch = choicesList.getJSONObject(k);
-            			String chList = ch.getString("choice_list_name");
-            			if (chList.equals(param)) {
-            				// If we already have this choice list, 
-            				// don't add it again!!
-            				addChoiceList = false;
-            			}
-            		}
-            	}
-            	if (segments != null && addChoiceList) {
-	        		JSONObject segment = segments.optJSONObject(0);
-	        		if (segment != null) {
-	        			JSONArray items = segment.getJSONArray("items");
-	        			for(int j = 0; j < items.length(); j++){
-	                    	JSONObject item = items.getJSONObject(j);
-	                    	JSONObject choice = new JSONObject();
-	                    	choice.put("choice_list_name", param);
-	                    	// Not sure of the best way to deal with value conversion
-	                    	// should this use gridValues?  Figure out what the numbers of each are?
-	                    	
-	                    	if (item.has("value")) {
-	                    		choice.put("data_value", item.getString("value"));
-	                    	
-	                    		String itemLabel = item.optString("label");
-	                    		itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
-	                    		choice.put("display.text", itemLabel);
-	                    	} else {
-	                    		choice.put("data_value", ""+j);
-	                    		choice.put("display.text", ""+j);
+	                    		// If the item does not have a param - do it the new way
+	                    		// This is done with grid values
+	                    		if (field.getJSONArray("grid_values") != null) {
+	                    			JSONArray gridValues = field.getJSONArray("grid_values");
+		                    		choice.put("data_value", ""+gridValues.getString(j));
+		                    		choice.put("display.text", ""+gridValues.getString(j));
+	                    		}
 	                    	}
 	                    	choicesList.put(choice);
 	                    }
