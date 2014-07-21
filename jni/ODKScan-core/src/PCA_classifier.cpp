@@ -140,9 +140,9 @@ void PCA_classifier::load(const string& inputPath) throw(cv::Exception){
 	statClassifier->clear();
 	statClassifier->read(*fs, cvGetFileNodeByName(*fs, cvGetRootFileNode(*fs), "classifierData") );
 }
+
 //Loads a image with the specified filename and adds it to the PCA set.
 //Classifications are inferred from the filename and added to training_bubble_values.
-
 void PCA_classifier::PCA_set_add(Mat& PCA_set, vector<int>& trainingBubbleValues, const string& filename, bool flipExamples) {
 
 	//if( !isImage(filename) ) return;

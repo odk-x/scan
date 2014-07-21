@@ -184,7 +184,7 @@ void convertQuad(const vector< Point_<T> >& quad, vector< Point_<U> >& outQuad){
 Pseudo-code description of findSegment:
 1.	Find lines along the edges of the bounding box
 2.	Find their intersections
-3.	Find the trasformation from the 4 intersection points to the rectangle defined in the template,
+3.	Find the transformation from the 4 intersection points to the rectangle defined in the template,
 	then use it to transform the segment into the rectangle.
 */
 template <class T>
@@ -218,6 +218,8 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 	findLines(imgThresh, A1, B1, roi, false, true);
 	findLines(imgThresh, A2, B2, roi, false, false);
 	findLines(imgThresh, A3, B3, roi, true, true);
+
+	//This line is making it crash
 	findLines(imgThresh, A4, B4, roi, true, false);
 
 	#if QUAD_FIND_MODE == QUAD_FIND_INTERSECTION
@@ -265,5 +267,6 @@ void findSegmentImpl(const Mat& img, const Rect& roi, vector< Point_<T> >& outQu
 		imwrite(segfilename, dbg_out);
 	#endif
 }
+
 void findSegment(const Mat& img, const Rect& roi, vector< Point >& outQuad){ findSegmentImpl(img, roi, outQuad); }
 void findSegment(const Mat& img, const Rect& roi, vector< Point2f >& outQuad){ findSegmentImpl(img, roi, outQuad); }

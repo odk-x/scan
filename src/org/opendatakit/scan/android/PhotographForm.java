@@ -39,7 +39,7 @@ import android.util.Log;
 import android.widget.Toast;
 /**
  * PhotographForm launches the Android camera app to capture a form image.
- * It also creates a directory for data about the form to be stored.
+ * It also creates a directory for data about the form to be stored.  
  **/
 public class PhotographForm extends Activity {
 	private static final String LOG_TAG = "ODKScan";

@@ -19,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.bubblebot.jni.Processor;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -31,6 +32,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
 import java.util.LinkedList;
 
 /**
@@ -77,6 +79,7 @@ public class ProcessInBG extends Service {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startid) {
 		try {
@@ -90,8 +93,7 @@ public class ProcessInBG extends Service {
 			if (configJSON == null) {
 				throw new Exception("config property is not in extras.");
 			}
-
-	    	
+			
 	    	final int notificationId = (int) (Math.random() * 9999999);
 			final NotificationManager notificationManager = (NotificationManager) 
 	                getSystemService(Context.NOTIFICATION_SERVICE);
@@ -106,7 +108,7 @@ public class ProcessInBG extends Service {
 	        notification.setLatestEventInfo(context, "ODK Scan", "Processing form...",
 	                PendingIntent.getActivity(context, 0, waitingIntent, 0));
 	        notificationManager.notify(notificationId , notification);
-	    	
+	        
 	    	//A subprocess is used to run the OpenCV code.
 	    	//I tried doing it synchronously inside this service but it locks up the UI.
 	    	
@@ -168,7 +170,6 @@ public class ProcessInBG extends Service {
 					Log.i(LOG_TAG, "Finished active thread status: " + activeThread.getState());
 					activeThread = null;
 	            	updateProcessingQueue();
-					
 					return true;
 	            }
 	    	});
@@ -178,8 +179,10 @@ public class ProcessInBG extends Service {
 	    			//The JNI object that connects to the ODKScan-core code.
 	    			final Processor mProcessor = new Processor();//ScanUtils.appFolder
 	    			Bundle outputData = new Bundle();
-                    Log.i(LOG_TAG, configJSON);
+	    			
+                    Log.i(LOG_TAG, "Using data = " + configJSON);
     				String result = mProcessor.processViaJSON(configJSON);
+    				
 					outputData.putString("result", result);
 	    			Message msg = new Message();
 	    			msg.setData(outputData);

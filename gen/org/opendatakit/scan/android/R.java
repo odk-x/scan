@@ -9,10 +9,50 @@ package org.opendatakit.scan.android;
 
 public final class R {
     public static final class array {
-        public static final int select_templates_default_entries=0x7f070000;
-        public static final int select_templates_default_values=0x7f070001;
+        public static final int select_templates_default_entries=0x7f090000;
+        public static final int select_templates_default_values=0x7f090001;
     }
     public static final class attr {
+        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int cameraBearing=0x7f010001;
+        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int cameraTargetLat=0x7f010002;
+        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int cameraTargetLng=0x7f010003;
+        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int cameraTilt=0x7f010004;
+        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int cameraZoom=0x7f010005;
         /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -20,7 +60,21 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int checkAll=0x7f010000;
+        public static final int checkAll=0x7f01000e;
+        /** <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>none</code></td><td>0</td><td></td></tr>
+<tr><td><code>normal</code></td><td>1</td><td></td></tr>
+<tr><td><code>satellite</code></td><td>2</td><td></td></tr>
+<tr><td><code>terrain</code></td><td>3</td><td></td></tr>
+<tr><td><code>hybrid</code></td><td>4</td><td></td></tr>
+</table>
+         */
+        public static final int mapType=0x7f010000;
         /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -28,42 +82,151 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int separator=0x7f010001;
+        public static final int separator=0x7f01000f;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiCompass=0x7f010006;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiRotateGestures=0x7f010007;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiScrollGestures=0x7f010008;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiTiltGestures=0x7f010009;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiZoomControls=0x7f01000a;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int uiZoomGestures=0x7f01000b;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int useViewLifecycle=0x7f01000c;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int zOrderOnTop=0x7f01000d;
+    }
+    public static final class color {
+        public static final int common_action_bar_splitter=0x7f060009;
+        /**  Sign-in Button Colors 
+         */
+        public static final int common_signin_btn_dark_text_default=0x7f060000;
+        public static final int common_signin_btn_dark_text_disabled=0x7f060002;
+        public static final int common_signin_btn_dark_text_focused=0x7f060003;
+        public static final int common_signin_btn_dark_text_pressed=0x7f060001;
+        public static final int common_signin_btn_default_background=0x7f060008;
+        public static final int common_signin_btn_light_text_default=0x7f060004;
+        public static final int common_signin_btn_light_text_disabled=0x7f060006;
+        public static final int common_signin_btn_light_text_focused=0x7f060007;
+        public static final int common_signin_btn_light_text_pressed=0x7f060005;
+        public static final int common_signin_btn_text_dark=0x7f06000a;
+        public static final int common_signin_btn_text_light=0x7f06000b;
     }
     public static final class drawable {
         public static final int bad_picture=0x7f020000;
-        public static final int good_picture=0x7f020001;
-        public static final int icon=0x7f020002;
-        public static final int odk_scan_logo=0x7f020003;
-        public static final int stand_example=0x7f020004;
+        public static final int common_signin_btn_icon_dark=0x7f020001;
+        public static final int common_signin_btn_icon_disabled_dark=0x7f020002;
+        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020003;
+        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020004;
+        public static final int common_signin_btn_icon_disabled_light=0x7f020005;
+        public static final int common_signin_btn_icon_focus_dark=0x7f020006;
+        public static final int common_signin_btn_icon_focus_light=0x7f020007;
+        public static final int common_signin_btn_icon_light=0x7f020008;
+        public static final int common_signin_btn_icon_normal_dark=0x7f020009;
+        public static final int common_signin_btn_icon_normal_light=0x7f02000a;
+        public static final int common_signin_btn_icon_pressed_dark=0x7f02000b;
+        public static final int common_signin_btn_icon_pressed_light=0x7f02000c;
+        public static final int common_signin_btn_text_dark=0x7f02000d;
+        public static final int common_signin_btn_text_disabled_dark=0x7f02000e;
+        public static final int common_signin_btn_text_disabled_focus_dark=0x7f02000f;
+        public static final int common_signin_btn_text_disabled_focus_light=0x7f020010;
+        public static final int common_signin_btn_text_disabled_light=0x7f020011;
+        public static final int common_signin_btn_text_focus_dark=0x7f020012;
+        public static final int common_signin_btn_text_focus_light=0x7f020013;
+        public static final int common_signin_btn_text_light=0x7f020014;
+        public static final int common_signin_btn_text_normal_dark=0x7f020015;
+        public static final int common_signin_btn_text_normal_light=0x7f020016;
+        public static final int common_signin_btn_text_pressed_dark=0x7f020017;
+        public static final int common_signin_btn_text_pressed_light=0x7f020018;
+        public static final int good_picture=0x7f020019;
+        public static final int icon=0x7f02001a;
+        public static final int odk_scan_logo=0x7f02001b;
+        public static final int stand_example=0x7f02001c;
     }
     public static final class id {
-        public static final int InstructionsButton=0x7f0a000b;
-        public static final int ScanButton=0x7f0a0009;
-        public static final int SettingsButton=0x7f0a000c;
-        public static final int ViewFormsButton=0x7f0a000a;
-        public static final int createdTime=0x7f0a0008;
-        public static final int failureContainer=0x7f0a0004;
-        public static final int failureMessage=0x7f0a0005;
-        public static final int myLinearLayout=0x7f0a0000;
-        public static final int nextPageBtn=0x7f0a000e;
-        public static final int photoStatus=0x7f0a0006;
-        public static final int process_button=0x7f0a0002;
-        public static final int retake_button=0x7f0a0001;
-        public static final int saveBtn=0x7f0a0010;
-        public static final int saveSurveyBtn=0x7f0a0012;
-        public static final int save_transcribe=0x7f0a000f;
-        public static final int scanNewForm=0x7f0a0018;
-        public static final int startOver=0x7f0a0019;
-        public static final int statusContainer=0x7f0a0016;
-        public static final int statusMessage=0x7f0a0017;
-        public static final int templateName=0x7f0a0007;
-        public static final int transcribeBtn=0x7f0a0011;
-        public static final int transcribeSurveyBtn=0x7f0a0013;
-        public static final int version_display=0x7f0a000d;
-        public static final int webview=0x7f0a0003;
-        public static final int webview2=0x7f0a0014;
-        public static final int webview3=0x7f0a0015;
+        public static final int InstructionsButton=0x7f070010;
+        public static final int ScanButton=0x7f07000e;
+        public static final int SettingsButton=0x7f070011;
+        public static final int ViewFormsButton=0x7f07000f;
+        public static final int createdTime=0x7f07000d;
+        public static final int failureContainer=0x7f070009;
+        public static final int failureMessage=0x7f07000a;
+        public static final int hybrid=0x7f070004;
+        public static final int myLinearLayout=0x7f070005;
+        public static final int nextPageBtn=0x7f070013;
+        public static final int none=0x7f070000;
+        public static final int normal=0x7f070001;
+        public static final int photoStatus=0x7f07000b;
+        public static final int process_button=0x7f070007;
+        public static final int retake_button=0x7f070006;
+        public static final int satellite=0x7f070002;
+        public static final int saveBtn=0x7f070015;
+        public static final int saveSurveyBtn=0x7f070017;
+        public static final int save_transcribe=0x7f070014;
+        public static final int scanNewForm=0x7f07001d;
+        public static final int startOver=0x7f07001e;
+        public static final int statusContainer=0x7f07001b;
+        public static final int statusMessage=0x7f07001c;
+        public static final int templateName=0x7f07000c;
+        public static final int terrain=0x7f070003;
+        public static final int transcribeBtn=0x7f070016;
+        public static final int transcribeSurveyBtn=0x7f070018;
+        public static final int version_display=0x7f070012;
+        public static final int webview=0x7f070008;
+        public static final int webview2=0x7f070019;
+        public static final int webview3=0x7f07001a;
     }
     public static final class layout {
         public static final int after_photo_taken=0x7f030000;
@@ -75,7 +238,7 @@ containing a value of this type.
         public static final int status=0x7f030006;
     }
     public static final class menu {
-        public static final int mscan_menu=0x7f090000;
+        public static final int mscan_menu=0x7f0b0000;
     }
     public static final class raw {
         public static final int license=0x7f050000;
@@ -84,169 +247,302 @@ containing a value of this type.
         /**  For Main Screen 
  For Main Screen 
          */
-        public static final int Health_Center=0x7f0600a1;
+        public static final int Health_Center=0x7f0800b6;
         /**  Instructions 
  Instructions 
          */
-        public static final int Instructions1=0x7f0600b4;
-        public static final int Instructions2=0x7f0600b5;
-        public static final int Instructions3=0x7f0600b6;
-        public static final int Instructions4=0x7f0600b7;
-        public static final int InstructionsButton=0x7f0600a5;
-        public static final int SettingsButton=0x7f0600a6;
-        public static final int ViewFormsButton=0x7f0600a4;
-        public static final int accept_location=0x7f060000;
-        public static final int access_error=0x7f060054;
-        public static final int activity_not_found=0x7f060001;
-        public static final int added_on_date_at_time=0x7f06006b;
-        public static final int admin_access_settings=0x7f06007d;
-        public static final int admin_password_changed=0x7f060086;
-        public static final int admin_password_disabled=0x7f060087;
-        public static final int admin_password_incorrect=0x7f060089;
-        public static final int admin_password_mismatch=0x7f060088;
-        public static final int admin_preferences=0x7f06007c;
-        public static final int after_photo_taken_activity=0x7f06009e;
-        public static final int aligning_form=0x7f0600a9;
-        public static final int app_description=0x7f060098;
-        public static final int app_name=0x7f060002;
-        public static final int app_url=0x7f060047;
-        public static final int bubble_instructions_activity=0x7f06009b;
-        public static final int bubble_process_activity=0x7f060099;
+        public static final int Instructions1=0x7f0800c9;
+        public static final int Instructions2=0x7f0800ca;
+        public static final int Instructions3=0x7f0800cb;
+        public static final int Instructions4=0x7f0800cc;
+        public static final int InstructionsButton=0x7f0800ba;
+        public static final int SettingsButton=0x7f0800bb;
+        public static final int ViewFormsButton=0x7f0800b9;
+        public static final int accept_location=0x7f080015;
+        public static final int access_error=0x7f080069;
+        public static final int activity_not_found=0x7f080016;
+        public static final int added_on_date_at_time=0x7f080080;
+        public static final int admin_access_settings=0x7f080092;
+        public static final int admin_password_changed=0x7f08009b;
+        public static final int admin_password_disabled=0x7f08009c;
+        public static final int admin_password_incorrect=0x7f08009e;
+        public static final int admin_password_mismatch=0x7f08009d;
+        public static final int admin_preferences=0x7f080091;
+        public static final int after_photo_taken_activity=0x7f0800b3;
+        public static final int aligning_form=0x7f0800be;
+        public static final int app_description=0x7f0800ad;
+        public static final int app_name=0x7f080017;
+        public static final int app_url=0x7f08005c;
+        /**   Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=70] 
+  Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=70] 
+  Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=70] 
+         */
+        public static final int auth_client_availability_notification_title=0x7f08000f;
+        /**   Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=42] 
+  Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=42] 
+  Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=42] 
+         */
+        public static final int auth_client_play_services_err_notification_msg=0x7f080010;
+        /**   Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
+  Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
+  Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
+         */
+        public static final int auth_client_requested_by_msg=0x7f080011;
+        public static final int bubble_instructions_activity=0x7f0800b0;
+        public static final int bubble_process_activity=0x7f0800ae;
         /**  For Preferences 
  For Preferences 
          */
-        public static final int calibrate=0x7f06009f;
-        public static final int cancel=0x7f060003;
-        public static final int cancel_location=0x7f060004;
-        public static final int change_font_size=0x7f060050;
-        public static final int change_formlist_url=0x7f060049;
-        public static final int change_language=0x7f060005;
-        public static final int change_password=0x7f060006;
-        public static final int change_protocol=0x7f06004b;
-        public static final int change_server=0x7f06007a;
-        public static final int change_server_url=0x7f060007;
-        public static final int change_splash_path=0x7f060046;
-        public static final int change_submission_url=0x7f06004c;
-        public static final int change_username=0x7f060008;
-        public static final int change_username_default=0x7f06007b;
-        public static final int change_view=0x7f060068;
-        public static final int click_to_web=0x7f06003e;
-        public static final int client=0x7f06003f;
-        public static final int collect_save=0x7f0600af;
-        public static final int collect_transcribe=0x7f0600b0;
-        public static final int could_not_register=0x7f0600ab;
-        public static final int default_completed=0x7f060009;
-        public static final int default_completed_summary=0x7f06000a;
-        public static final int default_odk_formlist=0x7f060052;
-        public static final int default_odk_submission=0x7f060053;
-        public static final int default_server_url=0x7f06000b;
-        public static final int default_splash_path=0x7f060043;
-        public static final int delete_confirm=0x7f06000c;
-        public static final int delete_file=0x7f06000d;
-        public static final int delete_no=0x7f06000e;
-        public static final int delete_yes=0x7f06000f;
-        public static final int disksync_in_progress=0x7f060073;
-        public static final int display_data=0x7f0600b2;
-        public static final int display_processed_data_activity=0x7f06009d;
-        public static final int display_processed_form_activity=0x7f06009c;
-        public static final int doFormDetection=0x7f0600a0;
-        public static final int download=0x7f060010;
-        public static final int download_forms_result=0x7f060011;
-        public static final int download_in_progress=0x7f060072;
-        public static final int downloading_data=0x7f060012;
-        public static final int enter_admin_password=0x7f06008a;
-        public static final int enter_data_button=0x7f060013;
-        public static final int enter_new_password=0x7f060084;
-        public static final int error_occured=0x7f060014;
-        public static final int expanding_expansion_files=0x7f060090;
-        public static final int expanding_file=0x7f060093;
-        public static final int expansion_complete=0x7f060091;
-        public static final int expansion_failed=0x7f060095;
-        public static final int expansion_progress=0x7f060094;
-        public static final int expansion_unzipping=0x7f060092;
-        public static final int fetching_file=0x7f060015;
-        public static final int fetching_manifest=0x7f06005b;
-        public static final int file_delete_in_progress=0x7f060018;
-        public static final int file_deleted_error=0x7f060016;
-        public static final int file_deleted_ok=0x7f060017;
-        public static final int file_fetch_failed=0x7f06005a;
-        public static final int finished_disk_scan=0x7f060019;
-        public static final int font_size=0x7f06004f;
-        public static final int font_size_extra_large=0x7f060063;
-        public static final int font_size_extra_small=0x7f060067;
-        public static final int font_size_large=0x7f060064;
-        public static final int font_size_medium=0x7f060065;
-        public static final int font_size_small=0x7f060066;
-        public static final int form_download_progress=0x7f060059;
-        public static final int form_download_unzipping=0x7f060074;
-        public static final int form_load_error=0x7f06008d;
-        public static final int form_scan_starting=0x7f060051;
-        public static final int formlist_url=0x7f06004d;
-        public static final int found_in_menu=0x7f06008b;
-        public static final int general_preferences=0x7f06003d;
-        public static final int get_forms=0x7f06001b;
-        public static final int get_location=0x7f06001c;
-        public static final int getting_location=0x7f06001a;
-        public static final int go_to_location=0x7f060048;
-        public static final int google_account=0x7f06005e;
-        public static final int invalid_form_id=0x7f060097;
-        public static final int list_failed_with_error=0x7f06001e;
-        public static final int load_remote_form_error=0x7f06001f;
-        public static final int loading_video=0x7f060096;
-        public static final int location_accuracy=0x7f060021;
-        public static final int location_provider_accuracy=0x7f060020;
-        public static final int main_menu=0x7f0600b3;
-        public static final int manage_files=0x7f060022;
-        public static final int manifest_server_error=0x7f060055;
-        public static final int manifest_tag_error=0x7f060058;
-        public static final int mark_as_finalized_summary=0x7f060083;
-        public static final int mark_as_finished=0x7f060077;
-        public static final int media_save_failed=0x7f06006f;
+        public static final int calibrate=0x7f0800b4;
+        public static final int cancel=0x7f080018;
+        public static final int cancel_location=0x7f080019;
+        public static final int change_font_size=0x7f080065;
+        public static final int change_formlist_url=0x7f08005e;
+        public static final int change_language=0x7f08001a;
+        public static final int change_password=0x7f08001b;
+        public static final int change_protocol=0x7f080060;
+        public static final int change_server=0x7f08008f;
+        public static final int change_server_url=0x7f08001c;
+        public static final int change_splash_path=0x7f08005b;
+        public static final int change_submission_url=0x7f080061;
+        public static final int change_username=0x7f08001d;
+        public static final int change_username_default=0x7f080090;
+        public static final int change_view=0x7f08007d;
+        public static final int click_to_web=0x7f080053;
+        public static final int client=0x7f080054;
+        public static final int collect_save=0x7f0800c4;
+        public static final int collect_transcribe=0x7f0800c5;
+        /**  Button in confirmation dialog to enable Google Play services.  Clicking it
+        will direct user to application settings of Google Play services where they
+        can enable it [CHAR LIMIT=40] 
+ Button in confirmation dialog to enable Google Play services.  Clicking it
+        will direct user to application settings of Google Play services where they
+        can enable it [CHAR LIMIT=40] 
+ Button in confirmation dialog to enable Google Play services.  Clicking it
+        will direct user to application settings of Google Play services where they
+        can enable it [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_enable_button=0x7f080006;
+        /**  Message in confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_enable_text=0x7f080005;
+        /**  Title of confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user they need to enable
+        Google Play services in application settings [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_enable_title=0x7f080004;
+        /**  Button in confirmation dialog for installing Google Play services [CHAR LIMIT=40] 
+ Button in confirmation dialog for installing Google Play services [CHAR LIMIT=40] 
+ Button in confirmation dialog for installing Google Play services [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_install_button=0x7f080003;
+        /**  (For phones) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ (For phones) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ (For phones) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_install_text_phone=0x7f080001;
+        /**  (For tablets) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ (For tablets) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ (For tablets) Message in confirmation dialog informing user that
+        they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_install_text_tablet=0x7f080002;
+        /**  Title of confirmation dialog informing user that they need to install
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that they need to install
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that they need to install
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_install_title=0x7f080000;
+        /**  Message in confirmation dialog informing user there is an unknown issue in Google Play
+        services [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user there is an unknown issue in Google Play
+        services [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user there is an unknown issue in Google Play
+        services [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_unknown_issue=0x7f080009;
+        /**  Message in confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_unsupported_text=0x7f08000b;
+        /**  Title of confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_unsupported_title=0x7f08000a;
+        /**  Button in confirmation dialog for updating Google Play services [CHAR LIMIT=40] 
+ Button in confirmation dialog for updating Google Play services [CHAR LIMIT=40] 
+ Button in confirmation dialog for updating Google Play services [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_update_button=0x7f08000c;
+        /**  Message in confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+ Message in confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=NONE] 
+         */
+        public static final int common_google_play_services_update_text=0x7f080008;
+        /**  Title of confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+ Title of confirmation dialog informing user that they need to update
+        Google Play services (from Play Store) [CHAR LIMIT=40] 
+         */
+        public static final int common_google_play_services_update_title=0x7f080007;
+        /**  Sign-in button text [CHAR LIMIT=15] 
+ Sign-in button text [CHAR LIMIT=15] 
+ Sign-in button text [CHAR LIMIT=15] 
+         */
+        public static final int common_signin_button_text=0x7f08000d;
+        /**  Long form sign-in button text [CHAR LIMIT=30] 
+ Long form sign-in button text. This is the placeholder text, used if we can't
+        find the service-side assets. [CHAR LIMIT=25] 
+ Long form sign-in button text. This is the placeholder text, used if we can't
+        find the service-side assets. [CHAR LIMIT=25] 
+         */
+        public static final int common_signin_button_text_long=0x7f08000e;
+        public static final int could_not_register=0x7f0800c0;
+        public static final int default_completed=0x7f08001e;
+        public static final int default_completed_summary=0x7f08001f;
+        public static final int default_odk_formlist=0x7f080067;
+        public static final int default_odk_submission=0x7f080068;
+        public static final int default_server_url=0x7f080020;
+        public static final int default_splash_path=0x7f080058;
+        public static final int delete_confirm=0x7f080021;
+        public static final int delete_file=0x7f080022;
+        public static final int delete_no=0x7f080023;
+        public static final int delete_yes=0x7f080024;
+        public static final int disksync_in_progress=0x7f080088;
+        public static final int display_data=0x7f0800c7;
+        public static final int display_processed_data_activity=0x7f0800b2;
+        public static final int display_processed_form_activity=0x7f0800b1;
+        public static final int doFormDetection=0x7f0800b5;
+        public static final int download=0x7f080025;
+        public static final int download_forms_result=0x7f080026;
+        public static final int download_in_progress=0x7f080087;
+        public static final int downloading_data=0x7f080027;
+        public static final int enter_admin_password=0x7f08009f;
+        public static final int enter_data_button=0x7f080028;
+        public static final int enter_new_password=0x7f080099;
+        public static final int error_occured=0x7f080029;
+        public static final int expanding_expansion_files=0x7f0800a5;
+        public static final int expanding_file=0x7f0800a8;
+        public static final int expansion_complete=0x7f0800a6;
+        public static final int expansion_failed=0x7f0800aa;
+        public static final int expansion_progress=0x7f0800a9;
+        public static final int expansion_unzipping=0x7f0800a7;
+        public static final int fetching_file=0x7f08002a;
+        public static final int fetching_manifest=0x7f080070;
+        public static final int file_delete_in_progress=0x7f08002d;
+        public static final int file_deleted_error=0x7f08002b;
+        public static final int file_deleted_ok=0x7f08002c;
+        public static final int file_fetch_failed=0x7f08006f;
+        public static final int finished_disk_scan=0x7f08002e;
+        public static final int font_size=0x7f080064;
+        public static final int font_size_extra_large=0x7f080078;
+        public static final int font_size_extra_small=0x7f08007c;
+        public static final int font_size_large=0x7f080079;
+        public static final int font_size_medium=0x7f08007a;
+        public static final int font_size_small=0x7f08007b;
+        public static final int form_download_progress=0x7f08006e;
+        public static final int form_download_unzipping=0x7f080089;
+        public static final int form_load_error=0x7f0800a2;
+        public static final int form_scan_starting=0x7f080066;
+        public static final int formlist_url=0x7f080062;
+        public static final int found_in_menu=0x7f0800a0;
+        public static final int general_preferences=0x7f080052;
+        public static final int get_forms=0x7f080030;
+        public static final int get_location=0x7f080031;
+        public static final int getting_location=0x7f08002f;
+        public static final int go_to_location=0x7f08005d;
+        public static final int google_account=0x7f080073;
+        public static final int invalid_form_id=0x7f0800ac;
+        public static final int list_failed_with_error=0x7f080033;
+        public static final int load_remote_form_error=0x7f080034;
+        public static final int loading_video=0x7f0800ab;
+        public static final int location_accuracy=0x7f080036;
+        /**  Location client code resources (prefix with location_client) 
+
+        Begin strings for location.reporting
+    
+
+        Some InactiveReason names.  See more in OneUp/package/location/res/values/strings.xml
+    
+         */
+        public static final int location_client_ulr_inactive_age_under_13=0x7f080012;
+        public static final int location_client_ulr_inactive_age_unknown=0x7f080013;
+        public static final int location_client_ulr_inactive_unknown_restriction=0x7f080014;
+        public static final int location_provider_accuracy=0x7f080035;
+        public static final int main_menu=0x7f0800c8;
+        public static final int manage_files=0x7f080037;
+        public static final int manifest_server_error=0x7f08006a;
+        public static final int manifest_tag_error=0x7f08006d;
+        public static final int mark_as_finalized_summary=0x7f080098;
+        public static final int mark_as_finished=0x7f08008c;
+        public static final int media_save_failed=0x7f080084;
         /**  DisplayProcessedForm 
          */
-        public static final int next_page=0x7f0600ac;
-        public static final int no_connection=0x7f060024;
-        public static final int no_formdef_json=0x7f060076;
-        public static final int no_forms_uploaded=0x7f06005d;
-        public static final int no_items_display=0x7f060025;
-        public static final int no_items_display_forms=0x7f060026;
-        public static final int no_items_display_instances=0x7f060027;
-        public static final int no_manifest=0x7f060075;
-        public static final int noselect_error=0x7f060023;
-        public static final int not_yet_sent=0x7f060070;
-        public static final int ok=0x7f060028;
-        public static final int parse_openrosa_formlist_failed=0x7f060029;
-        public static final int password=0x7f06002a;
-        public static final int please_wait=0x7f06002b;
-        public static final int please_wait_long=0x7f06002c;
+        public static final int next_page=0x7f0800c1;
+        public static final int no_connection=0x7f080039;
+        public static final int no_formdef_json=0x7f08008b;
+        public static final int no_forms_uploaded=0x7f080072;
+        public static final int no_items_display=0x7f08003a;
+        public static final int no_items_display_forms=0x7f08003b;
+        public static final int no_items_display_instances=0x7f08003c;
+        public static final int no_manifest=0x7f08008a;
+        public static final int noselect_error=0x7f080038;
+        public static final int not_yet_sent=0x7f080085;
+        public static final int ok=0x7f08003d;
+        public static final int parse_openrosa_formlist_failed=0x7f08003e;
+        public static final int password=0x7f08003f;
+        public static final int please_wait=0x7f080040;
+        public static final int please_wait_long=0x7f080041;
         /**  AfterPhotoTaken 
  AfterPhotoTaken 
          */
-        public static final int process_form=0x7f0600a7;
-        public static final int processing_form=0x7f0600aa;
-        public static final int protocol=0x7f06004a;
-        public static final int provider_disabled_error=0x7f06001d;
-        public static final int refresh=0x7f06002d;
-        public static final int retake_photo=0x7f0600a8;
-        public static final int review_data=0x7f06002e;
-        public static final int review_data_button=0x7f06002f;
-        public static final int root_element_error=0x7f060056;
-        public static final int root_namespace_error=0x7f060057;
-        public static final int save_as=0x7f060081;
-        public static final int save_as_summary=0x7f060082;
+        public static final int process_form=0x7f0800bc;
+        public static final int processing_form=0x7f0800bf;
+        public static final int protocol=0x7f08005f;
+        public static final int provider_disabled_error=0x7f080032;
+        public static final int refresh=0x7f080042;
+        public static final int retake_photo=0x7f0800bd;
+        public static final int review_data=0x7f080043;
+        public static final int review_data_button=0x7f080044;
+        public static final int root_element_error=0x7f08006b;
+        public static final int root_namespace_error=0x7f08006c;
+        public static final int save_as=0x7f080096;
+        public static final int save_as_summary=0x7f080097;
         /**  Popup menu 
  Popup menu 
          */
-        public static final int save_data=0x7f0600b1;
-        public static final int save_mid=0x7f06007f;
-        public static final int save_mid_summary=0x7f060080;
-        public static final int scan_new_form=0x7f0600a3;
-        public static final int searching_for_expansion_files=0x7f06008f;
-        public static final int select_another_image=0x7f060044;
-        public static final int selected_google_account_text=0x7f06005f;
-        public static final int send_data=0x7f060031;
-        public static final int send_data_button=0x7f060032;
-        public static final int send_selected_data=0x7f060033;
+        public static final int save_data=0x7f0800c6;
+        public static final int save_mid=0x7f080094;
+        public static final int save_mid_summary=0x7f080095;
+        public static final int scan_new_form=0x7f0800b8;
+        public static final int searching_for_expansion_files=0x7f0800a4;
+        public static final int select_another_image=0x7f080059;
+        public static final int selected_google_account_text=0x7f080074;
+        public static final int send_data=0x7f080046;
+        public static final int send_data_button=0x7f080047;
+        public static final int send_selected_data=0x7f080048;
         /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
@@ -261,8 +557,8 @@ containing a value of this type.
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
          */
-        public static final int sending_failed_on_date_at_time=0x7f06006d;
-        public static final int sending_items=0x7f060030;
+        public static final int sending_failed_on_date_at_time=0x7f080082;
+        public static final int sending_items=0x7f080045;
         /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
@@ -277,35 +573,35 @@ containing a value of this type.
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
          */
-        public static final int sent_on_date_at_time=0x7f06006c;
-        public static final int server_auth_credentials=0x7f060034;
-        public static final int server_platform_google_forms=0x7f060061;
-        public static final int server_platform_odk_aggregate=0x7f060060;
-        public static final int server_platform_other=0x7f060062;
-        public static final int server_preferences=0x7f060037;
-        public static final int server_requires_auth=0x7f060035;
-        public static final int server_url=0x7f060036;
-        public static final int shortcut_name=0x7f06008c;
-        public static final int show_sent_and_unsent_forms=0x7f060069;
-        public static final int show_splash=0x7f060040;
-        public static final int show_splash_summary=0x7f060041;
-        public static final int show_unsent_forms=0x7f06006a;
-        public static final int splash_path=0x7f060042;
-        public static final int submission_url=0x7f06004e;
-        public static final int success=0x7f06005c;
-        public static final int survey_save=0x7f0600ad;
-        public static final int survey_transcribe=0x7f0600ae;
-        public static final int the_current_health_center_is=0x7f0600a2;
-        public static final int toggle_selected=0x7f060038;
-        public static final int upload_in_progress=0x7f06008e;
-        public static final int uploading_data=0x7f060039;
-        public static final int url_error=0x7f06003a;
-        public static final int use_odk_default=0x7f060045;
-        public static final int user_access_form_entry=0x7f06007e;
-        public static final int user_access_main_menu=0x7f060078;
-        public static final int user_access_preferences=0x7f060079;
-        public static final int username=0x7f06003b;
-        public static final int verify_new_password=0x7f060085;
+        public static final int sent_on_date_at_time=0x7f080081;
+        public static final int server_auth_credentials=0x7f080049;
+        public static final int server_platform_google_forms=0x7f080076;
+        public static final int server_platform_odk_aggregate=0x7f080075;
+        public static final int server_platform_other=0x7f080077;
+        public static final int server_preferences=0x7f08004c;
+        public static final int server_requires_auth=0x7f08004a;
+        public static final int server_url=0x7f08004b;
+        public static final int shortcut_name=0x7f0800a1;
+        public static final int show_sent_and_unsent_forms=0x7f08007e;
+        public static final int show_splash=0x7f080055;
+        public static final int show_splash_summary=0x7f080056;
+        public static final int show_unsent_forms=0x7f08007f;
+        public static final int splash_path=0x7f080057;
+        public static final int submission_url=0x7f080063;
+        public static final int success=0x7f080071;
+        public static final int survey_save=0x7f0800c2;
+        public static final int survey_transcribe=0x7f0800c3;
+        public static final int the_current_health_center_is=0x7f0800b7;
+        public static final int toggle_selected=0x7f08004d;
+        public static final int upload_in_progress=0x7f0800a3;
+        public static final int uploading_data=0x7f08004e;
+        public static final int url_error=0x7f08004f;
+        public static final int use_odk_default=0x7f08005a;
+        public static final int user_access_form_entry=0x7f080093;
+        public static final int user_access_main_menu=0x7f08008d;
+        public static final int user_access_preferences=0x7f08008e;
+        public static final int username=0x7f080050;
+        public static final int verify_new_password=0x7f08009a;
         /**  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
@@ -320,15 +616,15 @@ containing a value of this type.
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
          */
-        public static final int version=0x7f06006e;
-        public static final int view_bubble_forms_activity=0x7f06009a;
-        public static final int view_hierarchy=0x7f06003c;
-        public static final int xforms_file_exists=0x7f060071;
+        public static final int version=0x7f080083;
+        public static final int view_bubble_forms_activity=0x7f0800af;
+        public static final int view_hierarchy=0x7f080051;
+        public static final int xforms_file_exists=0x7f080086;
     }
     public static final class style {
-        public static final int APTButton=0x7f080002;
-        public static final int StandardButton=0x7f080001;
-        public static final int StandardFont=0x7f080000;
+        public static final int APTButton=0x7f0a0002;
+        public static final int StandardButton=0x7f0a0001;
+        public static final int StandardFont=0x7f0a0000;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;
@@ -347,7 +643,7 @@ containing a value of this type.
            @see #ListPreferenceMultiSelect_separator
          */
         public static final int[] ListPreferenceMultiSelect = {
-            0x7f010000, 0x7f010001
+            0x7f01000e, 0x7f01000f
         };
         /**
           <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#checkAll}
@@ -377,5 +673,249 @@ containing a value of this type.
           @attr name org.opendatakit.scan.android:separator
         */
         public static final int ListPreferenceMultiSelect_separator = 1;
+        /** Attributes that can be used with a MapAttrs.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #MapAttrs_cameraBearing org.opendatakit.scan.android:cameraBearing}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_cameraTargetLat org.opendatakit.scan.android:cameraTargetLat}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_cameraTargetLng org.opendatakit.scan.android:cameraTargetLng}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_cameraTilt org.opendatakit.scan.android:cameraTilt}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_cameraZoom org.opendatakit.scan.android:cameraZoom}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_mapType org.opendatakit.scan.android:mapType}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiCompass org.opendatakit.scan.android:uiCompass}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiRotateGestures org.opendatakit.scan.android:uiRotateGestures}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiScrollGestures org.opendatakit.scan.android:uiScrollGestures}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiTiltGestures org.opendatakit.scan.android:uiTiltGestures}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiZoomControls org.opendatakit.scan.android:uiZoomControls}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_uiZoomGestures org.opendatakit.scan.android:uiZoomGestures}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_useViewLifecycle org.opendatakit.scan.android:useViewLifecycle}</code></td><td></td></tr>
+           <tr><td><code>{@link #MapAttrs_zOrderOnTop org.opendatakit.scan.android:zOrderOnTop}</code></td><td></td></tr>
+           </table>
+           @see #MapAttrs_cameraBearing
+           @see #MapAttrs_cameraTargetLat
+           @see #MapAttrs_cameraTargetLng
+           @see #MapAttrs_cameraTilt
+           @see #MapAttrs_cameraZoom
+           @see #MapAttrs_mapType
+           @see #MapAttrs_uiCompass
+           @see #MapAttrs_uiRotateGestures
+           @see #MapAttrs_uiScrollGestures
+           @see #MapAttrs_uiTiltGestures
+           @see #MapAttrs_uiZoomControls
+           @see #MapAttrs_uiZoomGestures
+           @see #MapAttrs_useViewLifecycle
+           @see #MapAttrs_zOrderOnTop
+         */
+        public static final int[] MapAttrs = {
+            0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003,
+            0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007,
+            0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b,
+            0x7f01000c, 0x7f01000d
+        };
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#cameraBearing}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:cameraBearing
+        */
+        public static final int MapAttrs_cameraBearing = 1;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#cameraTargetLat}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:cameraTargetLat
+        */
+        public static final int MapAttrs_cameraTargetLat = 2;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#cameraTargetLng}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:cameraTargetLng
+        */
+        public static final int MapAttrs_cameraTargetLng = 3;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#cameraTilt}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:cameraTilt
+        */
+        public static final int MapAttrs_cameraTilt = 4;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#cameraZoom}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a floating point value, such as "<code>1.2</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:cameraZoom
+        */
+        public static final int MapAttrs_cameraZoom = 5;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#mapType}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be one of the following constant values.</p>
+<table>
+<colgroup align="left" />
+<colgroup align="left" />
+<colgroup align="left" />
+<tr><th>Constant</th><th>Value</th><th>Description</th></tr>
+<tr><td><code>none</code></td><td>0</td><td></td></tr>
+<tr><td><code>normal</code></td><td>1</td><td></td></tr>
+<tr><td><code>satellite</code></td><td>2</td><td></td></tr>
+<tr><td><code>terrain</code></td><td>3</td><td></td></tr>
+<tr><td><code>hybrid</code></td><td>4</td><td></td></tr>
+</table>
+          @attr name org.opendatakit.scan.android:mapType
+        */
+        public static final int MapAttrs_mapType = 0;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiCompass}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiCompass
+        */
+        public static final int MapAttrs_uiCompass = 6;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiRotateGestures}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiRotateGestures
+        */
+        public static final int MapAttrs_uiRotateGestures = 7;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiScrollGestures}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiScrollGestures
+        */
+        public static final int MapAttrs_uiScrollGestures = 8;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiTiltGestures}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiTiltGestures
+        */
+        public static final int MapAttrs_uiTiltGestures = 9;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiZoomControls}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiZoomControls
+        */
+        public static final int MapAttrs_uiZoomControls = 10;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#uiZoomGestures}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:uiZoomGestures
+        */
+        public static final int MapAttrs_uiZoomGestures = 11;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#useViewLifecycle}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:useViewLifecycle
+        */
+        public static final int MapAttrs_useViewLifecycle = 12;
+        /**
+          <p>This symbol is the offset where the {@link org.opendatakit.scan.android.R.attr#zOrderOnTop}
+          attribute's value can be found in the {@link #MapAttrs} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name org.opendatakit.scan.android:zOrderOnTop
+        */
+        public static final int MapAttrs_zOrderOnTop = 13;
     };
 }

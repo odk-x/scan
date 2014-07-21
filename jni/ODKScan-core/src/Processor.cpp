@@ -393,7 +393,6 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	Mat transformation = (Mat_<double>(3,3) << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 	Point offset = segmentRect.tl();
 
-
 		Rect expandedRect = resizeRect(segmentRect, 1 + SEGMENT_BUFFER);
 	
 		//Reduce the segment buffer if it goes over the image edge.
@@ -420,14 +419,23 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentImg = formImage(expandedRect);
 		segmentJsonOut["quad"] = quadToJsonArray(rectToQuad( segmentRect ));
 	}
-	else if(extendedSegment.get("align_segment", true).asBool()) {
-		segmentImg = formImage(expandedRect);
 
+	/*
+	 * Nicki: Commenting this out for now since it seems to be causing the bad behavior
+	 * we sometimes see. Needs more work to figure out why. I think it may be when segments
+	 * don't have lines around them, then the code can't find lines and crashes.
+	 */
+	/*else if(extendedSegment.get("align_segment", true).asBool())
+	{
+		segmentImg = formImage(expandedRect);
 		vector<Point2f> quad;
+
+		//This method is making it crash
 		findSegment(segmentImg, segmentRect - expandedRect.tl(), quad);
 
 		#define MAX_SIZE_VARIATION 0.4
-		if(testQuad(quad, segmentRect, MAX_SIZE_VARIATION)){
+		if(testQuad(quad, segmentRect, MAX_SIZE_VARIATION))
+		{
 			#ifdef DEBUG_PROCESSOR
 				//This makes a stream of dots so we can see how fast things are going.
 				//we get a ! when things go wrong.
@@ -453,7 +461,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			segmentImg = formImage(segmentRect);
 			segmentJsonOut["quad"] = quadToJsonArray(rectToQuad( segmentRect ));
 		}
-	}
+	}*/
 	else {
 		segmentImg = formImage(segmentRect);
 		segmentJsonOut["quad"] = quadToJsonArray(rectToQuad( segmentRect ));
@@ -596,13 +604,11 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	const Json::Value segments = extendedField["segments"];
 	Json::Value outField = Json::Value(field);
 	Json::Value outSegments;
-
 	//This field is just used to block out features from some region.
 	if(field.get("mask", false).asBool()) {
 		cout << "mask" << endl;
 		return Json::Value();
 	}
-
 	#ifdef OUTPUT_BUBBLE_IMAGES
 		//namer.setPrefix(field.get("classifier", Json::Value()).get("training_data_uri", "na").asString());
 		namer.setPrefix(field.get("label", "unlabeled").asString());
@@ -612,12 +618,9 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 		const Json::Value segment = segments[j];
 		Json::Value segmentJsonOut(segment);
 		segmentJsonOut["index"] = (int)j;
-
 		Json::Value extendedSegment = Json::Value(extendedField);
 		extend(extendedSegment, segmentJsonOut);
-
 		segmentJsonOut = segmentFunction(segmentJsonOut, extendedSegment);
-
 		if(!segmentJsonOut.isNull()){
 			outSegments.append(segmentJsonOut);
 		}
@@ -638,7 +641,8 @@ Json::Value formFunction(const Json::Value& templateRoot){
 	const Json::Value fields = templateRoot["fields"];
 	Json::Value outForm = Json::Value(templateRoot);
 	Json::Value outFields;
-	for ( size_t i = 0; i < fields.size(); i++ ) {
+	for ( size_t i = 0; i < fields.size(); i++ )
+	{
 		const Json::Value field = fields[i];
 		Json::Value outField = fieldFunction(field, templateRoot);
 		if(!outField.isNull()){
@@ -651,6 +655,7 @@ Json::Value formFunction(const Json::Value& templateRoot){
 	outForm["templatePath"] = templPath;
 	outForm.removeMember("items");
 	outForm.removeMember("classifier");
+	LOGI("DONE");
 	return outForm;
 }
 
@@ -778,14 +783,16 @@ bool processForm(const string& outputPath, const string& jsonOutputPath, const s
 	#ifdef TIME_IT	
 		init = clock();
 	#endif
-	
-	if( !root || formImage.empty() ){
+
+	if( !root || formImage.empty() )
+	{
 		cout << "Unable to process form. Error code: " <<
 		        (int)!root << (int)formImage.empty() << endl;
 		return false;
 	}
 	root["output_path"] = outputPath;
 	const Json::Value JsonOutput = formFunction(root);
+
 
 	#ifdef  DEBUG_PROCESSOR
 		cout << "done" << endl;
@@ -797,7 +804,7 @@ bool processForm(const string& outputPath, const string& jsonOutputPath, const s
 	
 	//Create the marked up image:
 	imwrite(markedupImagePath, markupForm(JsonOutput, formImage, true));
-	
+
 	//Create the json output file
 	ofstream outfile(jsonOutputPath.c_str(), ios::out | ios::binary);
 	if(minifyJson){
@@ -808,6 +815,7 @@ bool processForm(const string& outputPath, const string& jsonOutputPath, const s
 		outfile << JsonOutput;
 	}
 	outfile.close();
+
 
 	#ifdef TIME_IT
 		LOGI("Process time: ");
@@ -969,6 +977,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 		Json::Value config;// will contain the root value after parsing.
 		Json::Reader reader;
 		bool parsingSuccessful = reader.parse( jsonString, config );
+
 		if(!parsingSuccessful){
 			result["errorMessage"] = "Could not parse JSON configuration string.";
 			return stringify(result);
@@ -984,7 +993,6 @@ const string Processor::processViaJSON(const char* jsonString) {
 		string outputDirectory = config["outputDirectory"].asString();
 		processorImpl->loadFormImage(config["inputImage"].asString().c_str(),
 		                             config.get("calibrationFilePath", "").asString().c_str());
-
 		int formIdx = 0;
 
 		if(config.isMember("templatePath")){
@@ -1021,8 +1029,6 @@ const string Processor::processViaJSON(const char* jsonString) {
 			return stringify(result);
 		}
 
-
-
 		if(config.get("alignForm", true).asBool()){
 			string alignedFormOutputPath = config.get("alignedFormOutputPath",
 					addSlashIfNeeded(outputDirectory) + "aligned.jpg").asString();
@@ -1049,6 +1055,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 				}
 			}
 		}
+
 		if(config.get("processForm", true).asBool()){
 			processorImpl->trainingDataPath = config.get("trainingDataDirectory", "training_examples/").asString();
 			string normalizedOutDir = addSlashIfNeeded(outputDirectory);
@@ -1056,7 +1063,8 @@ const string Processor::processViaJSON(const char* jsonString) {
 					normalizedOutDir + "output.json").asString();
 			string markedupFormOutputPath = config.get("markedupFormOutputPath",
 					normalizedOutDir + "markedup.jpg").asString();
-			if(!processorImpl->processForm(normalizedOutDir, jsonOutputPath, markedupFormOutputPath, false)){
+			if(!processorImpl->processForm(normalizedOutDir, jsonOutputPath, markedupFormOutputPath, false))
+			{
 				result["errorMessage"] = "Could not process form.";
 				return stringify(result);
 			}
