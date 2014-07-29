@@ -389,11 +389,46 @@ public class JSON2SurveyJSON extends Activity{
 						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getInt("value"));
 					// This will need to be addressed correctly	
 					} else if (field.getString("type").equals("select_many")) {
-						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("value"));
-						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
+						// Need to parse this to get multiple values if there are any
+						// and write them into the array as appropriate
+						String scanValue = field.getString("value");
+						if (scanValue.length() > 0) {
+							String space = " ";
+							String comma = ",";
+							String surveyValue = "[";
+							
+							int index = scanValue.indexOf(space);
+							int startInd = 0;
+							String interimSurveyValue;
+							while (index >= 0 && index < scanValue.length()) {
+								interimSurveyValue = scanValue.substring(startInd, index);
+								surveyValue = surveyValue + "\"" + interimSurveyValue + "\",";
+								startInd = index + 1;
+								index = scanValue.indexOf(space, startInd);
+							}
+							
+							if (startInd < scanValue.length()) {
+								interimSurveyValue = scanValue.substring(startInd);
+								surveyValue = surveyValue + "\"" + interimSurveyValue + "\"";
+							}
+							
+							// Strip off extra comma
+							int lastInd = surveyValue.length() - 1;
+							if (surveyValue.lastIndexOf(comma) == lastInd) {
+								surveyValue = surveyValue.substring(0, lastInd);
+							}
+							
+							surveyValue = surveyValue + "]";
+							addStringValueToTableContentValue(tablesValues, field.getString("name"), surveyValue);
+							dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
+						}
 					}else {
-						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("value"));
-						dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
+						// Check if the string is empty - if it is don't write anything out
+						String value = field.getString("value");
+						if (value.length() > 0) {
+	 						addStringValueToTableContentValue(tablesValues, field.getString("name"), field.getString("value"));
+							dbValuesToWrite.append(field.getString("name")).append("=").append(field.getString("value"));
+						}
 					}
 				} else if(field.has("default")){
 					if (field.getString("type").equals("int")) {
@@ -619,7 +654,14 @@ public class JSON2SurveyJSON extends Activity{
         			prompt.put("display.text", label);
         		} 
         		prompt.put("name", field.getString("name"));
-        		prompt.put("type", "select_one");
+        		
+        		// Set the correct type
+        		if (type.equals("select_many")) {
+        			prompt.put("type", "select_multiple");
+        		} else {
+        			prompt.put("type", "select_one");
+        		}
+        		
         		String param = field.optString("param");
         		if (!param.equals("")) {
         			prompt.put("values_list", param);

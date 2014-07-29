@@ -104,6 +104,23 @@ Json::Value computeFieldValue(const Json::Value& field){
 				cValue = classification;
 			}
 			Json::Value itemValue = items[j]["value"];
+
+			// New FormDesigner uses grid_values JSON array so we
+			// need to check if this form uses that
+			if (itemValue.isNull()) {
+				// check if there are grid_values in the field
+				Json::Value type = field["type"];
+				string typeStr = type.asString();
+				std::size_t found = typeStr.find("select");
+				if (found!=std::string::npos) {
+					Json::Value gridValues = field["grid_values"];
+					if (!gridValues.isNull() && j < gridValues.size()) {
+						itemValue = gridValues[j];
+						LOGI("Using grid values!!");
+					}
+				}
+			}
+
 			switch ( cValue.type() )
 			{
 				case Json::stringValue:
