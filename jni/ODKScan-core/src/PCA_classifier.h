@@ -7,6 +7,7 @@
 #include <opencv2/ml/ml.hpp>
 #include "Addons.h"
 #include <json/json.h>
+#include <dirent.h>
 
 /*
 This class does classification using OpenCV's support vector machine and PCA.
@@ -14,6 +15,9 @@ This class does classification using OpenCV's support vector machine and PCA.
 class PCA_classifier
 {
 	private:	
+	 	std::string c_dir;
+		std::string t_dir;
+
 		cv::Ptr<CvSVM> statClassifier;
 
 		std::vector<std::string> classifications;
@@ -51,9 +55,14 @@ class PCA_classifier
 		cv::Point align_item(const cv::Mat& det_img_gray, const cv::Point& seed_location, double alignment_radius) const;
 
 		Json::Value classify_item(const cv::Mat& det_img_gray, const cv::Point& item_location) const;
-		
+
 		void save(const std::string& outputPath) const throw(cv::Exception);
 		void load(const std::string& inputPath) throw(cv::Exception);
+
+		//Number classification stuff
+		bool train_number_classifier(const std::string& trainDir);
+		Json::Value classify_number(const cv::Mat& det_img_gray, const cv::Point& item_location) const;
+
 };
 
 #endif

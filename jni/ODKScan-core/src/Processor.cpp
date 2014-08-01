@@ -490,56 +490,68 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		Json::Value itemsJsonOut;
 		Json::Value classifierJson = extendedSegment["classifier"];
 		double alignment_radius = classifierJson.get("alignment_radius", 2.0).asDouble();
-		Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
-		vector<Point> locations;
-		vector<Point> deltas;
-		//Align items:
-		for (size_t i = 0; i < items.size(); i++) {
-			Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
-			Point itemLocation = initLocation;
-			if(alignment_radius > .1){
-				itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
+
+		//DO NUMBER CLASSIFICATION
+		if (classifierJson.get("training_data_uri", 0) == "numbers")
+		{
+			LOGI("Classifying numbers...");
+		}
+		else //DO BUBBLE AND CHECKBOX CLASSIFICATION
+		{
+			Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
+			vector<Point> locations;
+			vector<Point> deltas;
+			//Align items:
+			for (size_t i = 0; i < items.size(); i++) {
+				Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
+				Point itemLocation = initLocation;
+				if(alignment_radius > .1){
+					itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
+				}
+				locations.push_back(itemLocation);
+				deltas.push_back(itemLocation - initLocation);
+
 			}
-			locations.push_back(itemLocation);
-			deltas.push_back(itemLocation - initLocation);
 
-		}
-
-		//Catch runaway items:
-		Point avgDelta = Point(0,0);
-		for (size_t i = 0; i < deltas.size(); i++) {
-			avgDelta += deltas[i];
-		}
-		avgDelta *= 1.0 / items.size();
-
-		for (size_t i = 0; i < locations.size(); i++) {
-			//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
-			//If the bubble's delta does not fall within that circle it is a runaway.
-			if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
-				locations[i] = locations[i] - deltas[i] + avgDelta;
+			//Catch runaway items:
+			Point avgDelta = Point(0,0);
+			for (size_t i = 0; i < deltas.size(); i++) {
+				avgDelta += deltas[i];
 			}
-		}
+			avgDelta *= 1.0 / items.size();
 
-		//Classify items
-		for (size_t i = 0; i < items.size(); i++) {
-			Json::Value itemJsonOut = items[i];
-			itemJsonOut["classification"] = classifier->classify_item(segmentImg, locations[i]);
-			/*
-			Point rectOffset = segmentRect.tl() - expandedRect.tl();
-			Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x  + rectOffset.x,
-					locations[i].y  + rectOffset.y, 1.0)) + Mat(Point3d(-rectOffset.x, -rectOffset.y, 0));
-			*/
-			Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
-					locations[i].y, 1.0));
-			itemJsonOut["absolute_location"] = pointToJson(
-				Point( absoluteLocation.at<double>(0u,0u) / absoluteLocation.at<double>(2, 0u),
-				       absoluteLocation.at<double>(1,0u) / absoluteLocation.at<double>(2, 0u)) +
-				offset);
+			for (size_t i = 0; i < locations.size(); i++) {
+				//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
+				//If the bubble's delta does not fall within that circle it is a runaway.
+				if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
+					locations[i] = locations[i] - deltas[i] + avgDelta;
+				}
+			}
 
-			itemsJsonOut.append(itemJsonOut);
+			//Classify items
+			for (size_t i = 0; i < items.size(); i++) {
+				Json::Value itemJsonOut = items[i];
+				itemJsonOut["classification"] = classifier->classify_item(segmentImg, locations[i]);
+				/*
+				Point rectOffset = segmentRect.tl() - expandedRect.tl();
+				Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x  + rectOffset.x,
+						locations[i].y  + rectOffset.y, 1.0)) + Mat(Point3d(-rectOffset.x, -rectOffset.y, 0));
+				*/
+				Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
+						locations[i].y, 1.0));
+				itemJsonOut["absolute_location"] = pointToJson(
+					Point( absoluteLocation.at<double>(0u,0u) / absoluteLocation.at<double>(2, 0u),
+						   absoluteLocation.at<double>(1,0u) / absoluteLocation.at<double>(2, 0u)) +
+					offset);
+
+				itemsJsonOut.append(itemJsonOut);
+			}
 		}
 		segmentJsonOut["items"] = itemsJsonOut;
-	}  else if(extendedSegment.get("type", 0) == "qrcode"){
+	}
+
+	//Classification for QR codes
+	else if(extendedSegment.get("type", 0) == "qrcode"){
 		LOGI("scanning qr code...");
 		
 		//Blowing up the image can make decoding work sometimes,
@@ -554,7 +566,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		copyMakeBorder( segmentImg, tmp, borderSize, borderSize, borderSize, borderSize, BORDER_CONSTANT, 0 );
 		debugShow(tmp);
 		*/
-		//I modifieid this zxing class to take OpenCV mats
+		//I modified this zxing class to take OpenCV mats
 		Ref<LuminanceSource> source = ImageReaderSource::create(largeSegment);
 
 		string result;

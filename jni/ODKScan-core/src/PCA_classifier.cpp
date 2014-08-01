@@ -395,3 +395,138 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 	return output;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+//Going to edit this to train a Naive Bayes classifier for numbers
+bool PCA_classifier::train_number_classifier(const string& trainDir)
+{
+
+	//exampleSize = myExampleSize;
+
+	/*Mat PCA_set;
+	vector<int> trainingBubbleValues;
+	for(size_t i = 0; i < examplePaths.size(); i++) {
+		PCA_set_add(PCA_set, trainingBubbleValues, examplePaths[i], flipExamples);
+	}
+
+	//I think PCA breaks if there are too many eigenvalues.
+	if(PCA_set.rows < eigenvalues) return false;
+
+	my_PCA = PCA(PCA_set, Mat(), CV_PCA_DATA_AS_ROW, eigenvalues);
+	Mat comparisonVectors = my_PCA.project(PCA_set);
+
+	//If there is a negative_label do two class classification and report confidence.
+	if(classifier_params.isMember("negative_label")) {
+		int emptyClassIdx = vectorFind(classifications,
+		                               classifier_params.get("negative_label", "empty").asString());
+		Mat trainingBubbleValuesMat = Mat(1,1, CV_32SC1);
+		trainingBubbleValuesMat.at<int>(0) = int(trainingBubbleValues[0] == emptyClassIdx);
+		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
+			trainingBubbleValuesMat.push_back( int(trainingBubbleValues[i] == emptyClassIdx) );
+		}
+		statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(),
+		                           Mat(), CvSVMParams(), 20, CvSVM::get_default_grid(CvSVM::C),
+		                           CvSVM::get_default_grid(CvSVM::GAMMA), CvSVM::get_default_grid(CvSVM::P),
+		                           CvSVM::get_default_grid(CvSVM::NU), CvSVM::get_default_grid(CvSVM::COEF),
+		                           CvSVM::get_default_grid(CvSVM::DEGREE));
+
+	} else {
+		Mat trainingBubbleValuesMat(1,1,CV_32SC1);
+		trainingBubbleValuesMat.at<int>(0) = trainingBubbleValues[0];
+		for(size_t i = 1; i < trainingBubbleValues.size(); i++){
+			trainingBubbleValuesMat.push_back( trainingBubbleValues[i] );
+		}
+		#ifdef DISABLE_PCA
+			statClassifier->train_auto(PCA_set, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
+		#else
+			statClassifier->train_auto(comparisonVectors, trainingBubbleValuesMat, Mat(), Mat(), CvSVMParams());
+		#endif
+	}
+	*/
+	return true;
+}
+
+/* This filters out non-image files when recursing through a directory */
+int filterFiles(const struct dirent *ent) {
+    const char *file_name = ent->d_name;
+    const char *jpeg = ".jpg";
+    return !!strstr(file_name, jpeg);
+}
+
+/* Defines a rectangular mask */
+int rect_mask(int x, int y, int w, int h, int dir) {
+    return 1;
+}
+
+/* Function that receives the mean pixel value of an image and outputs
+ * the threshold value that we use to split the image into black/white.
+ * Simply returning the mean seems fine, but has not been tested
+ * rigorously */
+int thresh(int mean) {
+    return mean;
+}
+
+
+//Going to edit this to use Naive Bayes classification for numbers
+Json::Value PCA_classifier::classify_number(const Mat& det_img_gray, const Point& item_location) const {
+
+	Json::Value output;
+
+	/*Mat query_pixels;
+	#ifdef USE_GET_RECT_SUB_PIX
+		getRectSubPix(det_img_gray, Size(exampleSize.width, exampleSize.height),
+		              item_location, query_pixels);
+	#else
+		Rect window = Rect(item_location - Point(exampleSize.width/2,
+		                                           exampleSize.height/2), exampleSize);
+		//Constrain the window to the image size:
+		window = window & Rect(Point(0,0), det_img_gray.size());
+
+		query_pixels = Mat::zeros(exampleSize, det_img_gray.type());
+		query_pixels(Rect(Point(0,0), window.size())) += det_img_gray(window);
+	#endif
+
+	#ifdef OUTPUT_BUBBLE_IMAGES
+		Mat dbg_img = query_pixels.clone();
+	#endif
+
+	query_pixels.convertTo(query_pixels, CV_32F);
+	query_pixels = query_pixels.reshape(0,1);
+
+	#ifdef NORMALIZE
+		normalize(query_pixels, query_pixels);
+	#endif
+
+
+	if(classifier_params.isMember("negative_label")) {
+		double classifierRv;
+		#ifdef DISABLE_PCA
+			classifierRv = statClassifier->predict( query_pixels, true );
+		#else
+			classifierRv = statClassifier->predict( my_PCA.project(query_pixels), true );
+		#endif
+
+		string classification_label = classifications[int(classifierRv > 0)];
+		Json::Value default_classification = classifier_params.get("default_classification", 0);
+		output["confidence"] = classifierRv;
+		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
+	} else {
+		int classificationIndex;
+		#ifdef DISABLE_PCA
+			classificationIndex = statClassifier->predict( query_pixels );
+		#else
+			classificationIndex = statClassifier->predict( my_PCA.project(query_pixels) );
+		#endif
+		string classification_label = classifications[classificationIndex];
+		Json::Value default_classification = classifier_params.get("default_classification", 0);
+		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
+	}
+	#ifdef OUTPUT_BUBBLE_IMAGES
+		//string bubbleName = output["value"].asString() + "_" + namer.get_unique_name("");
+		string bubbleName = namer.get_unique_name("_");
+		imwrite("bubble_images/" + bubbleName + ".jpg", dbg_img);
+	#endif*/
+
+	return output;
+}
+
