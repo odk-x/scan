@@ -59,10 +59,6 @@ class PCA_classifier
 		void save(const std::string& outputPath) const throw(cv::Exception);
 		void load(const std::string& inputPath) throw(cv::Exception);
 
-		//Number classification stuff
-		bool train_number_classifier(const std::string& trainDir);
-		Json::Value classify_number(const cv::Mat& det_img_gray, const cv::Point& item_location) const;
-
 };
 
 #endif

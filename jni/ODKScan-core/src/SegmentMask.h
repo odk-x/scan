@@ -17,6 +17,7 @@ class SegmentMask {
     cv::Mat mask;
     int mask_area;
   public:
+    SegmentMask() {}
     SegmentMask(const mask_func mf, int w, int h, int dir) : func(mf), mask(h, w, CV_8U, cv::Scalar::all(0)) {
       int px;
       mask_area = 0;

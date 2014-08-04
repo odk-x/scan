@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+#include "configuration.h"
 #include "SegmentMask.h"
 #include "PixelStats.h"
 
@@ -58,8 +59,8 @@ protected:
     void t_process(const cv::Mat& img, int img_num);
     int c_process(const cv::Mat &img);
     
-    const std::string t_dir;
-    const std::string c_dir;    // name of classify directory
+    std::string t_dir;
+    std::string c_dir;    // name of classify directory
     
     int c_numbers;              // number of images to classify
     int t_numbers;
@@ -73,11 +74,11 @@ protected:
     std::vector<cv::Rect> rois; // rectangles for the segment locations
     std::vector<int> guesses;   // keeps track of guesses
     std::vector<int> correct;   // keeps track of correct guesses
-    const int total_pixels;     // total pixels in each segment
+    /*const*/ int total_pixels;     // total pixels in each segment
 
     void find_roi(int segment, int iw, int ih, int mw, int mh);
     int predict_number(const char guess);
-    void pre_process(cv::Mat& img, std::string img_name);
+    void pre_process(cv::Mat& img);
     int get_black_pixels(const cv::Mat& img, int segment); 
     void crop_img(cv::Mat& img, int target_w, int target_h);
     
@@ -86,7 +87,8 @@ protected:
     
     
 public:
-    NumberClassifier (const std::string classify_dir, const std::string train_dir, int iw, int ih, int mw, int mh):
+    NumberClassifier();
+    NumberClassifier ( std::string& classify_dir,  std::string& train_dir, int iw, int ih, int mw, int mh):
         c_dir(classify_dir), img_w(iw), img_h(ih),
         t_dir(train_dir),
         guesses(10, 0),
@@ -104,6 +106,7 @@ public:
             }
         };
     
+    int classify_segment(const cv::Mat& img, const cv::Point& item_location);
     void classify(void);
     void print_results(void);
     void print_rois(void);

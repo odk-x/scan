@@ -16,6 +16,8 @@ int NumberClassifier::rect_mask(int x, int y, int w, int h, int dir) {
     return 1;
 }
 
+NumberClassifier::NumberClassifier() {}
+
 /* Calculates the location and dimensions of each segment's rectangular
  * boundary based on the size of the image and the size of the segments.
  * Assumes that the image is aligned, and centers each segment on the midpoint
@@ -195,25 +197,23 @@ void NumberClassifier::crop_img(cv::Mat& img, int target_w, int target_h) {
 }
 
 /* Converts the image to black/white, crops it, resizes it */
-void NumberClassifier::pre_process(cv::Mat& img, std::string img_name)
+void NumberClassifier::pre_process(cv::Mat& img)
 {
-    //cv::imwrite("sandbox/" + img_name + "_a", img);
     cv::Mat img_gray = img;
     if (img.channels() > 1)
         cv::cvtColor(img, img_gray, CV_BGR2GRAY);
     std::vector<cv::Mat> channels;
     split(img, channels);
-    int mean = (int)cv::mean(channels[0])[0];
-    //int thresh = (*t_func)(mean);
+    int threshold = (int)cv::mean(channels[0])[0];
+    threshold = threshold-20;
     cv::Mat img_bin;
-    cv::threshold(img_gray, img_bin, mean, 255, cv::THRESH_BINARY);
+    cv::threshold(img_gray, img_bin, threshold, 255, cv::THRESH_BINARY);
     img = img_bin;
-    //cv::imwrite("sandbox/" + img_name + "_bin", img);
-    
+    //cv::imwrite(c_dir + "W_PROCESSED.jpg", img);
     crop_img(img, img_w, img_h);
-    cv::imwrite("sandbox/" + img_name + "_crop", img);
+    //cv::imwrite(c_dir + "X_PROCESSED.jpg", img);
     cv::resize(img, img, cv::Size(img_w,img_h), 0, 0, cv::INTER_AREA);
-    //cv::imwrite("sandbox/" + img_name + "_final", img);
+    //cv::imwrite(c_dir + "Y_PROCESSED.jpg", img);
 }
 
 /* Prints the results of the classification */
@@ -229,19 +229,20 @@ void NumberClassifier::print_results(void) {
 
 /* Iterates through the classification directory, passing each image to the
  * c_process() function which performs the actual classification */
+//Currently not used in ODK Scan
 void NumberClassifier::classify(void) {
     int n = c_numbers;
     if (n < 0) {
-        std::cerr << "Error opening directory" << std::endl;
+        LOGI("Error opening directory");
     }
     while (n--) {
         std::string img_name = std::string(c_list[n]->d_name);
         int img_num = img_name.at(0) - 0x30;
         cv::Mat img = cv::imread(c_dir + img_name, CV_LOAD_IMAGE_COLOR);
         if (img.empty())
-            std::cerr << "Image not loaded" << std::endl;
+        	LOGI("Image not loaded");
         else {
-            pre_process(img, img_name);
+            pre_process(img);
             int guess = c_process(img);
             if (img_num == guess)
                 correct.at(img_num)++;
@@ -254,33 +255,69 @@ void NumberClassifier::classify(void) {
     delete c_list;
 }
 
+int NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location) {
+	cv::Mat query_pixels;
+	getRectSubPix(img, cv::Size(img_w, img_h), item_location, query_pixels);
+	pre_process(query_pixels);
+	int guess = c_process(query_pixels);
+	return guess;
+}
+
 /* Counts the number of black pixels in the given segment of the image */
-int NumberClassifier::get_black_pixels(const cv::Mat& img, int segment) {
-    cv::Mat img_segment = img(rois.at(segment));
-    if ((1 << segment) & (TOP_BIT | MIDDLE_BIT | BOTTOM_BIT)) {
-        bitwise_and(img_segment, h_mask.get_mask(segment), img_segment);
-    } else if ((1 << segment) & (TOP_LEFT_BIT | TOP_RIGHT_BIT | BOTTOM_LEFT_BIT | BOTTOM_RIGHT_BIT)) {
-        bitwise_and(img_segment, v_mask.get_mask(segment), img_segment);
+int NumberClassifier::get_black_pixels(const cv::Mat& img, int segment)
+{
+    cv::Mat i_segment = img(rois.at(segment));
+    if ((1 << segment) & (TOP_BIT | MIDDLE_BIT | BOTTOM_BIT))
+    {
+        bitwise_and(i_segment, h_mask.get_mask(segment), i_segment);
     }
-    return total_pixels - cv::countNonZero(img_segment);
+    else if ((1 << segment) & (TOP_LEFT_BIT | TOP_RIGHT_BIT | BOTTOM_LEFT_BIT | BOTTOM_RIGHT_BIT))
+    {
+        bitwise_and(i_segment, v_mask.get_mask(segment), i_segment);
+    }
+
+    //temporarily hardcoding these values. Need to change them later.
+    total_pixels = 15*15;
+
+    int returnNumber = total_pixels - cv::countNonZero(i_segment);
+
+    //debugging
+    //std::stringstream ss;
+    //ss << "segment " << segment << " total_pixels " << total_pixels << " number black pixels " << returnNumber;
+    //std::string str = ss.str();
+    //const char * c = str.c_str();
+    //LOGI(c);
+    //end debugging
+
+    return returnNumber;
 }
 
 /* This function iterates through a training directory and calls
  * t_process() on each image in the directory. Can be used by any
  * ML classifier as a generic train function */
 void NumberClassifier::train(void) {
-    int n = t_numbers;
+	int n = t_numbers;
     if (n < 0) {
-        std::cerr << "Error opening directory" << std::endl;
+    	LOGI("Error opening number training directory");
     }
     while (n--) {
         std::string img_name = std::string(t_list[n]->d_name);
         int img_num = img_name.at(0) - 0x30;
+
+        //debugging
+        //std::stringstream ss;
+        //ss << t_dir << img_name;
+        //std::string str = ss.str();
+        //const char * c = str.c_str();
+        //LOGI(c);
+        //end debugging
+
         cv::Mat img = cv::imread(t_dir + img_name, CV_LOAD_IMAGE_COLOR);
         if (img.empty())
-            std::cerr << "Image not loaded " << t_dir + img_name << std::endl;
+            LOGI("Number training image not loaded");
+
         else {
-            pre_process(img, img_name);
+            pre_process(img);
             t_process(img, img_num);
         }
         delete t_list[n];
@@ -291,10 +328,19 @@ void NumberClassifier::train(void) {
 /* This adds the number of pixels in each segment to the stats
  * object which keeps track of the mean and variance of each
  * segment for each number during training */
-void NumberClassifier::t_process(const cv::Mat& img, int img_num) {
+void NumberClassifier::t_process(const cv::Mat& img, int img_num)
+{
     for (int i = 0; i < NUM_SEGMENTS; i++) {
         int black_pixels = get_black_pixels(img, i);
         stats.add_seg(img_num, i, black_pixels);
+
+        //debugging
+        //std::stringstream ss;
+        //ss << "img num " << img_num << " i " << i << " black pixels " << black_pixels;
+        //std::string str = ss.str();
+        //const char * c = str.c_str();
+        //LOGI(c);
+        //end debugging
     }
 }
 
@@ -302,18 +348,31 @@ void NumberClassifier::t_process(const cv::Mat& img, int img_num) {
  * (thus it calculates 10 different probabilities). Assumes that the
  * pixel counts form a normal distribution */
 int NumberClassifier::c_process(const cv::Mat& img) {
-    float max_prod = -1.0;
-    int max_num;
-    float prod;
+
+	//stats.print_stats();
+
+	float max_prod = 0;
+    int max_num = -1;
+    float prod = 0;
     for (int num = 0; num < 10; num++) {
         prod = 1.0;
         for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
             int black_pixels = get_black_pixels(img, seg);
-            prod *= stats.get_prob(num, seg, black_pixels);
+            float newProd = stats.get_prob(num, seg, black_pixels);
+            prod *= newProd;
+
+            //debugging
+            //std::stringstream ss;
+            //ss << "seg " << seg << " get_prob " << newProd << " black pixels " << black_pixels;
+            //std::string str = ss.str();
+            //const char * c = str.c_str();
+            //LOGI(c);
+            //end debugging
+
         }
         if (prod > max_prod) {
             max_prod = prod;
-            max_num = num;
+			max_num = num;
         }
     }
     return max_num;

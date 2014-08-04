@@ -21,6 +21,7 @@
 #include "SegmentAligner.h"
 #include "AlignmentUtils.h"
 #include "Addons.h"
+#include "NumberClassifier.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -174,13 +175,16 @@ Json::Value computeFieldValue(const Json::Value& field){
 	return output;
 }
 //Generate a marked up version of the form image that shows classifications and values.
-Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts) {
+Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts)
+{
+	LOGI("Mark up form");
+
 	Mat markupImage;
 	cvtColor(inputImage, markupImage, CV_GRAY2RGB);
 	const Json::Value fields = bvRoot["fields"];
-	for ( size_t i = 0; i < fields.size(); i++ ) {
+	for ( size_t i = 0; i < fields.size(); i++ )
+	{
 		const Json::Value field = fields[i];
-		
 		float avgWidth = 0;
 		float avgY = 0;
 		int endOfField = 0;
@@ -188,7 +192,7 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 		Scalar boxColor = getColor(int(i));
 	
 		const Json::Value segments = field["segments"];
-		
+
 		for ( size_t j = 0; j < segments.size(); j++ ) {
 			const Json::Value segment = segments[j];
 
@@ -204,41 +208,49 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 			else{
 				polylines(markupImage, &p, &n, 1, true, boxColor, 1, CV_AA);
 			}
-			
+
 			//Compute some stuff to figure out where to draw output on the form
 			avgWidth += norm(quad[0] - quad[1]);
 			if(endOfField < quad[1].x){
 				endOfField = quad[1].x;
 			}
 			avgY += quad[3].y;// + quad[1].y + quad[2].y + quad[3].y) / 4;
-			
 
 			const Json::Value items = segment["items"];
+			LOGI("1");
 			for ( size_t k = 0; k < items.size(); k++ ) {
 				const Json::Value Item = items[k];
+				LOGI("2");
 				Point ItemLocation(jsonToPoint(Item["absolute_location"]));
 				Json::Value classification = Item["classification"];
 				Json::Value cValue = classification["value"];
+				LOGI("3");
 				double confidence = abs(classification.get("confidence", 1.0).asDouble()) / 2.0;
 				
 				if(cValue.isBool()){
+					LOGI("isBool");
 					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asBool()) * confidence, 1, CV_AA);
 				}
 				else if(cValue.isInt()){
+					LOGI("isInt");
 					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asInt()) * confidence, 1, CV_AA);
 				}
 				else if(cValue.isString()){
-
+					LOGI("isString");
 					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
 						FONT_HERSHEY_SIMPLEX, 0.8, Scalar::all(0), 3, CV_AA);
 					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
 						FONT_HERSHEY_SIMPLEX, 0.8, boxColor, 2, CV_AA);
+					LOGI("4");
 				}
 				else{
-					cout << "Don't know what this is: " << cValue << endl;
+					LOGI("Don't know what this is.");
 				}
 			}
 		}
+
+		LOGI("5");
+
 		if(field.isMember("value")){
 			Point textBoxTL;
 			if(drawCounts && avgWidth > 0){
@@ -259,6 +271,7 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 			        FONT_HERSHEY_SIMPLEX, 0.8, boxColor, 2, CV_AA);
 		}
 	}
+	LOGI("Done with markup");
 	return markupImage;
 }
 //deprecated
@@ -308,21 +321,41 @@ class Processor::ProcessorImpl
 {
 public:
 	string trainingDataPath;
+	bool trainedNumberClassifier;
 	Mat formImage;
 	Aligner aligner;
 private:
 	
 	Json::Value root;
-	//Json::Value JsonOutput;
+
+	//this was commented out
+	Json::Value JsonOutput;
 
 	typedef std::map<const std::string, cv::Ptr< PCA_classifier> > ClassiferMap;
 	ClassiferMap classifiers;
+	NumberClassifier numberClassifier;
 
 	string templPath;
 
 	#ifdef TIME_IT
 		clock_t init;
 	#endif
+
+
+//Creates a number classifier
+void trainNumberClassifier(const Json::Value& classifier)
+{
+	//Currently classifier directory does nothing. Need to remove it.
+	std::string classifyDirectory("/storage/emulated/0/ODKScan/output/test/");
+
+	std::string trainingPath = trainingDataPath + "numbers/";
+	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
+	numberClassifier.train();
+	trainedNumberClassifier = true;
+
+	LOGI("Trained number classifier...");
+
+}
 
 //Creates a classifier based on the given JSON classifier specification.
 //Classifiers are cached in memory via the "classifiers" map. 
@@ -486,7 +519,8 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 
 	//Do classification stuff:
 	Json::Value items = extendedSegment["items"];
-	if(!items.isNull()){
+	if(!items.isNull())
+	{
 		Json::Value itemsJsonOut;
 		Json::Value classifierJson = extendedSegment["classifier"];
 		double alignment_radius = classifierJson.get("alignment_radius", 2.0).asDouble();
@@ -494,10 +528,73 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		//DO NUMBER CLASSIFICATION
 		if (classifierJson.get("training_data_uri", 0) == "numbers")
 		{
-			LOGI("Classifying numbers...");
+			if (!trainedNumberClassifier) {
+				trainNumberClassifier (classifierJson);
+			}
+
+			//OLD CODE
+			//Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
+			vector<Point> locations;
+			vector<Point> deltas;
+			//Align items:
+			for (size_t i = 0; i < items.size(); i++) {
+				Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
+				Point itemLocation = initLocation;
+				//if(alignment_radius > .1){
+				//	itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
+				//}
+				locations.push_back(itemLocation);
+				deltas.push_back(itemLocation - initLocation);
+
+			}
+
+			//Catch runaway items:
+			Point avgDelta = Point(0,0);
+			for (size_t i = 0; i < deltas.size(); i++) {
+				avgDelta += deltas[i];
+			}
+			avgDelta *= 1.0 / items.size();
+
+			for (size_t i = 0; i < locations.size(); i++) {
+				//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
+				//If the bubble's delta does not fall within that circle it is a runaway.
+				if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
+					locations[i] = locations[i] - deltas[i] + avgDelta;
+				}
+			}
+
+			//Classify items
+			for (size_t i = 0; i < items.size(); i++) {
+				Json::Value itemJsonOut = items[i];
+
+				int classifiedNumber = numberClassifier.classify_segment(segmentImg, locations[i]);
+
+				std::stringstream ss;
+				ss << classifiedNumber;
+				std::string str = ss.str();
+
+				itemJsonOut["classification"] = str;
+
+		        //debugging
+		        const char * c = str.c_str();
+		        LOGI(c);
+		        //end debugging
+
+				Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
+						locations[i].y, 1.0));
+				itemJsonOut["absolute_location"] = pointToJson(
+					Point( absoluteLocation.at<double>(0u,0u) / absoluteLocation.at<double>(2, 0u),
+						   absoluteLocation.at<double>(1,0u) / absoluteLocation.at<double>(2, 0u)) +
+					offset);
+
+				itemsJsonOut.append(itemJsonOut);
+			}
+
 		}
 		else //DO BUBBLE AND CHECKBOX CLASSIFICATION
 		{
+			LOGI("Classifying bubbles and checkboxes");
+
 			Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
 			vector<Point> locations;
 			vector<Point> deltas;
@@ -690,7 +787,7 @@ Json::Value formFunction(const Json::Value& templateRoot){
 
 public:
 
-ProcessorImpl()  {}
+ProcessorImpl() {}
 
 bool setTemplate(const char* templatePathArg) {
 	#ifdef DEBUG_PROCESSOR
@@ -893,6 +990,7 @@ int detectForm(){
 /* This stuff hooks the Processor class up to the implementation class: */
 Processor::Processor() : processorImpl(new ProcessorImpl()){
 	processorImpl->trainingDataPath = "training_examples/";
+	processorImpl->trainedNumberClassifier = false;
 	LOGI("Processor successfully constructed.");
 }
 

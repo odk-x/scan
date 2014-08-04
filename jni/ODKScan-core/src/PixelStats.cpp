@@ -4,7 +4,7 @@
 #include <iostream>
 
 /* Inserts a new data point into the stored state. It has to recalculate
- * the mean and variance wheneve this happens */
+ * the mean and variance whenever this happens */
 void PixelStats::add_seg(int num, int seg, int px_count) {
     seg_stats seg_st = stats[num][seg];
     float new_m = seg_st.m + (px_count - seg_st.m) / (seg_st.n + 1);
@@ -31,3 +31,5 @@ float PixelStats::normal_pdf(int x, float mu, float s) {
     float z = (x - mu) / s;
     return (inv_sqrt_2pi / s) * std::exp(-0.5f * z * z);
 }
+
+
