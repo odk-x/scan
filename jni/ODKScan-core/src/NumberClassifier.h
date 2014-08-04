@@ -8,6 +8,7 @@
 #include "configuration.h"
 #include "SegmentMask.h"
 #include "PixelStats.h"
+#include <json/json.h>
 
 // Number of segments per image
 #define NUM_SEGMENTS 7
@@ -106,7 +107,7 @@ public:
             }
         };
     
-    int classify_segment(const cv::Mat& img, const cv::Point& item_location);
+    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location);
     void classify(void);
     void print_results(void);
     void print_rois(void);

@@ -217,39 +217,33 @@ Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts
 			avgY += quad[3].y;// + quad[1].y + quad[2].y + quad[3].y) / 4;
 
 			const Json::Value items = segment["items"];
-			LOGI("1");
+
 			for ( size_t k = 0; k < items.size(); k++ ) {
 				const Json::Value Item = items[k];
-				LOGI("2");
+
 				Point ItemLocation(jsonToPoint(Item["absolute_location"]));
 				Json::Value classification = Item["classification"];
-				Json::Value cValue = classification["value"];
-				LOGI("3");
+		        Json::Value cValue = classification.get("value", false);
+
 				double confidence = abs(classification.get("confidence", 1.0).asDouble()) / 2.0;
 				
 				if(cValue.isBool()){
-					LOGI("isBool");
 					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asBool()) * confidence, 1, CV_AA);
 				}
 				else if(cValue.isInt()){
-					LOGI("isInt");
 					circle(markupImage, ItemLocation, 2, 	getColor(cValue.asInt()) * confidence, 1, CV_AA);
 				}
 				else if(cValue.isString()){
-					LOGI("isString");
 					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
 						FONT_HERSHEY_SIMPLEX, 0.8, Scalar::all(0), 3, CV_AA);
 					putText(markupImage, cValue.asString(), ItemLocation + Point(0, -10),
 						FONT_HERSHEY_SIMPLEX, 0.8, boxColor, 2, CV_AA);
-					LOGI("4");
 				}
 				else{
 					LOGI("Don't know what this is.");
 				}
 			}
 		}
-
-		LOGI("5");
 
 		if(field.isMember("value")){
 			Point textBoxTL;
@@ -329,7 +323,7 @@ private:
 	Json::Value root;
 
 	//this was commented out
-	Json::Value JsonOutput;
+	//Json::Value JsonOutput;
 
 	typedef std::map<const std::string, cv::Ptr< PCA_classifier> > ClassiferMap;
 	ClassiferMap classifiers;
@@ -567,17 +561,18 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			for (size_t i = 0; i < items.size(); i++) {
 				Json::Value itemJsonOut = items[i];
 
-				int classifiedNumber = numberClassifier.classify_segment(segmentImg, locations[i]);
+				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i]);
 
-				std::stringstream ss;
-				ss << classifiedNumber;
-				std::string str = ss.str();
+				//int classifiedNumber = numberClassifier.classify_segment(segmentImg, locations[i]);
 
-				itemJsonOut["classification"] = str;
+				//std::stringstream ss;
+				//ss << classifiedNumber;
+				//std::string str = ss.str();
+				//itemJsonOut["classification"] = str;
 
 		        //debugging
-		        const char * c = str.c_str();
-		        LOGI(c);
+		        //const char * c = str.c_str();
+		        //LOGI(c);
 		        //end debugging
 
 				Mat absoluteLocation = transformation.inv() * Mat(Point3d( locations[i].x,
@@ -721,6 +716,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	catch(...){
 		LOGI(("Could not output segment to: " + segmentOutPath + segmentName).c_str());
 	}
+
 	return segmentJsonOut;
 }
 
@@ -757,6 +753,10 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	if(!value.isNull()){
 		outField["value"] = value;
 	}
+	else
+	{
+		LOGI("Value is null!");
+	}
 	outField.removeMember("fields");
 	outField.removeMember("items");
 	outField.removeMember("classifier");
@@ -781,7 +781,7 @@ Json::Value formFunction(const Json::Value& templateRoot){
 	outForm["templatePath"] = templPath;
 	outForm.removeMember("items");
 	outForm.removeMember("classifier");
-	LOGI("DONE");
+	LOGI("Done with classification");
 	return outForm;
 }
 

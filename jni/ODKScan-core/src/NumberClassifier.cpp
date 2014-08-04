@@ -255,12 +255,20 @@ void NumberClassifier::classify(void) {
     delete c_list;
 }
 
-int NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location) {
+Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location) {
+
+	Json::Value output;
+
 	cv::Mat query_pixels;
 	getRectSubPix(img, cv::Size(img_w, img_h), item_location, query_pixels);
 	pre_process(query_pixels);
 	int guess = c_process(query_pixels);
-	return guess;
+
+	output["classification"] = guess;
+	output["value"] = guess;
+	output["confidence"] = 1;
+
+	return output;
 }
 
 /* Counts the number of black pixels in the given segment of the image */
