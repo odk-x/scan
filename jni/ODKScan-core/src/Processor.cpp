@@ -162,7 +162,20 @@ Json::Value computeFieldValue(const Json::Value& field){
 					//for a tally.
 				case Json::intValue:
 				case Json::uintValue:
-					output = Json::Value(output.asInt() + cValue.asInt());
+					//Need to take care of number classification
+					//so that it concatenates multi-digit numbers
+					if (classification.get("type", 0) == "number")
+					{
+						stringstream ss;
+						ss << cValue.asInt();
+						string addingNumber(ss.str());
+						output = Json::Value(output.asString() + addingNumber);
+					}
+					//Just add everything together
+					else
+					{
+						output = Json::Value(output.asInt() + cValue.asInt());
+					}
 				break;
 				case Json::realValue:
 					output = Json::Value(output.asDouble() + cValue.asDouble());
@@ -174,6 +187,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 	}
 	return output;
 }
+
 //Generate a marked up version of the form image that shows classifications and values.
 Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts)
 {
@@ -343,8 +357,10 @@ void trainNumberClassifier(const Json::Value& classifier)
 	std::string classifyDirectory("/storage/emulated/0/ODKScan/output/test/");
 
 	std::string trainingPath = trainingDataPath + "numbers/";
+	//Hardcoding some values for now based on the size of the box in the training set
+	//Want to change this later.
 	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
-	numberClassifier.train();
+	numberClassifier.train(40, 53);
 	trainedNumberClassifier = true;
 
 	LOGI("Trained number classifier...");
@@ -526,51 +542,24 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 				trainNumberClassifier (classifierJson);
 			}
 
-			//OLD CODE
-			//Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
+			int classifier_height = classifierJson.get("classifier_height", 28).asInt();
+			int classifier_width = classifierJson.get("classifier_width", 20).asInt();
+
 			vector<Point> locations;
-			vector<Point> deltas;
-			//Align items:
 			for (size_t i = 0; i < items.size(); i++) {
 				Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
 				Point itemLocation = initLocation;
-				//if(alignment_radius > .1){
-				//	itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
-				//}
 				locations.push_back(itemLocation);
-				deltas.push_back(itemLocation - initLocation);
-
-			}
-
-			//Catch runaway items:
-			Point avgDelta = Point(0,0);
-			for (size_t i = 0; i < deltas.size(); i++) {
-				avgDelta += deltas[i];
-			}
-			avgDelta *= 1.0 / items.size();
-
-			for (size_t i = 0; i < locations.size(); i++) {
-				//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
-				//If the bubble's delta does not fall within that circle it is a runaway.
-				if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
-					locations[i] = locations[i] - deltas[i] + avgDelta;
-				}
 			}
 
 			//Classify items
 			for (size_t i = 0; i < items.size(); i++) {
 				Json::Value itemJsonOut = items[i];
-
-				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i]);
-
-				//int classifiedNumber = numberClassifier.classify_segment(segmentImg, locations[i]);
+				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i], classifier_height, classifier_width);
 
 				//std::stringstream ss;
 				//ss << classifiedNumber;
 				//std::string str = ss.str();
-				//itemJsonOut["classification"] = str;
-
-		        //debugging
 		        //const char * c = str.c_str();
 		        //LOGI(c);
 		        //end debugging

@@ -5,6 +5,12 @@
 
 #include "NumberClassifier.h"
 
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+using namespace cv;
+
 /* This filters out non-image files when recursing through a directory */
 int NumberClassifier::filter(const struct dirent *ent) {
     const char *file_name = ent->d_name;
@@ -109,111 +115,294 @@ void NumberClassifier::print_rois(void) {
 }
 
 /* Searches for the outline of the box and uses it's location to crop and align the image */
-void NumberClassifier::crop_img(cv::Mat& img, int target_w, int target_h) {
+void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
     
-    cv::Mat inverted;
+	imageNumber++;
+
+	cv::Mat inverted;
     cv::bitwise_not ( img, inverted );
-    
+
+    int widthThreshold = box_width;
+    int heightThreshold = box_height;
+
+    std::vector<int> top_lines;
+    std::vector<int> bottom_lines;
+    std::vector<int> left_lines;
+    std::vector<int> right_lines;
+
     //Find the top horizontal line of the box outline
     int total_black = 0;
-    int currentMax = 0;
-    int black_line = 0;
+    int currentMin = 100;
     for (int i=0; i<img.rows/2; i++)
     {
         cv::Rect r = cv::Rect(0, i, img.cols, 1);
         total_black = cv::countNonZero(inverted(r));
-        
-        if (total_black > currentMax)
+        int difference = abs (total_black - box_width);
+        if ((difference <= currentMin) && (difference < widthThreshold))
         {
-            currentMax = total_black;
-            black_line = i;
+        	currentMin = difference;
+            top_lines.push_back(i);
         }
     }
-    int horizontal_top = black_line;
-    //cv::line(img, cv::Point(0, black_line), cv::Point(img.cols, black_line), cv::Scalar(0,0,125), 1, 1);
 
     //Find the bottom horizontal line of the box outline
     total_black = 0;
-    currentMax = 0;
-    black_line = 0;
-    for (int i=img.rows/2; i<img.rows-1; i++)
+    currentMin = 100;
+    for (int i=img.rows/2; i<img.rows; i++)
     {
         cv::Rect r = cv::Rect(0, i, img.cols, 1);
         total_black = cv::countNonZero(inverted(r));
-        
-        if (total_black > currentMax)
+        int difference = abs (total_black - box_width);
+
+        if ((difference <= currentMin) && (difference < widthThreshold))
         {
-            currentMax = total_black;
-            black_line = i;
+        	currentMin = difference;
+            bottom_lines.push_back(i);
         }
     }
-    int horizontal_bottom = black_line;
-    //cv::line(img, cv::Point(0, black_line), cv::Point(img.cols, black_line), cv::Scalar(0,0,125), 1, 1);
+
+
     
-    //Find the top vertical line of the box outline
+    //Find the left vertical line of the box outline
     total_black = 0;
-    currentMax = 0;
-    black_line = 0;
+    currentMin = 100;
     for (int i=0; i<img.cols/2; i++)
     {
         cv::Rect r = cv::Rect(i, 0, 1, img.rows);
         total_black = cv::countNonZero(inverted(r));
-        
-        if (total_black > currentMax)
+        int difference = abs (total_black - box_height);
+        if ((difference <= currentMin) && (difference < heightThreshold))
         {
-            currentMax = total_black;
-            black_line = i;
+        	currentMin = difference;
+            left_lines.push_back(i);
         }
     }
-    int vertical_top = black_line;
-    //cv::line(img, cv::Point(black_line, 0), cv::Point(black_line, img.rows), cv::Scalar(0,0,125), 1, 1);
+
     
     //Find the bottom vertical line of the box outline
     total_black = 0;
-    currentMax = 0;
-    black_line = 0;
-    for (int i=img.cols/2; i<img.cols-1; i++)
+    currentMin = 100;
+    for (int i=img.cols/2; i<img.cols; i++)
     {
         cv::Rect r = cv::Rect(i, 0, 1, img.rows);
         total_black = cv::countNonZero(inverted(r));
         
-        if (total_black > currentMax)
+        int difference = abs (total_black - box_height);
+
+        if ((difference <= currentMin) && (difference < heightThreshold))
         {
-            currentMax = total_black;
-            black_line = i;
+        	currentMin = difference;
+        	right_lines.push_back(i);
         }
     }
-    int vertical_bottom = black_line;
-    //cv::line(img, cv::Point(black_line, 0), cv::Point(black_line, img.rows), cv::Scalar(0,0,125), 1, 1);
-    
-    horizontal_top += 2;
-    horizontal_bottom -= 2;
-    vertical_top += 2;
-    vertical_bottom -= 2;
+
+    int top_line = 0;
+    int bottom_line = img.rows;
+    int left_line = 0;
+    int right_line = img.cols;
+
+    //Finding TOP LINE
+    //if we didn't find any candidate top lines then use the top of the image
+    if (top_lines.size() == 0)
+    {
+    	top_line = 0;
+    }
+	//if we only found one candidate top line then use that
+    else if (top_lines.size() == 1)
+	{
+		top_line = top_lines[0];
+	}
+	//if there is more than one candidate line, use the bottom lines to choose the best
+	else
+	{
+		int minDifference = 100;
+
+		//Start with just the bottom of the image
+		for (size_t i = 0; i < top_lines.size(); i++)
+		{
+			int candidateHeight = bottom_line - top_lines[i];
+
+			int difference = abs (candidateHeight - box_height);
+			if (difference < minDifference)
+			{
+				minDifference = difference;
+				top_line = top_lines[i];
+			}
+		}
+
+		if (bottom_lines.size() != 0)
+		{
+			for (size_t i = 0; i < top_lines.size(); i++)
+			{
+				for (size_t j = 0; j < bottom_lines.size(); j++)
+				{
+					int candidateHeight = bottom_lines[j] - top_lines[i];
+					int difference = abs (candidateHeight - box_height);
+					if (difference < minDifference)
+					{
+						minDifference = difference;
+						top_line = top_lines[i];
+					}
+				}
+			}
+		}
+	}
+
+    //Finding BOTTOM LINE
+    if (bottom_lines.size() == 0)
+	{
+		bottom_line = img.rows;
+	}
+	//if we only found one candidate bottom line then use that
+	else if (bottom_lines.size() == 1)
+	{
+		bottom_line = bottom_lines[0];
+	}
+	//if there is more than one candidate line, use the top lines to choose the best
+	else
+	{
+		int minDifference = 100;
+
+		//Start with just the bottom of the image
+		for (size_t i = 0; i < bottom_lines.size(); i++)
+		{
+			int candidateHeight = bottom_lines[i] - top_line;
+
+			int difference = abs (candidateHeight - box_height);
+			if (difference < minDifference)
+			{
+				minDifference = difference;
+				bottom_line = bottom_lines[i];
+			}
+		}
+	}
+
+    //Finding LEFT LINE
+    //if we didn't find any candidate left lines then use the edge of the image
+    if (left_lines.size() == 0)
+    {
+    	left_line = 0;
+    }
+	//if we only found one candidate top line then use that
+    else if (left_lines.size() == 1)
+	{
+    	left_line = left_lines[0];
+	}
+	//if there is more than one candidate line, use the right lines to choose the best
+	else
+	{
+		int minDifference = 100;
+
+		//Start with just the bottom of the image
+		for (size_t i = 0; i < left_lines.size(); i++)
+		{
+			int candidateHeight = right_line - left_lines[i];
+
+			int difference = abs (candidateHeight - box_width);
+			if (difference < minDifference)
+			{
+				minDifference = difference;
+				left_line = left_lines[i];
+			}
+		}
+
+		if (right_lines.size() != 0)
+		{
+			for (size_t i = 0; i < left_lines.size(); i++)
+			{
+				for (size_t j = 0; j < right_lines.size(); j++)
+				{
+					int candidateHeight = right_lines[j] - left_lines[i];
+					int difference = abs (candidateHeight - box_width);
+					if (difference < minDifference)
+					{
+						minDifference = difference;
+						left_line = left_lines[i];
+					}
+				}
+			}
+		}
+	}
+
+    //Finding RIGHT LINE
+    //if we didn't find any candidate right lines then use the edge of the image
+    if (right_lines.size() == 0)
+    {
+    	right_line = img.cols;
+    }
+	//if we only found one candidate top line then use that
+    else if (right_lines.size() == 1)
+	{
+    	right_line = right_lines[0];
+	}
+	//if there is more than one candidate line, use the right lines to choose the best
+    else
+	{
+		int minDifference = 100;
+
+		//Start with just the bottom of the image
+		for (size_t i = 0; i < right_lines.size(); i++)
+		{
+			int candidateHeight = right_lines[i] - left_line;
+
+			int difference = abs (candidateHeight - box_width);
+			if (difference < minDifference)
+			{
+				minDifference = difference;
+				right_line = right_lines[i];
+			}
+		}
+	}
+
+    //debugging
+    cv::line(img, cv::Point(0, top_line), cv::Point(img.cols, top_line), cv::Scalar(125), 1, 1);
+    cv::line(img, cv::Point(0, bottom_line), cv::Point(img.cols, bottom_line), cv::Scalar(125), 1, 1);
+    cv::line(img, cv::Point(left_line, 0), cv::Point(left_line, img.rows), cv::Scalar(125), 1, 1);
+    cv::line(img, cv::Point(right_line, 0), cv::Point(right_line, img.rows), cv::Scalar(125), 1, 1);
+
+	stringstream ss;
+	ss << c_dir << imageNumber << "_binary.jpg";
+	std::string imgName = ss.str();
+	stringstream ss2;
+	ss2 << c_dir << imageNumber << "_cropped.jpg";
+	std::string queryPixelsName = ss2.str();
+
+	//stringstream msgsss;
+    //msgsss << imageNumber << " ch " << candidateHeight << " diff " << difference << " minDiff " << minDifference << " top_line " << top_line;
+    //std::string msgs = msgsss.str();
+    //const char * c = msgs.c_str();
+    //LOGI(c);
+
+	cv::imwrite(imgName, img);
+
+    int horizontal_top = top_line + 3;
+    int horizontal_bottom = bottom_line - 1;
+    int vertical_top = left_line + 3;
+    int vertical_bottom = right_line - 1;
     
     int new_width = vertical_bottom - vertical_top;
     int new_height = horizontal_bottom - horizontal_top;
     img = img(cv::Rect(vertical_top, horizontal_top, new_width, new_height));
+
+    cv::imwrite(queryPixelsName, img);
 }
 
 /* Converts the image to black/white, crops it, resizes it */
-void NumberClassifier::pre_process(cv::Mat& img)
+void NumberClassifier::pre_process(cv::Mat& img, int classifier_height, int classifier_width)
 {
-    cv::Mat img_gray = img;
+	cv::resize(img, img, cv::Size(25,35), 0, 0, cv::INTER_AREA);
+	cv::Mat img_gray = img;
     if (img.channels() > 1)
         cv::cvtColor(img, img_gray, CV_BGR2GRAY);
     std::vector<cv::Mat> channels;
     split(img, channels);
     int threshold = (int)cv::mean(channels[0])[0];
-    threshold = threshold-20;
     cv::Mat img_bin;
     cv::threshold(img_gray, img_bin, threshold, 255, cv::THRESH_BINARY);
     img = img_bin;
-    //cv::imwrite(c_dir + "W_PROCESSED.jpg", img);
-    crop_img(img, img_w, img_h);
-    //cv::imwrite(c_dir + "X_PROCESSED.jpg", img);
+
+    crop_img(img, classifier_height, classifier_width);
     cv::resize(img, img, cv::Size(img_w,img_h), 0, 0, cv::INTER_AREA);
-    //cv::imwrite(c_dir + "Y_PROCESSED.jpg", img);
 }
 
 /* Prints the results of the classification */
@@ -227,46 +416,33 @@ void NumberClassifier::print_results(void) {
     std::cout << "Total: " << total_correct << "/" << c_numbers << std::endl;
 }
 
-/* Iterates through the classification directory, passing each image to the
- * c_process() function which performs the actual classification */
-//Currently not used in ODK Scan
-void NumberClassifier::classify(void) {
-    int n = c_numbers;
-    if (n < 0) {
-        LOGI("Error opening directory");
-    }
-    while (n--) {
-        std::string img_name = std::string(c_list[n]->d_name);
-        int img_num = img_name.at(0) - 0x30;
-        cv::Mat img = cv::imread(c_dir + img_name, CV_LOAD_IMAGE_COLOR);
-        if (img.empty())
-        	LOGI("Image not loaded");
-        else {
-            pre_process(img);
-            int guess = c_process(img);
-            if (img_num == guess)
-                correct.at(img_num)++;
-            else
-                std::cerr << "Guessed " << img_name << " as " << guess << std::endl;
-            guesses.at(img_num)++;
-        }
-        delete c_list[n];
-    }
-    delete c_list;
-}
-
-Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location) {
+Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location, int classifier_height, int classifier_width) {
 
 	Json::Value output;
-
 	cv::Mat query_pixels;
-	getRectSubPix(img, cv::Size(img_w, img_h), item_location, query_pixels);
-	pre_process(query_pixels);
+
+	//add some pixels to give it a little buffer
+	int expandedHeight = classifier_height + (0.25*classifier_height);
+	int expandedWidth = classifier_width + (0.25*classifier_width);
+
+	getRectSubPix(img, cv::Size(expandedWidth, expandedHeight), item_location, query_pixels);
+
+	//debugging
+	//stringstream ss;
+	//ss << c_dir << item_location.x << "_" << item_location.y << "_binary.jpg";
+	//std::string imgName = ss.str();
+	//stringstream ss2;
+	//ss2 << c_dir << item_location.x << "_" << item_location.y << "_query_pixels.jpg";
+	//std::string queryPixelsName = ss2.str();
+	//cv::imwrite(queryPixelsName, query_pixels);
+
+	pre_process(query_pixels, classifier_height, classifier_width);
 	int guess = c_process(query_pixels);
 
 	output["classification"] = guess;
 	output["value"] = guess;
 	output["confidence"] = 1;
+	output["type"] = "number";
 
 	return output;
 }
@@ -303,7 +479,7 @@ int NumberClassifier::get_black_pixels(const cv::Mat& img, int segment)
 /* This function iterates through a training directory and calls
  * t_process() on each image in the directory. Can be used by any
  * ML classifier as a generic train function */
-void NumberClassifier::train(void) {
+void NumberClassifier::train(int box_width, int box_height) {
 	int n = t_numbers;
     if (n < 0) {
     	LOGI("Error opening number training directory");
@@ -311,21 +487,12 @@ void NumberClassifier::train(void) {
     while (n--) {
         std::string img_name = std::string(t_list[n]->d_name);
         int img_num = img_name.at(0) - 0x30;
-
-        //debugging
-        //std::stringstream ss;
-        //ss << t_dir << img_name;
-        //std::string str = ss.str();
-        //const char * c = str.c_str();
-        //LOGI(c);
-        //end debugging
-
         cv::Mat img = cv::imread(t_dir + img_name, CV_LOAD_IMAGE_COLOR);
         if (img.empty())
             LOGI("Number training image not loaded");
 
         else {
-            pre_process(img);
+            pre_process(img, box_height, box_width);
             t_process(img, img_num);
         }
         delete t_list[n];

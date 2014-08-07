@@ -45,7 +45,7 @@ import android.widget.TextView;
  */
 public class AfterPhotoTaken extends Activity {
 
-	private static final String LOG_TAG = "ODKScan";
+	private static final String LOG_TAG = "ODKScan";   
 
 	private String photoName;
 	private RunProcessor runProcessor;
