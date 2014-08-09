@@ -355,6 +355,7 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
 	}
 
     //debugging
+    /*
     cv::line(img, cv::Point(0, top_line), cv::Point(img.cols, top_line), cv::Scalar(125), 1, 1);
     cv::line(img, cv::Point(0, bottom_line), cv::Point(img.cols, bottom_line), cv::Scalar(125), 1, 1);
     cv::line(img, cv::Point(left_line, 0), cv::Point(left_line, img.rows), cv::Scalar(125), 1, 1);
@@ -366,26 +367,9 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
 	stringstream ss2;
 	ss2 << c_dir << imageNumber << "_cropped.jpg";
 	std::string queryPixelsName = ss2.str();
+	*/
 
-	//stringstream msgsss;
-    //msgsss << imageNumber << " ch " << candidateHeight << " diff " << difference << " minDiff " << minDifference << " top_line " << top_line;
-    //std::string msgs = msgsss.str();
-    //const char * c = msgs.c_str();
-    //LOGI(c);
-
-	//Trying to white out some space around the number.
-	//It's not working very well so I'm skipping it.
-	/*Rect rec = Rect(0, top_line, img.cols, 2);
-	cv::rectangle(img,rec,(255,255,255),-1);
-	rec = Rect(0, bottom_line-1, img.cols, 1);
-	cv::rectangle(img,rec,(255,255,255),-1);
-
-	rec = Rect(left_line, 0, left_line+2, img.rows);
-	cv::rectangle(img,rec,(255,255,255),-1);
-	rec = Rect(right_line-1, 0, 1, img.rows);
-	cv::rectangle(img,rec,(255,255,255),-1);*/
-
-	cv::imwrite(imgName, img);
+	//cv::imwrite(imgName, img);
 
     int horizontal_top = top_line + 3;
     int horizontal_bottom = bottom_line -1 ;
@@ -411,13 +395,12 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
 
 		if (boundRect.width * boundRect.height < 25)
 		{
-			LOGI("HERE");
 			Scalar color = Scalar(255,255,255);
 			drawContours(img, contours, i, color, 1, 8, hierarchy, 0, Point() );
 		}
 	}
 
-    cv::imwrite(queryPixelsName, img);
+    //cv::imwrite(queryPixelsName, img);
 }
 
 /* Converts the image to black/white, crops it, resizes it */
