@@ -373,16 +373,49 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
     //const char * c = msgs.c_str();
     //LOGI(c);
 
+	//Trying to white out some space around the number.
+	//It's not working very well so I'm skipping it.
+	/*Rect rec = Rect(0, top_line, img.cols, 2);
+	cv::rectangle(img,rec,(255,255,255),-1);
+	rec = Rect(0, bottom_line-1, img.cols, 1);
+	cv::rectangle(img,rec,(255,255,255),-1);
+
+	rec = Rect(left_line, 0, left_line+2, img.rows);
+	cv::rectangle(img,rec,(255,255,255),-1);
+	rec = Rect(right_line-1, 0, 1, img.rows);
+	cv::rectangle(img,rec,(255,255,255),-1);*/
+
 	cv::imwrite(imgName, img);
 
     int horizontal_top = top_line + 3;
-    int horizontal_bottom = bottom_line - 1;
+    int horizontal_bottom = bottom_line -1 ;
     int vertical_top = left_line + 3;
-    int vertical_bottom = right_line - 1;
+    int vertical_bottom = right_line -1 ;
     
     int new_width = vertical_bottom - vertical_top;
     int new_height = horizontal_bottom - horizontal_top;
     img = img(cv::Rect(vertical_top, horizontal_top, new_width, new_height));
+
+	//Trying to eliminate dots to see if that helps with 1, 4, 7, 9
+	cv::bitwise_not ( img, inverted );
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+
+	findContours(inverted, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+	vector<vector<Point> > contours_poly( contours.size() );
+	for( int i = 0; i< contours.size(); i++ )
+	{
+		approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+		Rect boundRect = boundingRect( Mat(contours_poly[i]) );
+
+		if (boundRect.width * boundRect.height < 25)
+		{
+			LOGI("HERE");
+			Scalar color = Scalar(255,255,255);
+			drawContours(img, contours, i, color, 1, 8, hierarchy, 0, Point() );
+		}
+	}
 
     cv::imwrite(queryPixelsName, img);
 }
