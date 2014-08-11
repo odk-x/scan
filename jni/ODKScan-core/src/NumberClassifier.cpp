@@ -355,6 +355,7 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
 	}
 
     //debugging
+    /*
     cv::line(img, cv::Point(0, top_line), cv::Point(img.cols, top_line), cv::Scalar(125), 1, 1);
     cv::line(img, cv::Point(0, bottom_line), cv::Point(img.cols, bottom_line), cv::Scalar(125), 1, 1);
     cv::line(img, cv::Point(left_line, 0), cv::Point(left_line, img.rows), cv::Scalar(125), 1, 1);
@@ -366,25 +367,40 @@ void NumberClassifier::crop_img(cv::Mat& img, int box_height, int box_width) {
 	stringstream ss2;
 	ss2 << c_dir << imageNumber << "_cropped.jpg";
 	std::string queryPixelsName = ss2.str();
+	*/
 
-	//stringstream msgsss;
-    //msgsss << imageNumber << " ch " << candidateHeight << " diff " << difference << " minDiff " << minDifference << " top_line " << top_line;
-    //std::string msgs = msgsss.str();
-    //const char * c = msgs.c_str();
-    //LOGI(c);
-
-	cv::imwrite(imgName, img);
+	//cv::imwrite(imgName, img);
 
     int horizontal_top = top_line + 3;
-    int horizontal_bottom = bottom_line - 1;
+    int horizontal_bottom = bottom_line -1 ;
     int vertical_top = left_line + 3;
-    int vertical_bottom = right_line - 1;
+    int vertical_bottom = right_line -1 ;
     
     int new_width = vertical_bottom - vertical_top;
     int new_height = horizontal_bottom - horizontal_top;
     img = img(cv::Rect(vertical_top, horizontal_top, new_width, new_height));
 
-    cv::imwrite(queryPixelsName, img);
+	//Trying to eliminate dots to see if that helps with 1, 4, 7, 9
+	cv::bitwise_not ( img, inverted );
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+
+	findContours(inverted, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+	vector<vector<Point> > contours_poly( contours.size() );
+	for( int i = 0; i< contours.size(); i++ )
+	{
+		approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+		Rect boundRect = boundingRect( Mat(contours_poly[i]) );
+
+		if (boundRect.width * boundRect.height < 25)
+		{
+			Scalar color = Scalar(255,255,255);
+			drawContours(img, contours, i, color, 1, 8, hierarchy, 0, Point() );
+		}
+	}
+
+    //cv::imwrite(queryPixelsName, img);
 }
 
 /* Converts the image to black/white, crops it, resizes it */
