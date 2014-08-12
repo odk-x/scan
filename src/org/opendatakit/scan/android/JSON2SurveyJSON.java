@@ -350,14 +350,14 @@ public class JSON2SurveyJSON extends Activity{
 					tablesValues.put(imageName, picJson.toString());
 					dbValuesToWrite.append(imageName).append("=").append(picJson.toString());
 					*/
-					ObjectMapper objectMapper = new ObjectMapper();
-					Map<String, String> mapObject = new HashMap<String, String>();
-					//mapObject.put("uriFragment", tablesDirStr+formId+fileSeparatorStr+instancesDirStr+dirId+fileSeparatorStr+outputPicFile.getName());
-					//getAppRelativeInstancesDirPath
-					mapObject.put("uriFragment", ScanUtils.getAppRelativeInstancesDirPath(formId, dirId) + outputPicFile.getName());
-					mapObject.put("contentType", "image/jpg");
-					String picJsonStr = objectMapper.writeValueAsString(mapObject);
-					addStringValueToTableContentValue(tablesValues, imageName, picJsonStr);
+					
+					// database changes require that images have a field named
+					// image_uriFragment and image_contentType
+					String imageName_uriFragment = imageName + "_uriFragment";
+					String imageName_contentType = imageName + "_contentType";
+
+					addStringValueToTableContentValue(tablesValues, imageName_uriFragment, ScanUtils.getAppRelativeInstancesDirPath(formId, dirId) + outputPicFile.getName());
+					addStringValueToTableContentValue(tablesValues, imageName_contentType, "image/jpg");
 					
 					// Add styling for this image in the css file if no css file is found
 					if (writeOutCustomCss) {
