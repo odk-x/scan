@@ -125,11 +125,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 			switch ( cValue.type() )
 			{
 				case Json::stringValue:
-					//This case isn't used right now.
-					//It's for classifiers that picks up letters.
-					//The idea is to concatenate all the letters into a word.
-					output = Json::Value(output.asString() +
-						             cValue.asString());
+					output = Json::Value(output.asString() + cValue.asString());
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
@@ -538,12 +534,17 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		//DO NUMBER CLASSIFICATION
 		if (classifierJson.get("training_data_uri", 0) == "numbers")
 		{
+			LOGI("Classifying numbers");
 			if (!trainedNumberClassifier) {
 				trainNumberClassifier (classifierJson);
 			}
 
-			int classifier_height = classifierJson.get("classifier_height", 28).asInt();
-			int classifier_width = classifierJson.get("classifier_width", 20).asInt();
+			//HARDCODING SIZE OF NUMBERS FOR NOW!!!!
+			int classifier_height = 28;
+			int classifier_width = 20;
+			//Uncomment these lines to use the classifier size specified in the template.json
+			//int classifier_height = classifierJson.get("classifier_height", 28).asInt();
+			//int classifier_width = classifierJson.get("classifier_width", 20).asInt();
 
 			vector<Point> locations;
 			for (size_t i = 0; i < items.size(); i++) {
@@ -573,7 +574,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 
 				itemsJsonOut.append(itemJsonOut);
 			}
-
+			LOGI("Finished classifying numbers");
 		}
 		else //DO BUBBLE AND CHECKBOX CLASSIFICATION
 		{
@@ -734,6 +735,8 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 		segmentJsonOut = segmentFunction(segmentJsonOut, extendedSegment);
 		if(!segmentJsonOut.isNull()){
 			outSegments.append(segmentJsonOut);
+		} else {
+			LOGI("segmentJsonOut is null!");
 		}
 	}
 	outField["segments"] = outSegments;
@@ -741,10 +744,6 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	Json::Value value = computeFieldValue(outField);
 	if(!value.isNull()){
 		outField["value"] = value;
-	}
-	else
-	{
-		LOGI("Value is null!");
 	}
 	outField.removeMember("fields");
 	outField.removeMember("items");
