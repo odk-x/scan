@@ -181,6 +181,27 @@ Json::Value computeFieldValue(const Json::Value& field){
 			}
 		}
 	}
+
+	//Check if it is a formatted number and format appropriately
+	Json::Value delim = field["delim_type"];
+	if (!delim.isNull()) {
+		Json::Value elements_each_group = field["element_each_group"];
+		string outputString = output.asString();
+		string finalOutput = "";
+
+		int currentIndex = 0;
+		for ( size_t i = 0; i < elements_each_group.size(); i++ ) {
+			int groupSize = elements_each_group[i].asInt();
+			string thisGroup = outputString.substr(currentIndex, groupSize);
+			finalOutput = finalOutput + thisGroup;
+			if (i < elements_each_group.size() - 1) {
+				finalOutput = finalOutput + delim.asString();
+			}
+			currentIndex += groupSize;
+		}
+		output = Json::Value(finalOutput);
+	}
+
 	return output;
 }
 
