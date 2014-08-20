@@ -83,9 +83,15 @@ public class JSON2SurveyJSON extends Activity{
 		
 		//String rootTemplatePath = templatePaths.get(0);
 		
-		// Set the formId to use for this newly created form
-    	String formId = new File(templatePaths.get(0)).getName();
-    	formId = "scan_" + formId;
+        // Set the formId to use for this newly created form
+        // We used to just take the directory name from the 
+        // templatePath and add scan to make for formId name
+        // in the case of forms without subforms - Now we are 
+        // getting the name from the generated formDef.json
+        /*String formId = new File(templatePaths.get(0)).getName();
+        formId = "scan_" + formId;
+        xlsxFormId = formId;*/
+    	String formId = getFormIdFromFormDef(templatePath);
     	xlsxFormId = formId;
     	
 		String photoName = extras.getString("photoName");
@@ -135,28 +141,88 @@ public class JSON2SurveyJSON extends Activity{
 	
 			// If the form does exist already, there could be a versioning issue
 			if (!formDefFile.exists()) {
-				// Then we need to copy the correct formDef.json over
-				File dir = new File(templatePath);
-				if(!dir.isDirectory()) throw new IllegalStateException("Template path is bad");
-				for(File file : dir.listFiles()) {
-				    if(file.getName().endsWith("formDef.json")){
-						String jsonPath = file.getAbsolutePath();
-						// CAL: The following code should be made into a function
-						String val;
-						try {
-							val = JSONUtils.parseFileToJSONObject(jsonPath).toString();
-							writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
-						} catch (Exception e) {
-							e.printStackTrace();
-							Log.e(LOG_TAG, "Could not copy formDef.json over for single form");
-						} 
-				    }
+				try {
+					File formDefToWrite = findFileThatEndsIn(templatePath, "formDef.json");
+					JSONObject formDefObjToWrite = getJSONFromFile(formDefToWrite);
+					String val = formDefObjToWrite.toString();
+					writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
+				} catch (Exception e) {
+					e.printStackTrace();
+					Log.e(LOG_TAG, "Could not write out formDef.json to proper tables directory " + formId);
 				}
 			} 
 			
 			// Check if there is a registered Survey instance or create one
 			createSurveyInstance(formId);
 		}
+	}
+	
+	
+    /**
+     * Check for formId in formDef.json for forms without
+     * subforms 
+     * @param templatePath
+     */
+	public String getFormIdFromFormDef(String templatePath) {
+		// Find out what the formId should be from the 
+		// formDef.json
+		File formDef = null;
+		String formIdFromFormDef = null;
+		try {
+			formDef = findFileThatEndsIn(templatePath, "formDef.json");
+			JSONObject formDefObj = getJSONFromFile(formDef);
+			formIdFromFormDef = formDefObj.getJSONObject("specification").getJSONObject("settings").getJSONObject("form_id").getString("value");
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.e(LOG_TAG, "getFormIdFromFormDef: could not get the form id");
+		}
+		
+		return formIdFromFormDef;
+	}
+	
+    /**
+     * Check for formId in formDef.json for forms without
+     * subforms 
+     * @param templatePath
+     * @param suffix 
+     */
+	public File findFileThatEndsIn(String templatePath, String suffix) {
+		// Find out what the formId should be from the 
+		// formDef.json
+		File fileToReturn = null;
+		File dir = new File(templatePath);
+		if(!dir.isDirectory()) throw new IllegalStateException("Template path is bad");
+		for(File file : dir.listFiles()) {
+		    if(file.getName().endsWith(suffix)){
+		    	fileToReturn = file;
+				return fileToReturn;
+		    }
+		}
+		return fileToReturn;
+	}
+	
+    /**
+     * Get formDef.json output for non-subform forms
+     * @param formDef
+     * @return jsonOutput
+     * @throws Exception
+     */
+	public JSONObject getJSONFromFile(File formDef) throws Exception {
+		JSONObject jsonOutput = null;
+		
+		if (!formDef.isFile()) {
+			throw new IllegalStateException("getJSONFromFile: use a valid file");
+		}
+		
+		try {
+			String jsonPath = formDef.getAbsolutePath();
+			jsonOutput = JSONUtils.parseFileToJSONObject(jsonPath);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.e(LOG_TAG, "Could not get JSON output for file " + formDef.getName());
+		} 
+		
+		return jsonOutput;
 	}
 	
     /**
@@ -495,9 +561,7 @@ public class JSON2SurveyJSON extends Activity{
 		    	int ind = cursor.getColumnIndex("_id");
 		    	String foudnUuidStr = cursor.getString(ind);
 				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
-				Intent resultData = new Intent();
-				resultData.setData(Uri.parse(uriStr));
-				setResult(RESULT_OK, resultData);
+				setIntentToReturn(uriStr);
 		    	cursor.close();
 				finish();
 		    	return;
@@ -551,9 +615,7 @@ public class JSON2SurveyJSON extends Activity{
 	   	db.close();
 	    
 		String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
-		Intent resultData = new Intent();
-		resultData.setData(Uri.parse(uriStr));
-		setResult(RESULT_OK, resultData);
+		setIntentToReturn(uriStr);
 		finish();
 	}
 	
@@ -578,7 +640,22 @@ public class JSON2SurveyJSON extends Activity{
 			// This code will only handle one subform currently
 			// It will break otherwise
 			JSONArray subforms = new JSONArray();
+			
+			// Get the fields from the output.json file that need to be created in the 
+			// database table
+			JSONArray fields = new JSONArray();
+			
+			/*for(String photoName : photoNames){
+				JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).getJSONArray("fields");
+				int photoFieldsLength = photoFields.length();
+				for(int i = 0; i < photoFieldsLength; i++){
+					fields.put(photoFields.get(i));
+				}
+				Log.i(LOG_TAG, "Concated " + photoName);
+			}*/
+			
 			for(String photoName : photoNames){
+				// Getting subforms
 				if (JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).has("sub_forms")) {
 		    		JSONArray photoSubforms = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).getJSONArray("sub_forms");
 		    		int photoSubformsLength = photoSubforms.length();
@@ -587,6 +664,14 @@ public class JSON2SurveyJSON extends Activity{
 		    		}
 		    		Log.i(LOG_TAG, "Concated subforms for " + photoName);
 				}
+				
+				//Getting fields
+				JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).getJSONArray("fields");
+				int photoFieldsLength = photoFields.length();
+				for(int i = 0; i < photoFieldsLength; i++){
+					fields.put(photoFields.get(i));
+				}
+				Log.i(LOG_TAG, "Concated " + photoName);
 			}
 		    
 			int subformsLength = subforms.length();
@@ -601,19 +686,6 @@ public class JSON2SurveyJSON extends Activity{
 			subformId = "scan_" + subformId;
 			
 			tableName = subformId;
-			
-			// Get the fields from the output.json file that need to be created in the 
-			// database table
-			JSONArray fields = new JSONArray();
-			
-			for(String photoName : photoNames){
-				JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName)).getJSONArray("fields");
-				int photoFieldsLength = photoFields.length();
-				for(int i = 0; i < photoFieldsLength; i++){
-					fields.put(photoFields.get(i));
-				}
-				Log.i(LOG_TAG, "Concated " + photoName);
-			}
 		    
 			int fieldsLength = fields.length();
 			if(fieldsLength == 0){
@@ -637,9 +709,7 @@ public class JSON2SurveyJSON extends Activity{
 				int ind = cursor.getColumnIndex("_id");
 				String foudnUuidStr = cursor.getString(ind);
 				String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
-				Intent resultData = new Intent();
-				resultData.setData(Uri.parse(uriStr));
-				setResult(RESULT_OK, resultData);
+				setIntentToReturn(uriStr);
 				cursor.close();
 				finish();
 				return;
@@ -734,9 +804,7 @@ public class JSON2SurveyJSON extends Activity{
 	   	db.close();
 	    
 		String uriStr = ScanUtils.getSurveyUri(subformId) + rowId;
-		Intent resultData = new Intent();
-		resultData.setData(Uri.parse(uriStr));
-		setResult(RESULT_OK, resultData);
+		setIntentToReturn(uriStr);
 		finish();
 	}
 	
@@ -1107,6 +1175,20 @@ public class JSON2SurveyJSON extends Activity{
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Check if any of the provided file paths
+	 * were modified after the given date.
+	 * @param templatePaths
+	 * @param lastModified
+	 * @return
+	 */
+	// This function may be useful when checking for version issues?
+	private void setIntentToReturn(String uriString) {
+		Intent resultData = new Intent();
+		resultData.setData(Uri.parse(uriString));
+		setResult(RESULT_OK, resultData);
 	}
 	
 }
