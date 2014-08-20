@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -107,16 +109,13 @@ public class JSON2SurveyJSON extends Activity{
 		//String rootPhotoName = photoNames.get(0);
 		Log.i(LOG_TAG,"photoNames : " + photoNames);
 		
-		String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
-		File formDefFile = new File(directoryForFormDef, "formDef.json");
-		
 		// THIS WILL HAVE TO GET CLEANED UP!!!
 		// We are going to start using the FormDesigner's XLSX conversion files
-		// First we are going to check if these files exist - form.xlsx and formDef.json
-		// If they do then we are going to go to a completely separate function for now
+		// First we are going to check if the file exist - formDef.json
+		// If it does then we are going to go to a completely separate function for now
 		// Essentially this function will do the following things
 		// 1. Check if there is a subform in the directory
-		// 3. Loop through the output.json and create a survey instances for the subforms
+		// 3. Loop through the output.json and create survey instances for the subforms
 		// 4. Write that data to the database
 		// 5. Move only the subform files over to the proper tables directory
 		// 6. Launch Tables - there will have to be an index.html defined for the forms
@@ -125,42 +124,44 @@ public class JSON2SurveyJSON extends Activity{
 		if (checkForSubforms(templatePath)) {
 			createSurveyInstanceBasedOnFormDesignerForms(templatePath);
 			return;
-		}
-
-		// If the form does exist already, there could be a versioning issue
-		// This will need to be resolved in a better way
-		if (!formDefFile.exists()) {
-			String theString = null;
-			try {
-				theString = buildSurveyFormDef(templatePaths);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			myWebView = new WebView(this);
-			myWebView.getSettings().setJavaScriptEnabled(true);
-			myWebView.setVisibility(View.GONE);
-			myWebView.addJavascriptInterface(new JavaScriptHandler(this), "MyHandler");
-			myWebView.loadUrl(ScanUtils.getXlsxConverterUri());
-			
-			final String jsString = "javascript:convert('" + theString + "');";
-			
-			myWebView.setWebViewClient(new WebViewClient() {
-		        public void onPageFinished(WebView view, String url)
-		        {
-		        	myWebView.loadUrl(jsString);
-		        }
-		    });
 		} else {
+			String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
+			File formDefFile = new File(directoryForFormDef, "formDef.json");
+	
+			// If the form does exist already, there could be a versioning issue
+			// This will need to be resolved in a better way
+			if (!formDefFile.exists()) {
+				// Then we need to copy the correct formDef.json over
+				File dir = new File(templatePath);
+				if(!dir.isDirectory()) throw new IllegalStateException("Template path is bad");
+				for(File file : dir.listFiles()) {
+				    if(file.getName().endsWith("formDef.json")){
+						String jsonPath = file.getAbsolutePath();
+						// CAL: The following code should be made into a function
+						String val;
+						try {
+							val = JSONUtils.parseFileToJSONObject(jsonPath).toString();
+							writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
+						} catch (Exception e) {
+							e.printStackTrace();
+							Log.e(LOG_TAG, "Could not copy formDef.json over for single form");
+						} 
+				    }
+				}
+			} 
+			
 			// Check if there is a registered Survey instance or create one
 			createSurveyInstance();
 		}
 	}
 	
-	// CAL: Right now I am going to assume only one subform
-	// definition is possible
+    /**
+     * Checking if there are sub_forms
+     * @param templatePath
+     */
 	public boolean checkForSubforms(String templatePath) {
+		// Right now the assumption is only one subform
+		// definition is possible
 		boolean hasSubform = false;
 
 		try {
@@ -177,6 +178,13 @@ public class JSON2SurveyJSON extends Activity{
 		return hasSubform;
 	}
 	
+    /**
+     * Creating the database table needed from the 
+     * information provided by the Scan app
+     * @param db
+     * @param tableName
+     * @param subformFieldsToProcess
+     */
 	public void createSurveyTables(SQLiteDatabase db, String tableName, JSONArray fieldsToProcess)
 	{
 		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
@@ -203,7 +211,7 @@ public class JSON2SurveyJSON extends Activity{
 					// Should I check the image_path for the
 					// segment before including it - I don't think so
 					if (segment != null) {
-						String imageName = fieldName + "_image_" + j;
+						String imageName = fieldName + "_image" + j;
 						columns.put(imageName, "mimeUri");
 					}
 				}
@@ -228,6 +236,15 @@ public class JSON2SurveyJSON extends Activity{
 		}
 	}
 	
+    /**
+     * Creating the database table needed from the 
+     * information provided by the form designer.  This
+     * is used for the subforms case since we can't loop through
+     * it as we normally would. 
+     * @param db
+     * @param tableName
+     * @param subformFieldsToProcess
+     */
 	public void createSurveyTablesFromFormDesigner(SQLiteDatabase db, String tableName, JSONObject subformFieldsToProcess)
 	{
 		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
@@ -236,7 +253,7 @@ public class JSON2SurveyJSON extends Activity{
 		// back in
 		// Always add the scan output directory to the table definition
 		// This is used to map a Survey instance with a Scan photo
-		//columns.put(scanOutputDir, "string");
+		columns.put(scanOutputDir, "string");
 		
 		try {
 			JSONArray subformFieldNames = subformFieldsToProcess.names();
@@ -279,6 +296,9 @@ public class JSON2SurveyJSON extends Activity{
 		}
 	}
 	
+    /**
+     * Add a survey instance into the database
+     */
 	public void createSurveyInstance()
 	{	
 		ContentValues tablesValues = new ContentValues();
@@ -331,7 +351,6 @@ public class JSON2SurveyJSON extends Activity{
 		    if (cursor.moveToFirst()) {
 		    	int ind = cursor.getColumnIndex("_id");
 		    	String foudnUuidStr = cursor.getString(ind);
-				//String uriStr = surveyUriStr+formId+fileSeparatorStr+instanceIdStr + foudnUuidStr;
 				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
 				Intent resultData = new Intent();
 				resultData.setData(Uri.parse(uriStr));
@@ -348,7 +367,6 @@ public class JSON2SurveyJSON extends Activity{
 			File dirToMake = null;
 			String dirId = null;
 			StringBuilder cssStr = new StringBuilder();
-			//String cssDir = extStoreStr + surveyDirStr + tablesDirStr  + formId + fileSeparatorStr+ formsDirStr + formId; 
 			String cssDir = ScanUtils.getAppFormDirPath(formId);
 			
 			// Get the screen size in case we need to 
@@ -374,13 +392,7 @@ public class JSON2SurveyJSON extends Activity{
 			}
 			for(int i = 0; i < fieldsLength; i++){
 				JSONObject field = fields.optJSONObject(i);
-	        	/*May need to use this to have a note that scan uses to check if
-	        	 * the instance is already created?
-	        	 * if(field.getString("type").equals("note")){
-	        		Element fieldElement = instance.createElement("", "autogenerated_note_" + i);
-	        		instance.addChild(Node.ELEMENT, fieldElement);
-	        		continue;
-	        	}*/
+
 				String fieldName = validate(field.getString("name"));
 	        	JSONArray segments = field.optJSONArray("segments");
 	        	if(segments == null){
@@ -390,8 +402,8 @@ public class JSON2SurveyJSON extends Activity{
 	        	//and update their database value
 				for(int j = 0; j < segments.length(); j++){
 					JSONObject segment = segments.getJSONObject(j);
-					
-					String imageName = fieldName + "_image_" + j;
+					// Changed to get rid of underscore for Munjela's code
+					String imageName = fieldName + "_image" + j;
 					String imagePath = segment.getString("image_path");
 	
 					if(!segment.has("image_path") || segment.isNull("image_path")){
@@ -419,19 +431,6 @@ public class JSON2SurveyJSON extends Activity{
 					fos.close();
 					fis.close();
 					//---End of copying the image
-					
-					// Update the row value for the picture
-					// Use ObjectMapper to avoid "\/" in uriFragment paths
-					// Although, this doesn't cause an issue - leaving
-					// this code commented out for now
-					/*
-					JSONObject picJson = new JSONObject();
-	
-					picJson.put("uriFragment", tablesDirStr+formId+fileSeparatorStr+instancesDirStr+dirId+fileSeparatorStr+outputPicFile.getName());
-					picJson.put("uriFragment", "image/jpg");
-					tablesValues.put(imageName, picJson.toString());
-					dbValuesToWrite.append(imageName).append("=").append(picJson.toString());
-					*/
 					
 					// database changes require that images have a field named
 					// image_uriFragment and image_contentType
@@ -547,9 +546,13 @@ public class JSON2SurveyJSON extends Activity{
 		finish();
 	}
 	
-	// This is essentially the same things as the as the 
-	// createSurveyInstance - I am just doing this for a quick demo
-	// These things will have to be cleaned up!!!
+	
+    /**
+     * This is essentially the same things as the as the 
+	 * createSurveyInstance - I am just doing this for a quick demo
+	 * These things will have to be cleaned up!!!
+     * @param templatePath
+     */
 	public void createSurveyInstanceBasedOnFormDesignerForms(String templatePath)
 	{	
 		ContentValues tablesValues;
@@ -578,9 +581,7 @@ public class JSON2SurveyJSON extends Activity{
 		    
 			int subformsLength = subforms.length();
 			
-			// CAL: We are only able to handle one subform at this time
-			// It would be great if we could handle more, but for now NO!
-			// I think it would be as easy as putting a for loop around the following
+			// We are only able to handle one subform for now
 			if (subformsLength > 1) {
 				Log.i(LOG_TAG, "Using more than one subform has not been implemented yet");
 				return;
@@ -616,35 +617,6 @@ public class JSON2SurveyJSON extends Activity{
 			}
 		    
 			// For now assume that we are not creating main forms' tables or instances
-			// CAL: Need to confirm this?
-			/*Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
-			if (!cursor.moveToFirst()) {
-				Log.i(LOG_TAG, "No table definition found for " + tableName + ". Creating new table definition");
-				createSurveyTables(db, tableName, fields);
-			}*/ 
-		    
-			// CAL: These newly generated forms will not have scanOutputDir initially
-			// This will need to be revisited if someone wants to bring up the same instance
-			/*String selection = scanOutputDir + "=?";
-			String[] selectionArgs = {ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))};
-			cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
-			
-			// Check if the instance already exists in survey
-			if (cursor.moveToFirst()) {
-				int ind = cursor.getColumnIndex("_id");
-				String foudnUuidStr = cursor.getString(ind);
-				//String uriStr = surveyUriStr+formId+fileSeparatorStr+instanceIdStr + foudnUuidStr;
-				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
-				Intent resultData = new Intent();
-				resultData.setData(Uri.parse(uriStr));
-				setResult(RESULT_OK, resultData);
-				cursor.close();
-				finish();
-				return;
-			}*/ 
-		    
-
-		    
 			// This is for the creation of a subform db table
 			Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
 			if (!cursor.moveToFirst()) {
@@ -652,9 +624,7 @@ public class JSON2SurveyJSON extends Activity{
 				createSurveyTablesFromFormDesigner(db, tableName, subforms.getJSONObject(0).getJSONObject("fields"));
 			} 
 		    
-			// CAL: This will need to be revisited if a person wants to 
-			// edit an already saved instance - now we will just go into Tables
-			/*String selection = scanOutputDir + "=?";
+			String selection = scanOutputDir + "=?";
 			String[] selectionArgs = {ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))};
 			cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
 			
@@ -662,7 +632,6 @@ public class JSON2SurveyJSON extends Activity{
 			if (cursor.moveToFirst()) {
 				int ind = cursor.getColumnIndex("_id");
 				String foudnUuidStr = cursor.getString(ind);
-				//String uriStr = surveyUriStr+formId+fileSeparatorStr+instanceIdStr + foudnUuidStr;
 				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
 				Intent resultData = new Intent();
 				resultData.setData(Uri.parse(uriStr));
@@ -670,7 +639,7 @@ public class JSON2SurveyJSON extends Activity{
 				cursor.close();
 				finish();
 				return;
-			}*/ 
+			}
 
 			Log.i(LOG_TAG, "Transfering the values from the JSON output into the survey instance");
 	
@@ -719,8 +688,12 @@ public class JSON2SurveyJSON extends Activity{
 				JSONObject group = subformGroups.getJSONObject(i);
 				for (int k = 0; k < subformFieldNames.length(); k++) {
 					String subformFieldName = subformFieldNames.getString(k);
+					
+					if (group.isNull(subformFieldName)) {
+						break;
+					}
 					String scanFieldName = group.getString(subformFieldName);
-					//while(outputJsonFieldsIndex < fieldsLength) {
+					
 					for (int m = 0; m < fieldsLength; m++) {
 						JSONObject field = fields.optJSONObject(m);
 						String fieldName = validate(field.getString("name"));
@@ -864,9 +837,7 @@ public class JSON2SurveyJSON extends Activity{
 				// For each subgroup check if it is ready to be written out or not
 				if (tablesValues.size() > 0) {
 					// Add scan metadata here for the photo taken
-					// CAL: We are not doing this right now with FormDesigner converted forms 
-					// THIS SHOULD BE ADDED BACK IN!!!
-					//tablesValues.put(scanOutputDir, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+					tablesValues.put(scanOutputDir, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
 					Log.i(LOG_TAG,"Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
 					ODKDatabaseUtils.writeDataIntoExistingDBTableWithId(db, tableName, tablesValues, rowId);
 					
@@ -900,6 +871,13 @@ public class JSON2SurveyJSON extends Activity{
 		finish();
 	}
 	
+    /**
+     * Function to check whether or not to write a String value into
+     * ContentValues - we don't want to insert empty strings
+     * @param tableValue
+     * @param key
+     * @param value
+     */
 	public void addStringValueToTableContentValue(ContentValues tableValue, String key, String value)
 	{
 		if (value != "") {
@@ -907,12 +885,24 @@ public class JSON2SurveyJSON extends Activity{
 		}
 	}
 	
+    /**
+     * Callback function for after XLSXConverter JavaScript returns
+     * this was used with the buildSurveyFormDef function
+     * @param val
+     * @deprecated
+     */
 	public void javascriptCallFinished(String val) {
 		Log.i(LOG_TAG, "The formDef.json from xlsxconverter is" + val);
 		writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
 		createSurveyInstance();
 	}
 	
+    /**
+     * Write out string data to a file in a given directory
+     * @param directory
+     * @param fileName
+     * @param data
+     */
 	public static void writeOutToFile(String directory, String fileName, String data) {
 		File dirToMake = new File(directory);
 		dirToMake.mkdirs();
@@ -930,12 +920,26 @@ public class JSON2SurveyJSON extends Activity{
 		}
 	}
 	
+    /**
+     * Check that the string is a valid xml tag
+     * @param string
+     * @throws Exception 
+     */
+	private static String validate(String string) throws Exception {
+		if(Pattern.matches("[a-zA-Z][a-zA-Z_0-9]*", string)){
+			return string;
+		} else {
+			throw new Exception("Field name cannot be used in xform: " + string);
+		}
+	}
+	
 	/**
      * Builds an XFrom from a JSON template and writes it out to the specified file.
      * It builds it as a string which really isn't the best way to go.
      * @param templatePaths
-     * @param outputPath
+     * @return jsonOutputString
      * @throws Exception 
+     * @deprecated
      */
     public static String buildSurveyFormDef(ArrayList<String> templatePaths) throws Exception {
     	
@@ -1044,7 +1048,7 @@ public class JSON2SurveyJSON extends Activity{
         		}
 	        	for(int j = 0; j < segments.length(); j++){
 	        		JSONObject imagePrompt = new JSONObject();
-	        		String imageName = field.getString("name") + "_image_" + j;
+	        		String imageName = field.getString("name") + "_image" + j;
 	        		imagePrompt.put("name", imageName);
 	        		imagePrompt.put("type", "read_only_image");
 	        		imagePrompt.put(rowName, rowNum++);
@@ -1219,19 +1223,6 @@ public class JSON2SurveyJSON extends Activity{
 		
         return jsonOutputString;
     }
-    
-    /**
-     * Check that the string is a valid xml tag
-     * @throws Exception 
-     */
-	private static String validate(String string) throws Exception {
-		if(Pattern.matches("[a-zA-Z][a-zA-Z_0-9]*", string)){
-			return string;
-		} else {
-			throw new Exception("Field name cannot be used in xform: " + string);
-		}
-	}
-	
 	
 	/**
 	 * Check if any of the provided file paths
@@ -1240,7 +1231,7 @@ public class JSON2SurveyJSON extends Activity{
 	 * @param lastModified
 	 * @return
 	 */
-	/* This function may be useful when checking for version issues?
+	// This function may be useful when checking for version issues?
 	private boolean anyModifiedAfter(ArrayList<String> templatePaths,
 			long lastModified) {
 		for (String tp : templatePaths){
@@ -1250,5 +1241,5 @@ public class JSON2SurveyJSON extends Activity{
 		}
 		return false;
 	}
-	*/
+	
 }

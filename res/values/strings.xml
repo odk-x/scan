@@ -32,8 +32,8 @@
 
 <!-- DisplayProcessedForm -->
 <string name="next_page">Scan Next Page</string>
-<string name="survey_save">Survey Save</string>
-<string name="survey_transcribe">Survey Transcribe</string>
+<string name="save">Save</string>
+<string name="transcribe">Transcribe</string>
 <string name="collect_save">Collect Save</string>
 <string name="collect_transcribe">Collect Transcribe</string>
 
