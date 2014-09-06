@@ -41,7 +41,7 @@ public class DisplayProcessedForm extends Activity {
 
 	private Intent collectIntent;
 	
-	private Intent surveyIntent;
+	private Intent tablesIntent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -141,39 +141,39 @@ public class DisplayProcessedForm extends Activity {
 						}
 					}
 				});
-				Button saveSurveyData = (Button) findViewById(R.id.saveSurveyBtn);
-				saveSurveyData.setOnClickListener(new View.OnClickListener() {
+				Button save2Data = (Button) findViewById(R.id.save2Btn);
+				save2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						if(surveyIntent == null) {
-							surveyIntent = makeSurveyIntent();
+						if(tablesIntent == null) {
+							tablesIntent = makeTablesIntent();
 						} 
-						//surveyIntent is still null if Survey not installed.
-						if(surveyIntent != null) {
-							if(surveyIntent.getData() == null) {
-								exportToSurvey(2);
+						//tablesIntent is still null if Tables not installed.
+						if(tablesIntent != null) {
+							if(tablesIntent.getData() == null) {
+								exportToTables(2);
 							}
 						}
 						
 					}
 				});
-				Button transcribeSurveyData = (Button) findViewById(R.id.transcribeSurveyBtn);
-				transcribeSurveyData.setOnClickListener(new View.OnClickListener() {
+				Button transcribe2Data = (Button) findViewById(R.id.transcribe2Btn);
+				transcribe2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						if(surveyIntent == null) {
-							surveyIntent = makeSurveyIntent();
+						if(tablesIntent == null) {
+							tablesIntent = makeTablesIntent();
 						}
-						//surveyIntent is still null if Survey not installed.
-						if(surveyIntent != null) {
-							if(surveyIntent.getData() == null) {
-								exportToSurvey(3);
+						//tablesIntent is still null if Tables not installed.
+						if(tablesIntent != null) {
+							if(tablesIntent.getData() == null) {
+								exportToTables(3);
 							} else {
 								//The scan data has already been exported
-								//so just start Survey.
-								boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
-								if (surveyInstalled) {
-									startActivity(surveyIntent);
+								//so just start Tables.
+								boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
+								if (tablesInstalled) {
+									startActivity(tablesIntent);
 								}
 							}
 						}
@@ -254,50 +254,46 @@ public class DisplayProcessedForm extends Activity {
 	}
 
 	/**
-	 * Creates an intent for launching survey.
-	 * May return null if survey is not installed.
+	 * Creates an intent for launching tables.
+	 * May return null if tables is not installed.
 	 * @return
 	 */
-	public Intent makeSurveyIntent() {
-		// Initialize the intent that will start Survey.
-		Intent intent = new Intent();
+	public Intent makeTablesIntent() {
+		// Initialize the intent that will start Tables.
+		Intent intent = getPackageManager().getLaunchIntentForPackage("org.opendatakit.tables");
+		//Intent intent = new Intent();
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setAction(Intent.ACTION_VIEW);
 		
-		intent.setAction(Intent.ACTION_EDIT);
-		
-		//Start indicates that the form should be launched from the first question
-		//rather than the prompt list.
-		// Not sure if this start parameter is still necessary in Survey
-		intent.putExtra("start", true);
 		return intent;
 	}
 	
 	/**
-	 * Creates an intent for launching survey.
-	 * May return null if survey is not installed.
+	 * Creates an intent for launching tables.
+	 * May return null if tables is not installed.
 	 * @return
 	 */
-	public boolean checkForSurveyInstallation(Intent intent) {
+	public boolean checkForTablesInstallation(Intent intent) {
 		boolean installed = true;
 		
-		//Use the intent to see if survey is installed.
+		//Use the intent to see if tables is installed.
 		//this assumes that you have action and data specified
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
 			// ////////////
-			Log.i(LOG_TAG, "Survey is not installed.");
+			Log.i(LOG_TAG, "Tables is not installed.");
 			// ////////////		
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("ODK Survey was not found on this device.")
+			builder.setMessage("ODK Tables was not found on this device.")
 					.setCancelable(false)
-					// Take this out until Survey is available on the Google Play Store
+					// Take this out until Tables is available on the Google Play Store
 					//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
 					//	public void onClick(DialogInterface dialog,
 					//			int id) {
 					//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
-					//	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
+					//	    	.setData(Uri.parse("market://details?id=org.odk.tables.android"));
 					//		startActivity(goToMarket);
 					//		dialog.cancel();
 					//	}
@@ -339,12 +335,12 @@ public class DisplayProcessedForm extends Activity {
 	}
 	
 	/**
-	 * Exports the Scan JSON data to Survey.
-	 * If the requestCode is 3 Survey will be launched
+	 * Exports the Scan JSON data to Tables.
+	 * If the requestCode is 3 Tables will be launched
 	 * after the export activity returns a result.
 	 * @param requestCode
 	 */
-	public void exportToSurvey(int requestCode) {
+	public void exportToTables(int requestCode) {
 		showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
 		createInstanceIntent.putExtras(extras);
@@ -367,11 +363,11 @@ public class DisplayProcessedForm extends Activity {
 			}
 			
 			if (requestCode == 2 || requestCode == 3) {
-				Button saveSurveyData = (Button) findViewById(R.id.saveSurveyBtn);
-				saveSurveyData.setEnabled(false);
-				saveSurveyData.setText("saved");
-				surveyIntent.putExtras(data);
-				surveyIntent.setData(data.getData());
+				Button save2Data = (Button) findViewById(R.id.save2Btn);
+				save2Data.setEnabled(false);
+				save2Data.setText("saved");
+				tablesIntent.putExtras(data);
+				tablesIntent.setData(data.getData());
 			}
 			
 			if (requestCode == 1) {
@@ -382,10 +378,10 @@ public class DisplayProcessedForm extends Activity {
 			
 			if (requestCode == 3) {
 				//dismissDialog(1);
-				Log.i(LOG_TAG, "Starting Survey...");
-				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
-				if (surveyInstalled) {
-					startActivity(surveyIntent);
+				Log.i(LOG_TAG, "Starting Tables...");
+				boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
+				if (tablesInstalled) {
+					startActivity(tablesIntent);
 				}
 			}
 		}

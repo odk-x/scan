@@ -376,6 +376,7 @@ Json::Value PCA_classifier::classify_item(const Mat& det_img_gray, const Point& 
 		Json::Value default_classification = classifier_params.get("default_classification", 0);
 		output["confidence"] = classifierRv;
 		output["value"] = classifier_params["classification_map"].get(classification_label, default_classification);
+		output["type"] = "bool";
 	} else {
 		int classificationIndex;
 		#ifdef DISABLE_PCA

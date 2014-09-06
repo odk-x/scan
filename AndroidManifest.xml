@@ -46,7 +46,7 @@
             android:name="JSON2XForm"
             android:screenOrientation="portrait" >
         </activity>
-        <!-- CAL: Added to be able to translate the Scan code to JSON -->
+        <!-- Added to be able to translate the Scan code to JSON -->
         <activity
             android:name="JSON2SurveyJSON"
             android:screenOrientation="portrait" 

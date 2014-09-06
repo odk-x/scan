@@ -125,11 +125,7 @@ Json::Value computeFieldValue(const Json::Value& field){
 			switch ( cValue.type() )
 			{
 				case Json::stringValue:
-					//This case isn't used right now.
-					//It's for classifiers that picks up letters.
-					//The idea is to concatenate all the letters into a word.
-					output = Json::Value(output.asString() +
-						             cValue.asString());
+					output = Json::Value(output.asString() + cValue.asString());
 				break;
 				case Json::booleanValue:
 					if(!itemValue.isNull()){
@@ -162,7 +158,20 @@ Json::Value computeFieldValue(const Json::Value& field){
 					//for a tally.
 				case Json::intValue:
 				case Json::uintValue:
-					output = Json::Value(output.asInt() + cValue.asInt());
+					//Need to take care of number classification
+					//so that it concatenates multi-digit numbers
+					if (classification.get("type", 0) == "number")
+					{
+						stringstream ss;
+						ss << cValue.asInt();
+						string addingNumber(ss.str());
+						output = Json::Value(output.asString() + addingNumber);
+					}
+					//Just add everything together
+					else
+					{
+						output = Json::Value(output.asInt() + cValue.asInt());
+					}
 				break;
 				case Json::realValue:
 					output = Json::Value(output.asDouble() + cValue.asDouble());
@@ -172,8 +181,30 @@ Json::Value computeFieldValue(const Json::Value& field){
 			}
 		}
 	}
+
+	//Check if it is a formatted number and format appropriately
+	Json::Value delim = field["delim_type"];
+	if (!delim.isNull()) {
+		Json::Value elements_each_group = field["element_each_group"];
+		string outputString = output.asString();
+		string finalOutput = "";
+
+		int currentIndex = 0;
+		for ( size_t i = 0; i < elements_each_group.size(); i++ ) {
+			int groupSize = elements_each_group[i].asInt();
+			string thisGroup = outputString.substr(currentIndex, groupSize);
+			finalOutput = finalOutput + thisGroup;
+			if (i < elements_each_group.size() - 1) {
+				finalOutput = finalOutput + delim.asString();
+			}
+			currentIndex += groupSize;
+		}
+		output = Json::Value(finalOutput);
+	}
+
 	return output;
 }
+
 //Generate a marked up version of the form image that shows classifications and values.
 Mat markupForm(const Json::Value& bvRoot, const Mat& inputImage, bool drawCounts)
 {
@@ -343,8 +374,10 @@ void trainNumberClassifier(const Json::Value& classifier)
 	std::string classifyDirectory("/storage/emulated/0/ODKScan/output/test/");
 
 	std::string trainingPath = trainingDataPath + "numbers/";
+	//Hardcoding some values for now based on the size of the box in the training set
+	//Want to change this later.
 	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
-	numberClassifier.train();
+	numberClassifier.train(40, 53);
 	trainedNumberClassifier = true;
 
 	LOGI("Trained number classifier...");
@@ -522,55 +555,33 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		//DO NUMBER CLASSIFICATION
 		if (classifierJson.get("training_data_uri", 0) == "numbers")
 		{
+			LOGI("Classifying numbers");
 			if (!trainedNumberClassifier) {
 				trainNumberClassifier (classifierJson);
 			}
 
-			//OLD CODE
-			//Ptr<PCA_classifier> classifier = getClassifier(classifierJson);
+			//HARDCODING SIZE OF NUMBERS FOR NOW!!!!
+			int classifier_height = 28;
+			int classifier_width = 20;
+			//Uncomment these lines to use the classifier size specified in the template.json
+			//int classifier_height = classifierJson.get("classifier_height", 28).asInt();
+			//int classifier_width = classifierJson.get("classifier_width", 20).asInt();
+
 			vector<Point> locations;
-			vector<Point> deltas;
-			//Align items:
 			for (size_t i = 0; i < items.size(); i++) {
 				Point initLocation = SCALEPARAM * Point(items[i]["item_x"].asDouble(), items[i]["item_y"].asDouble());
 				Point itemLocation = initLocation;
-				//if(alignment_radius > .1){
-				//	itemLocation = classifier->align_item(segmentImg, initLocation, alignment_radius);
-				//}
 				locations.push_back(itemLocation);
-				deltas.push_back(itemLocation - initLocation);
-
-			}
-
-			//Catch runaway items:
-			Point avgDelta = Point(0,0);
-			for (size_t i = 0; i < deltas.size(); i++) {
-				avgDelta += deltas[i];
-			}
-			avgDelta *= 1.0 / items.size();
-
-			for (size_t i = 0; i < locations.size(); i++) {
-				//Draw a circle centered at the average delta, with the radius proportional to the alignment_radius.
-				//If the bubble's delta does not fall within that circle it is a runaway.
-				if(norm(deltas[i] - avgDelta) >  (alignment_radius / 2)){
-					locations[i] = locations[i] - deltas[i] + avgDelta;
-				}
 			}
 
 			//Classify items
 			for (size_t i = 0; i < items.size(); i++) {
 				Json::Value itemJsonOut = items[i];
-
-				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i]);
-
-				//int classifiedNumber = numberClassifier.classify_segment(segmentImg, locations[i]);
+				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i], classifier_height, classifier_width);
 
 				//std::stringstream ss;
 				//ss << classifiedNumber;
 				//std::string str = ss.str();
-				//itemJsonOut["classification"] = str;
-
-		        //debugging
 		        //const char * c = str.c_str();
 		        //LOGI(c);
 		        //end debugging
@@ -584,7 +595,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 
 				itemsJsonOut.append(itemJsonOut);
 			}
-
+			LOGI("Finished classifying numbers");
 		}
 		else //DO BUBBLE AND CHECKBOX CLASSIFICATION
 		{
@@ -745,6 +756,8 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 		segmentJsonOut = segmentFunction(segmentJsonOut, extendedSegment);
 		if(!segmentJsonOut.isNull()){
 			outSegments.append(segmentJsonOut);
+		} else {
+			LOGI("segmentJsonOut is null!");
 		}
 	}
 	outField["segments"] = outSegments;
@@ -752,10 +765,6 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 	Json::Value value = computeFieldValue(outField);
 	if(!value.isNull()){
 		outField["value"] = value;
-	}
-	else
-	{
-		LOGI("Value is null!");
 	}
 	outField.removeMember("fields");
 	outField.removeMember("items");

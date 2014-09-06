@@ -69,6 +69,8 @@ protected:
     int img_w;                  // images resized to this width
     int img_h;                  // images resized to this height
     
+    int imageNumber;
+
     SegmentMask h_mask;         // defines a mask shape for the vertical segments
     SegmentMask v_mask;         // defines a mask shape for the horiz. segments
     
@@ -79,9 +81,9 @@ protected:
 
     void find_roi(int segment, int iw, int ih, int mw, int mh);
     int predict_number(const char guess);
-    void pre_process(cv::Mat& img);
+    void pre_process(cv::Mat& img, int classifier_height, int classifier_width);
     int get_black_pixels(const cv::Mat& img, int segment); 
-    void crop_img(cv::Mat& img, int target_w, int target_h);
+    void crop_img(cv::Mat& img, int box_height, int box_width);
     
     static int filter(const struct dirent *d);  // Filters out files that are not images
     static int rect_mask(int x, int y, int w, int h, int dir); // Defines a rectangular mask for segments
@@ -90,8 +92,9 @@ protected:
 public:
     NumberClassifier();
     NumberClassifier ( std::string& classify_dir,  std::string& train_dir, int iw, int ih, int mw, int mh):
-        c_dir(classify_dir), img_w(iw), img_h(ih),
+    	c_dir(classify_dir), img_w(iw), img_h(ih),
         t_dir(train_dir),
+        imageNumber(0),
         guesses(10, 0),
         correct(10, 0),
         h_mask(&NumberClassifier::rect_mask, mw, mh, HORIZONTAL_MASK),
@@ -107,11 +110,11 @@ public:
             }
         };
     
-    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location);
-    void classify(void);
+    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location, int classifier_height, int classifier_width);
+    //void classify(void);
     void print_results(void);
     void print_rois(void);
-    void train(void);
+    void train(int box_width, int box_height);
 };
 
 #endif //_NUMBER_CLASSIFIER_H_

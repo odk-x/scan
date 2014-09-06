@@ -39,13 +39,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- * @deprecated using ProcessInBG instead.
+ * @deprecated using ProcessInBG instead.  
  * This activity starts the form processor and provides user feedback by
  * displaying progress dialogs and the alignment results.
  */
 public class AfterPhotoTaken extends Activity {
 
-	private static final String LOG_TAG = "ODKScan";
+	private static final String LOG_TAG = "ODKScan";   
 
 	private String photoName;
 	private RunProcessor runProcessor;

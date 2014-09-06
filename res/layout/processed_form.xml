@@ -44,18 +44,18 @@
 			This may change later -->
 		<Button
 		    style="@style/APTButton"
-	   	    android:id="@+id/saveSurveyBtn"
+	   	    android:id="@+id/save2Btn"
 	   	    android:layout_weight="1"
 	   	    android:layout_height="match_parent"
-	   	    android:text="@string/survey_save"
+	   	    android:text="@string/save"
 	   	    android:textSize="14sp">
 		</Button>
 		<Button
 		    style="@style/APTButton"
-	   	    android:id="@+id/transcribeSurveyBtn"
+	   	    android:id="@+id/transcribe2Btn"
 	   	    android:layout_weight="1"
 	   	    android:layout_height="match_parent"
-	   	    android:text="@string/survey_transcribe"
+	   	    android:text="@string/transcribe"
 	   	    android:textSize="14sp" >
 		</Button>
 	</LinearLayout>
