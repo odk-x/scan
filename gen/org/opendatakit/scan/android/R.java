@@ -149,6 +149,8 @@ containing a value of this type.
         public static final int zOrderOnTop=0x7f01000d;
     }
     public static final class color {
+        public static final int black=0x7f06000c;
+        public static final int blue=0x7f06000d;
         public static final int common_action_bar_splitter=0x7f060009;
         /**  Sign-in Button Colors 
          */
@@ -161,8 +163,16 @@ containing a value of this type.
         public static final int common_signin_btn_light_text_disabled=0x7f060006;
         public static final int common_signin_btn_light_text_focused=0x7f060007;
         public static final int common_signin_btn_light_text_pressed=0x7f060005;
-        public static final int common_signin_btn_text_dark=0x7f06000a;
-        public static final int common_signin_btn_text_light=0x7f06000b;
+        public static final int common_signin_btn_text_dark=0x7f060014;
+        public static final int common_signin_btn_text_light=0x7f060015;
+        public static final int green=0x7f06000e;
+        public static final int red=0x7f06000a;
+        public static final int solid_blue=0x7f060011;
+        public static final int solid_green=0x7f060012;
+        public static final int solid_red=0x7f060010;
+        public static final int solid_yellow=0x7f060013;
+        public static final int white=0x7f06000b;
+        public static final int yellow=0x7f06000f;
     }
     public static final class drawable {
         public static final int bad_picture=0x7f020000;
@@ -247,17 +257,18 @@ containing a value of this type.
         /**  For Main Screen 
  For Main Screen 
          */
-        public static final int Health_Center=0x7f0800b6;
+        public static final int Health_Center=0x7f0800ba;
         /**  Instructions 
  Instructions 
          */
-        public static final int Instructions1=0x7f0800c9;
-        public static final int Instructions2=0x7f0800ca;
-        public static final int Instructions3=0x7f0800cb;
-        public static final int Instructions4=0x7f0800cc;
-        public static final int InstructionsButton=0x7f0800ba;
-        public static final int SettingsButton=0x7f0800bb;
-        public static final int ViewFormsButton=0x7f0800b9;
+        public static final int Instructions1=0x7f0800cd;
+        public static final int Instructions2=0x7f0800ce;
+        public static final int Instructions3=0x7f0800cf;
+        public static final int Instructions4=0x7f0800d0;
+        public static final int InstructionsButton=0x7f0800be;
+        public static final int SettingsButton=0x7f0800bf;
+        public static final int ViewFormsButton=0x7f0800bd;
+        public static final int about=0x7f0800ae;
         public static final int accept_location=0x7f080015;
         public static final int access_error=0x7f080069;
         public static final int activity_not_found=0x7f080016;
@@ -268,9 +279,9 @@ containing a value of this type.
         public static final int admin_password_incorrect=0x7f08009e;
         public static final int admin_password_mismatch=0x7f08009d;
         public static final int admin_preferences=0x7f080091;
-        public static final int after_photo_taken_activity=0x7f0800b3;
-        public static final int aligning_form=0x7f0800be;
-        public static final int app_description=0x7f0800ad;
+        public static final int after_photo_taken_activity=0x7f0800b7;
+        public static final int aligning_form=0x7f0800c2;
+        public static final int app_description=0x7f0800b1;
         public static final int app_name=0x7f080017;
         public static final int app_url=0x7f08005c;
         /**   Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=70] 
@@ -288,12 +299,12 @@ containing a value of this type.
   Requested by string saying which app requested the notification. [CHAR LIMIT=42] 
          */
         public static final int auth_client_requested_by_msg=0x7f080011;
-        public static final int bubble_instructions_activity=0x7f0800b0;
-        public static final int bubble_process_activity=0x7f0800ae;
+        public static final int bubble_instructions_activity=0x7f0800b4;
+        public static final int bubble_process_activity=0x7f0800b2;
         /**  For Preferences 
  For Preferences 
          */
-        public static final int calibrate=0x7f0800b4;
+        public static final int calibrate=0x7f0800b8;
         public static final int cancel=0x7f080018;
         public static final int cancel_location=0x7f080019;
         public static final int change_font_size=0x7f080065;
@@ -310,8 +321,8 @@ containing a value of this type.
         public static final int change_view=0x7f08007d;
         public static final int click_to_web=0x7f080053;
         public static final int client=0x7f080054;
-        public static final int collect_save=0x7f0800c4;
-        public static final int collect_transcribe=0x7f0800c5;
+        public static final int collect_save=0x7f0800c8;
+        public static final int collect_transcribe=0x7f0800c9;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
@@ -419,7 +430,7 @@ containing a value of this type.
         find the service-side assets. [CHAR LIMIT=25] 
          */
         public static final int common_signin_button_text_long=0x7f08000e;
-        public static final int could_not_register=0x7f0800c0;
+        public static final int could_not_register=0x7f0800c4;
         public static final int default_completed=0x7f08001e;
         public static final int default_completed_summary=0x7f08001f;
         public static final int default_odk_formlist=0x7f080067;
@@ -431,10 +442,10 @@ containing a value of this type.
         public static final int delete_no=0x7f080023;
         public static final int delete_yes=0x7f080024;
         public static final int disksync_in_progress=0x7f080088;
-        public static final int display_data=0x7f0800c7;
-        public static final int display_processed_data_activity=0x7f0800b2;
-        public static final int display_processed_form_activity=0x7f0800b1;
-        public static final int doFormDetection=0x7f0800b5;
+        public static final int display_data=0x7f0800cb;
+        public static final int display_processed_data_activity=0x7f0800b6;
+        public static final int display_processed_form_activity=0x7f0800b5;
+        public static final int doFormDetection=0x7f0800b9;
         public static final int download=0x7f080025;
         public static final int download_forms_result=0x7f080026;
         public static final int download_in_progress=0x7f080087;
@@ -491,7 +502,7 @@ containing a value of this type.
         public static final int location_client_ulr_inactive_age_unknown=0x7f080013;
         public static final int location_client_ulr_inactive_unknown_restriction=0x7f080014;
         public static final int location_provider_accuracy=0x7f080035;
-        public static final int main_menu=0x7f0800c8;
+        public static final int main_menu=0x7f0800cc;
         public static final int manage_files=0x7f080037;
         public static final int manifest_server_error=0x7f08006a;
         public static final int manifest_tag_error=0x7f08006d;
@@ -500,7 +511,7 @@ containing a value of this type.
         public static final int media_save_failed=0x7f080084;
         /**  DisplayProcessedForm 
          */
-        public static final int next_page=0x7f0800c1;
+        public static final int next_page=0x7f0800c5;
         public static final int no_connection=0x7f080039;
         public static final int no_formdef_json=0x7f08008b;
         public static final int no_forms_uploaded=0x7f080072;
@@ -518,12 +529,14 @@ containing a value of this type.
         /**  AfterPhotoTaken 
  AfterPhotoTaken 
          */
-        public static final int process_form=0x7f0800bc;
-        public static final int processing_form=0x7f0800bf;
+        public static final int process_form=0x7f0800c0;
+        public static final int processing_form=0x7f0800c3;
         public static final int protocol=0x7f08005f;
         public static final int provider_disabled_error=0x7f080032;
+        public static final int read_license_fail=0x7f0800b0;
+        public static final int read_license_success=0x7f0800af;
         public static final int refresh=0x7f080042;
-        public static final int retake_photo=0x7f0800bd;
+        public static final int retake_photo=0x7f0800c1;
         public static final int review_data=0x7f080043;
         public static final int review_data_button=0x7f080044;
         public static final int root_element_error=0x7f08006b;
@@ -533,10 +546,10 @@ containing a value of this type.
         /**  Popup menu 
  Popup menu 
          */
-        public static final int save_data=0x7f0800c6;
+        public static final int save_data=0x7f0800ca;
         public static final int save_mid=0x7f080094;
         public static final int save_mid_summary=0x7f080095;
-        public static final int scan_new_form=0x7f0800b8;
+        public static final int scan_new_form=0x7f0800bc;
         public static final int searching_for_expansion_files=0x7f0800a4;
         public static final int select_another_image=0x7f080059;
         public static final int selected_google_account_text=0x7f080074;
@@ -587,11 +600,12 @@ containing a value of this type.
         public static final int show_splash_summary=0x7f080056;
         public static final int show_unsent_forms=0x7f08007f;
         public static final int splash_path=0x7f080057;
+        public static final int still_reading_license_file=0x7f0800ad;
         public static final int submission_url=0x7f080063;
         public static final int success=0x7f080071;
-        public static final int survey_save=0x7f0800c2;
-        public static final int survey_transcribe=0x7f0800c3;
-        public static final int the_current_health_center_is=0x7f0800b7;
+        public static final int survey_save=0x7f0800c6;
+        public static final int survey_transcribe=0x7f0800c7;
+        public static final int the_current_health_center_is=0x7f0800bb;
         public static final int toggle_selected=0x7f08004d;
         public static final int upload_in_progress=0x7f0800a3;
         public static final int uploading_data=0x7f08004e;
@@ -617,7 +631,7 @@ containing a value of this type.
  http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html 
          */
         public static final int version=0x7f080083;
-        public static final int view_bubble_forms_activity=0x7f0800af;
+        public static final int view_bubble_forms_activity=0x7f0800b3;
         public static final int view_hierarchy=0x7f080051;
         public static final int xforms_file_exists=0x7f080086;
     }

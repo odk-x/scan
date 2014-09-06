@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -20,9 +20,11 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opendatakit.aggregate.odktables.rest.entity.Column;
+import org.opendatakit.common.android.data.ElementDataType;
 import org.opendatakit.common.android.database.DataModelDatabaseHelper;
 import org.opendatakit.common.android.database.DataModelDatabaseHelperFactory;
-import org.opendatakit.common.android.utilities.ODKDatabaseUserDefinedTypes;
+import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 
@@ -148,11 +150,11 @@ public class JSON2SurveyJSON extends Activity{
 	
 	public void createSurveyTables(SQLiteDatabase db, String tableName, JSONArray fieldsToProcess)
 	{
-		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+	  List<Column> columns = new ArrayList<Column>();
 		
 		// Always add the scan output directory to the table definition
 		// This is used to map a Survey instance with a Scan photo
-		columns.put(scanOutputDir, "string");
+		columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
 			
 		try {
 			int fieldsLength = fieldsToProcess.length();
@@ -173,18 +175,21 @@ public class JSON2SurveyJSON extends Activity{
 					// segment before including it - I don't think so
 					if (segment != null) {
 						String imageName = fieldName + "_image_" + j;
-						columns.put(imageName, "mimeUri");
+						columns.add(new Column(imageName, imageName, DataTypeNamesToRemove.MIMEURI, 
+						    "[\"" + imageName + "_uriFragment\",\"" + imageName + "_contentType\"]"));
+						columns.add(new Column(imageName + "_uriFragment", "uriFragment", ElementDataType.rowpath.name(), "[]"));
+						columns.add(new Column(imageName + "_contentType", "contentType", ElementDataType.string.name(), "[]"));
 					}
 				}
 				
 				// Add column for field 
 				String type = field.getString("type").toUpperCase(Locale.US);
 				if (type.equals("INT")){
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.INTEGER);
+				  columns.add(new Column(fieldName, fieldName, ElementDataType.integer.name(), "[]"));
 				} else if (type.equals("FLOAT")){
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.NUMBER);
+              columns.add(new Column(fieldName, fieldName, ElementDataType.number.name(), "[]"));
 				} else {
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.STRING);
+              columns.add(new Column(fieldName, fieldName, ElementDataType.string.name(), "[]"));
 				}
 			}
 			
