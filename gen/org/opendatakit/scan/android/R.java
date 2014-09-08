@@ -222,8 +222,8 @@ containing a value of this type.
         public static final int process_button=0x7f070007;
         public static final int retake_button=0x7f070006;
         public static final int satellite=0x7f070002;
+        public static final int save2Btn=0x7f070017;
         public static final int saveBtn=0x7f070015;
-        public static final int saveSurveyBtn=0x7f070017;
         public static final int save_transcribe=0x7f070014;
         public static final int scanNewForm=0x7f07001d;
         public static final int startOver=0x7f07001e;
@@ -231,8 +231,8 @@ containing a value of this type.
         public static final int statusMessage=0x7f07001c;
         public static final int templateName=0x7f07000c;
         public static final int terrain=0x7f070003;
+        public static final int transcribe2Btn=0x7f070018;
         public static final int transcribeBtn=0x7f070016;
-        public static final int transcribeSurveyBtn=0x7f070018;
         public static final int version_display=0x7f070012;
         public static final int webview=0x7f070008;
         public static final int webview2=0x7f070019;
@@ -541,6 +541,7 @@ containing a value of this type.
         public static final int review_data_button=0x7f080044;
         public static final int root_element_error=0x7f08006b;
         public static final int root_namespace_error=0x7f08006c;
+        public static final int save=0x7f0800c6;
         public static final int save_as=0x7f080096;
         public static final int save_as_summary=0x7f080097;
         /**  Popup menu 
@@ -603,10 +604,9 @@ containing a value of this type.
         public static final int still_reading_license_file=0x7f0800ad;
         public static final int submission_url=0x7f080063;
         public static final int success=0x7f080071;
-        public static final int survey_save=0x7f0800c6;
-        public static final int survey_transcribe=0x7f0800c7;
         public static final int the_current_health_center_is=0x7f0800bb;
         public static final int toggle_selected=0x7f08004d;
+        public static final int transcribe=0x7f0800c7;
         public static final int upload_in_progress=0x7f0800a3;
         public static final int uploading_data=0x7f08004e;
         public static final int url_error=0x7f08004f;

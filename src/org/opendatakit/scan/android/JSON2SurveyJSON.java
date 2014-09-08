@@ -322,11 +322,11 @@ public class JSON2SurveyJSON extends Activity{
      */
 	public void createSurveyTablesFromFormDesigner(SQLiteDatabase db, String tableName, JSONObject subformFieldsToProcess)
 	{
-		LinkedHashMap<String, String> columns = new LinkedHashMap<String, String>();
+	  List<Column> columns = new ArrayList<Column>();
 		
 		// Always add the scan output directory to the table definition
 		// This is used to map a Survey instance with a Scan photo
-		columns.put(scanOutputDir, "string");
+	  columns.add(new Column( scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
 		
 		try {
 			JSONArray subformFieldNames = subformFieldsToProcess.names();
@@ -345,15 +345,15 @@ public class JSON2SurveyJSON extends Activity{
 				// this would be nice to do once the FormDesigner is stable
 				String type = subformFieldsToProcess.getString(fieldName);
 				if (type.equals("integer")){
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.INTEGER);
-					columns.put(imageName, ODKDatabaseUserDefinedTypes.MIMEURI);
+				  columns.add( new Column( fieldName, fieldName, ElementDataType.integer.name(), "[]"));
 				} else if (type.equals("decimal")){
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.NUMBER);
-					columns.put(imageName, ODKDatabaseUserDefinedTypes.MIMEURI);
+				  columns.add( new Column( fieldName, fieldName, ElementDataType.number.name(), "[]"));
 				} else {
-					columns.put(fieldName, ODKDatabaseUserDefinedTypes.STRING);
-					columns.put(imageName, ODKDatabaseUserDefinedTypes.MIMEURI);
+				  columns.add( new Column( fieldName, fieldName, ElementDataType.string.name(), "[]"));
 				}
+				columns.add( new Column( imageName, imageName, DataTypeNamesToRemove.MIMEURI, "[\"" + imageName + "_contentType\",\"" + imageName + "_uriFragment\"]"));
+				columns.add( new Column( imageName+"_contentType", "contentType", ElementDataType.string.name(), "[]"));
+				columns.add( new Column( imageName+"_uriFragment", "uriFragment", ElementDataType.rowpath.name(), "[]"));
 			}
 			
 			// Create the database table with the columns
