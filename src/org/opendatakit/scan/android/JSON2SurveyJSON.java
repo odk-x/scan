@@ -560,7 +560,8 @@ public class JSON2SurveyJSON extends Activity{
 		    if (cursor.moveToFirst()) {
 		    	int ind = cursor.getColumnIndex("_id");
 		    	String foudnUuidStr = cursor.getString(ind);
-				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
+				//String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
+				String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foudnUuidStr);
 				setIntentToReturn(uriStr);
 		    	cursor.close();
 				finish();
@@ -614,7 +615,8 @@ public class JSON2SurveyJSON extends Activity{
 		    
 	   	db.close();
 	    
-		String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
+		//String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
+		String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId);
 		setIntentToReturn(uriStr);
 		finish();
 	}
@@ -708,7 +710,8 @@ public class JSON2SurveyJSON extends Activity{
 			if (cursor.moveToFirst()) {
 				int ind = cursor.getColumnIndex("_id");
 				String foudnUuidStr = cursor.getString(ind);
-				String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
+				//String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
+				String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, foudnUuidStr);
 				setIntentToReturn(uriStr);
 				cursor.close();
 				finish();
@@ -803,7 +806,8 @@ public class JSON2SurveyJSON extends Activity{
 		    
 	   	db.close();
 	    
-		String uriStr = ScanUtils.getSurveyUri(subformId) + rowId;
+	   	// Return uri
+		String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, rowId);
 		setIntentToReturn(uriStr);
 		finish();
 	}

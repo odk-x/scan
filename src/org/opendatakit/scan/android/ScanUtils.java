@@ -57,8 +57,12 @@ public class ScanUtils {
 		return extStorageDir + "/opendatakit/" + appName + "/tables/" + formId +  "/instances/"; 
 	}
 	
-	public static String getSurveyUri(String formId) {
-		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=";
+	public static String getSurveyUriForInstanceAndDisplayContents(String formId, String instanceId) {
+		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId + "&screenPath=survey/_contents";
+	}
+	
+	public static String getSurveyUriForInstance(String formId, String instanceId) {
+		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId;
 	}
 	
 	public static String getXlsxConverterUri() {

@@ -41,6 +41,8 @@ public class DisplayProcessedForm extends Activity {
 
 	private Intent collectIntent;
 	
+	private Intent surveyIntent;
+	
 	private Intent tablesIntent;
 	
 	@Override
@@ -145,6 +147,7 @@ public class DisplayProcessedForm extends Activity {
 				save2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
+						/* Uncomment if you want Scan to launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						} 
@@ -152,6 +155,16 @@ public class DisplayProcessedForm extends Activity {
 						if(tablesIntent != null) {
 							if(tablesIntent.getData() == null) {
 								exportToTables(2);
+							}
+						}*/
+						
+						if(surveyIntent == null) {
+							surveyIntent = makeSurveyIntent();
+						}	 
+						//surveyIntent is still null if Survey not installed.
+						if(surveyIntent != null) {
+							if(surveyIntent.getData() == null) {
+								exportToSurvey(2);
 							}
 						}
 						
@@ -161,6 +174,7 @@ public class DisplayProcessedForm extends Activity {
 				transcribe2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
+						/* Uncomment to have Scan launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						}
@@ -174,6 +188,23 @@ public class DisplayProcessedForm extends Activity {
 								boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
 								if (tablesInstalled) {
 									startActivity(tablesIntent);
+								}
+							}
+						}*/
+						
+						if(surveyIntent == null) {
+							surveyIntent = makeSurveyIntent();
+						}
+						//surveyIntent is still null if Survey not installed.
+						if(surveyIntent != null) {
+							if(surveyIntent.getData() == null) {
+								exportToSurvey(3);
+							} else {
+								//The scan data has already been exported
+								//so just start Tables.
+								boolean surveyInstalled = checkForTablesInstallation(surveyIntent);
+								if (surveyInstalled) {
+									startActivity(surveyIntent);
 								}
 							}
 						}
@@ -252,6 +283,27 @@ public class DisplayProcessedForm extends Activity {
 		intent.putExtra("start", true);
 		return intent;
 	}
+	
+	/**
+	 * Creates an intent for launching survey.
+	 * May return null if survey is not installed.
+	 * @return
+	 */
+	public Intent makeSurveyIntent() {
+		// Initialize the intent that will start Survey.
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		
+		intent.setAction(Intent.ACTION_EDIT);
+		
+		//Start indicates that the form should be launched from the first question
+		//rather than the prompt list.
+		// Not sure if this start parameter is still necessary in Survey
+		intent.putExtra("start", true);
+		return intent;
+	}
 
 	/**
 	 * Creates an intent for launching tables.
@@ -268,6 +320,48 @@ public class DisplayProcessedForm extends Activity {
 		intent.setAction(Intent.ACTION_VIEW);
 		
 		return intent;
+	}
+	
+	/**
+	 * Creates an intent for launching survey.
+	 * May return null if survey is not installed.
+	 * @return
+	 */
+	public boolean checkForSurveyInstallation(Intent intent) {
+		boolean installed = true;
+		
+		//Use the intent to see if survey is installed.
+		//this assumes that you have action and data specified
+		PackageManager packMan = getPackageManager();
+		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
+			// ////////////
+			Log.i(LOG_TAG, "Survey is not installed.");
+			// ////////////		
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("ODK Survey was not found on this device.")
+					.setCancelable(false)
+					// Take this out until Survey is available on the Google Play Store
+					//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
+					//	public void onClick(DialogInterface dialog,
+					//			int id) {
+					//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
+					//	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
+					//		startActivity(goToMarket);
+					//		dialog.cancel();
+					//	}
+					//})
+					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int id) {
+							dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+			installed = false;
+		}
+		
+		return installed;
 	}
 	
 	/**
@@ -335,6 +429,21 @@ public class DisplayProcessedForm extends Activity {
 	}
 	
 	/**
+	 * Exports the Scan JSON data to Survey.
+	 * If the requestCode is 3 Survey will be launched
+	 * after the export activity returns a result.
+	 * @param requestCode
+	 */
+	public void exportToSurvey(int requestCode) {
+		showDialog(0);
+		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
+		createInstanceIntent.putExtras(extras);
+		createInstanceIntent.putExtra("templatePath", templatePath);
+		createInstanceIntent.putExtra("photoName", photoName);
+		startActivityForResult(createInstanceIntent, requestCode);
+	}
+	
+	/**
 	 * Exports the Scan JSON data to Tables.
 	 * If the requestCode is 3 Tables will be launched
 	 * after the export activity returns a result.
@@ -366,8 +475,11 @@ public class DisplayProcessedForm extends Activity {
 				Button save2Data = (Button) findViewById(R.id.save2Btn);
 				save2Data.setEnabled(false);
 				save2Data.setText("saved");
+				/* Uncomment to launch tables
 				tablesIntent.putExtras(data);
-				tablesIntent.setData(data.getData());
+				tablesIntent.setData(data.getData());*/
+				surveyIntent.putExtras(data);
+				surveyIntent.setData(data.getData());
 			}
 			
 			if (requestCode == 1) {
@@ -378,10 +490,17 @@ public class DisplayProcessedForm extends Activity {
 			
 			if (requestCode == 3) {
 				//dismissDialog(1);
+				/* Uncomment to launch tables
 				Log.i(LOG_TAG, "Starting Tables...");
 				boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
 				if (tablesInstalled) {
 					startActivity(tablesIntent);
+				}*/
+
+				Log.i(LOG_TAG, "Starting Survey...");
+				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
+				if (surveyInstalled) {
+					startActivity(surveyIntent);
 				}
 			}
 		}
