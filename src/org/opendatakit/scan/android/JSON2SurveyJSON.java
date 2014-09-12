@@ -19,9 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendatakit.aggregate.odktables.rest.entity.Column;
+import org.opendatakit.common.android.data.ColumnDefinition;
 import org.opendatakit.common.android.data.ElementDataType;
 import org.opendatakit.common.android.database.DataModelDatabaseHelper;
 import org.opendatakit.common.android.database.DataModelDatabaseHelperFactory;
+import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
@@ -257,14 +259,16 @@ public class JSON2SurveyJSON extends Activity{
      * @param tableName
      * @param subformFieldsToProcess
      */
-	public void createSurveyTables(SQLiteDatabase db, String tableName, JSONArray fieldsToProcess)
+	public ArrayList<ColumnDefinition> createSurveyTables(SQLiteDatabase db, String tableName, JSONArray fieldsToProcess)
 	{
 	  List<Column> columns = new ArrayList<Column>();
 		
 		// Always add the scan output directory to the table definition
 		// This is used to map a Survey instance with a Scan photo
 		columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
-			
+
+		ArrayList<ColumnDefinition> orderedColumns = null;
+		
 		try {
 			int fieldsLength = fieldsToProcess.length();
 			for(int i = 0; i < fieldsLength; i++){
@@ -303,11 +307,13 @@ public class JSON2SurveyJSON extends Activity{
 			}
 			
 			// Create the database table with the columns
-			ODKDatabaseUtils.createOrOpenDBTableWithColumns(db, tableName, columns);
-		    
+			orderedColumns = ODKDatabaseUtils.createOrOpenDBTableWithColumns(db, tableName, columns);
+		   return orderedColumns;
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.e(LOG_TAG, "Error - Could NOT create table " + tableName + " with columns");
+			// TODO: ensure that we handle exceptions up the call stack properly!!!!
+			throw new IllegalArgumentException("Unable to create table");
 		}
 	}
 	
@@ -320,7 +326,7 @@ public class JSON2SurveyJSON extends Activity{
      * @param tableName
      * @param subformFieldsToProcess
      */
-	public void createSurveyTablesFromFormDesigner(SQLiteDatabase db, String tableName, JSONObject subformFieldsToProcess)
+	public ArrayList<ColumnDefinition> createSurveyTablesFromFormDesigner(SQLiteDatabase db, String tableName, JSONObject subformFieldsToProcess)
 	{
 	  List<Column> columns = new ArrayList<Column>();
 		
@@ -357,11 +363,13 @@ public class JSON2SurveyJSON extends Activity{
 			}
 			
 			// Create the database table with the columns
-			ODKDatabaseUtils.createOrOpenDBTableWithColumns(db, tableName, columns);
+			return ODKDatabaseUtils.createOrOpenDBTableWithColumns(db, tableName, columns);
 		    
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.e(LOG_TAG, "Error - Could NOT create subform table " + tableName + " with columns");
+			// TODO: verify that exceptions are properly handled up the stack
+			throw new IllegalArgumentException("Unable to create subform table");
 		}
 	}
 	
@@ -522,7 +530,8 @@ public class JSON2SurveyJSON extends Activity{
 		SQLiteDatabase db = dbh.getWritableDatabase();
 		
 		String tableName = formId;
-			
+		ArrayList<ColumnDefinition> orderedColumns;
+		
 		String rowId = null;
 		StringBuilder dbValuesToWrite = new StringBuilder();
 		String uuidStr = UUID.randomUUID().toString();
@@ -553,9 +562,11 @@ public class JSON2SurveyJSON extends Activity{
 		    Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
 		    if (!cursor.moveToFirst()) {
 		    	Log.i(LOG_TAG, "No table definition found for " + tableName + ". Creating new table definition");
-		    	createSurveyTables(db, tableName, fields);
-		    	
-		    } 
+		    	orderedColumns = createSurveyTables(db, tableName, fields);
+		    } else {
+		      List<Column> columns = ODKDatabaseUtils.getUserDefinedColumns(db, tableName);
+		      orderedColumns = ColumnDefinition.buildColumnDefinitions(columns);
+		    }
 		    
 		    String selection = scanOutputDir + "=?";
 		    String[] selectionArgs = {ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))};
@@ -563,9 +574,9 @@ public class JSON2SurveyJSON extends Activity{
 		    
 		    // Check if the instance already exists in survey
 		    if (cursor.moveToFirst()) {
-		    	int ind = cursor.getColumnIndex("_id");
-		    	String foudnUuidStr = cursor.getString(ind);
-				String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
+		    	int ind = cursor.getColumnIndex(DataTableColumns.ID);
+		    	String foundUuidStr = cursor.getString(ind);
+				String uriStr = ScanUtils.getSurveyUri(formId) + foundUuidStr;
 				setIntentToReturn(uriStr);
 		    	cursor.close();
 				finish();
@@ -606,7 +617,7 @@ public class JSON2SurveyJSON extends Activity{
 				// Add scan metadata here for the photo taken
 				tablesValues.put(scanOutputDir, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
 				Log.i(LOG_TAG,"Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
-				ODKDatabaseUtils.writeDataIntoExistingDBTableWithId(db, tableName, tablesValues, rowId);
+				ODKDatabaseUtils.insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns, tablesValues, rowId);
 				
 				if (writeOutCustomCss) {
 					writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
@@ -691,7 +702,8 @@ public class JSON2SurveyJSON extends Activity{
 			subformId = "scan_" + subformId;
 			
 			tableName = subformId;
-		    
+		   ArrayList<ColumnDefinition> orderedColumns;
+		   
 			int fieldsLength = fields.length();
 			if(fieldsLength == 0){
 				throw new JSONException("There are no fields in the json output file.");
@@ -702,8 +714,11 @@ public class JSON2SurveyJSON extends Activity{
 			Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
 			if (!cursor.moveToFirst()) {
 				Log.i(LOG_TAG, "No table definition found for " + tableName + ". Creating new table definition");
-				createSurveyTablesFromFormDesigner(db, tableName, subforms.getJSONObject(0).getJSONObject("fields"));
-			} 
+				orderedColumns = createSurveyTablesFromFormDesigner(db, tableName, subforms.getJSONObject(0).getJSONObject("fields"));
+			} else {
+			  List<Column> columns = ODKDatabaseUtils.getUserDefinedColumns(db, tableName);
+			  orderedColumns = ColumnDefinition.buildColumnDefinitions(columns);
+			}
 		    
 			String selection = scanOutputDir + "=?";
 			String[] selectionArgs = {ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))};
@@ -784,7 +799,7 @@ public class JSON2SurveyJSON extends Activity{
 					// Add scan metadata here for the photo taken
 					tablesValues.put(scanOutputDir, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
 					Log.i(LOG_TAG,"Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
-					ODKDatabaseUtils.writeDataIntoExistingDBTableWithId(db, tableName, tablesValues, rowId);
+					ODKDatabaseUtils.insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns, tablesValues, rowId);
 					
 					if (writeOutCustomCss) {
 						writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
