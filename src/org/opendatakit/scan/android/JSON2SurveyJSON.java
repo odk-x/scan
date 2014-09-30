@@ -20,7 +20,7 @@ import org.json.JSONObject;
 import org.opendatakit.aggregate.odktables.rest.entity.Column;
 import org.opendatakit.common.android.data.ColumnDefinition;
 import org.opendatakit.common.android.data.ElementDataType;
-import org.opendatakit.common.android.database.DataModelDatabaseHelperFactory;
+import org.opendatakit.common.android.database.DatabaseFactory;
 import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
@@ -547,7 +547,7 @@ public class JSON2SurveyJSON extends Activity {
     String rowId = null;
     SQLiteDatabase db = null;
     try {
-      db = DataModelDatabaseHelperFactory.getDatabase(this, ScanUtils.getAppNameForSurvey());
+      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getAppNameForSurvey());
 
       String tableName = formId;
       ArrayList<ColumnDefinition> orderedColumns;
@@ -683,7 +683,7 @@ public class JSON2SurveyJSON extends Activity {
     String rowId = null;
 
     try {
-      db = DataModelDatabaseHelperFactory.getDatabase(this, ScanUtils.getAppNameForSurvey());
+      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getAppNameForSurvey());
       // This code will only handle one subform currently
       // It will break otherwise
       JSONArray subforms = new JSONArray();
