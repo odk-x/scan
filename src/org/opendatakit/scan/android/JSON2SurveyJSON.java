@@ -25,6 +25,7 @@ import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
+import org.opendatakit.common.android.utilities.TableUtil;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -588,8 +589,7 @@ public class JSON2SurveyJSON extends Activity {
               + ". Creating new table definition");
           orderedColumns = createSurveyTables(db, tableName, fields);
         } else {
-          List<Column> columns = ODKDatabaseUtils.get().getUserDefinedColumns(db, tableName);
-          orderedColumns = ColumnDefinition.buildColumnDefinitions(columns);
+          orderedColumns = TableUtil.get().getColumnDefinitions(db, tableName);
         }
 
         String selection = scanOutputDir + "=?";
@@ -754,8 +754,7 @@ public class JSON2SurveyJSON extends Activity {
         orderedColumns = createSurveyTablesFromFormDesigner(db, tableName, subforms
             .getJSONObject(0).getJSONObject("fields"));
       } else {
-        List<Column> columns = ODKDatabaseUtils.get().getUserDefinedColumns(db, tableName);
-        orderedColumns = ColumnDefinition.buildColumnDefinitions(columns);
+        orderedColumns = TableUtil.get().getColumnDefinitions(db, tableName);
       }
 
       String selection = scanOutputDir + "=?";
