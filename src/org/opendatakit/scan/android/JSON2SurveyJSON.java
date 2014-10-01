@@ -601,7 +601,7 @@ public class JSON2SurveyJSON extends Activity {
           int ind = cursor.getColumnIndex(DataTableColumns.ID);
           String foundUuidStr = cursor.getString(ind);
           //String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
-          String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foudnUuidStr);
+          String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foundUuidStr);
           setIntentToReturn(uriStr);
           cursor.close();
           finish();
