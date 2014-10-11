@@ -322,7 +322,7 @@ public class JSON2SurveyJSON extends Activity {
 
       // Create the database table with the columns
       orderedColumns = ODKDatabaseUtils.get()
-          .createOrOpenDBTableWithColumns(db, tableName, columns);
+          .createOrOpenDBTableWithColumns(db, ScanUtils.getAppNameForSurvey(), tableName, columns);
       return orderedColumns;
     } catch (Exception e) {
       e.printStackTrace();
@@ -381,7 +381,7 @@ public class JSON2SurveyJSON extends Activity {
       }
 
       // Create the database table with the columns
-      return ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db, tableName, columns);
+      return ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db, ScanUtils.getAppNameForSurvey(), tableName, columns);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -589,7 +589,7 @@ public class JSON2SurveyJSON extends Activity {
               + ". Creating new table definition");
           orderedColumns = createSurveyTables(db, tableName, fields);
         } else {
-          orderedColumns = TableUtil.get().getColumnDefinitions(db, tableName);
+          orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getAppNameForSurvey(), tableName);
         }
 
         String selection = scanOutputDir + "=?";
@@ -754,7 +754,7 @@ public class JSON2SurveyJSON extends Activity {
         orderedColumns = createSurveyTablesFromFormDesigner(db, tableName, subforms
             .getJSONObject(0).getJSONObject("fields"));
       } else {
-        orderedColumns = TableUtil.get().getColumnDefinitions(db, tableName);
+        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getAppNameForSurvey(), tableName);
       }
 
       String selection = scanOutputDir + "=?";
