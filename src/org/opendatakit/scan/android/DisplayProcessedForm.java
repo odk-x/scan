@@ -147,7 +147,7 @@ public class DisplayProcessedForm extends Activity {
 				save2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						/* Uncomment if you want Scan to launch Tables
+						// Launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						} 
@@ -156,8 +156,8 @@ public class DisplayProcessedForm extends Activity {
 							if(tablesIntent.getData() == null) {
 								exportToTables(2);
 							}
-						}*/
-						
+						}
+						/* Uncomment if you want Scan to launch Survey
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}	 
@@ -166,7 +166,7 @@ public class DisplayProcessedForm extends Activity {
 							if(surveyIntent.getData() == null) {
 								exportToSurvey(2);
 							}
-						}
+						}*/
 						
 					}
 				});
@@ -174,7 +174,7 @@ public class DisplayProcessedForm extends Activity {
 				transcribe2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						/* Uncomment to have Scan launch Tables
+						// Launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						}
@@ -190,8 +190,8 @@ public class DisplayProcessedForm extends Activity {
 									startActivity(tablesIntent);
 								}
 							}
-						}*/
-						
+						}
+						/* Uncomment if you want Scan to launch Survey
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}
@@ -207,7 +207,7 @@ public class DisplayProcessedForm extends Activity {
 									startActivity(surveyIntent);
 								}
 							}
-						}
+						}*/
 					}
 				});
 			}
@@ -312,8 +312,13 @@ public class DisplayProcessedForm extends Activity {
 	 */
 	public Intent makeTablesIntent() {
 		// Initialize the intent that will start Tables.
+	   // final String TABLE_DISPLAY_ACTIVITY =
+	   //     "org.opendatakit.tables.activities.TableDisplayActivity";
+	   // Intent intent = new Intent(TABLE_DISPLAY_ACTIVITY);
+	    
+	   //Old Way
 		Intent intent = getPackageManager().getLaunchIntentForPackage("org.opendatakit.tables");
-		//Intent intent = new Intent();
+	    
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -475,11 +480,12 @@ public class DisplayProcessedForm extends Activity {
 				Button save2Data = (Button) findViewById(R.id.save2Btn);
 				save2Data.setEnabled(false);
 				save2Data.setText("saved");
-				/* Uncomment to launch tables
+				// Launch tables
 				tablesIntent.putExtras(data);
-				tablesIntent.setData(data.getData());*/
+				tablesIntent.setData(data.getData());
+				/* Uncomment to launch survey
 				surveyIntent.putExtras(data);
-				surveyIntent.setData(data.getData());
+				surveyIntent.setData(data.getData());*/
 			}
 			
 			if (requestCode == 1) {
@@ -490,18 +496,18 @@ public class DisplayProcessedForm extends Activity {
 			
 			if (requestCode == 3) {
 				//dismissDialog(1);
-				/* Uncomment to launch tables
+				// Launch tables
 				Log.i(LOG_TAG, "Starting Tables...");
 				boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
 				if (tablesInstalled) {
 					startActivity(tablesIntent);
-				}*/
-
+				}
+			   /* Uncomment to launch survey
 				Log.i(LOG_TAG, "Starting Survey...");
 				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
 				if (surveyInstalled) {
 					startActivity(surveyIntent);
-				}
+				}*/
 			}
 		}
 

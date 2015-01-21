@@ -17,9 +17,9 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.aggregate.odktables.rest.ElementDataType;
 import org.opendatakit.aggregate.odktables.rest.entity.Column;
 import org.opendatakit.common.android.data.ColumnDefinition;
+import org.opendatakit.aggregate.odktables.rest.ElementDataType;
 import org.opendatakit.common.android.database.DatabaseFactory;
 import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
@@ -43,6 +43,16 @@ public class JSON2SurveyJSON extends Activity {
   private static final String LOG_TAG = "ODKScan";
 
   private static final String scanOutputDir = "scan_output_directory";
+  
+  private static final String APP_NAME = "appName";
+  
+  private static final String TABLE_ID = "tableId";
+  
+  private static final String FILE_NAME = "filename";
+  
+  private static final String TABLE_DISPLAY_TYPE = "tableDisplayViewType";
+  
+  private static final String TABLES_DISPLAY_LIST = "LIST";
 
   private static String xlsxFormId;
 
@@ -321,15 +331,15 @@ public class JSON2SurveyJSON extends Activity {
       }
 
       // Create the database table with the columns
-      orderedColumns = ODKDatabaseUtils.get()
-          .createOrOpenDBTableWithColumns(db, ScanUtils.getAppNameForSurvey(), tableName, columns);
-      return orderedColumns;
+      // TODO: Not have this hardcoded to the appName of tables
+      orderedColumns = ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db,
+          ScanUtils.getODKAppName(), tableName, columns);
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT create table " + tableName + " with columns");
-      // TODO: ensure that we handle exceptions up the call stack properly!!!!
       throw new IllegalArgumentException("Unable to create table");
     }
+    return orderedColumns;
   }
 
   /**
@@ -348,6 +358,8 @@ public class JSON2SurveyJSON extends Activity {
     // Always add the scan output directory to the table definition
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
+
+    ArrayList<ColumnDefinition> orderedColumns = null;
 
     try {
       JSONArray subformFieldNames = subformFieldsToProcess.names();
@@ -372,6 +384,7 @@ public class JSON2SurveyJSON extends Activity {
         } else {
           columns.add(new Column(fieldName, fieldName, ElementDataType.string.name(), "[]"));
         }
+
         columns.add(new Column(imageName, imageName, DataTypeNamesToRemove.MIMEURI, "[\""
             + imageName + "_contentType\",\"" + imageName + "_uriFragment\"]"));
         columns.add(new Column(imageName + "_contentType", "contentType", ElementDataType.string
@@ -381,14 +394,15 @@ public class JSON2SurveyJSON extends Activity {
       }
 
       // Create the database table with the columns
-      return ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db, ScanUtils.getAppNameForSurvey(), tableName, columns);
-
+      // TODO: Not have this hardcoded to the appName of tables
+      orderedColumns = ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db,
+          ScanUtils.getODKAppName(), tableName, columns);
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT create subform table " + tableName + " with columns");
-      // TODO: verify that exceptions are properly handled up the stack
       throw new IllegalArgumentException("Unable to create subform table");
     }
+    return orderedColumns;
   }
 
   /**
@@ -445,8 +459,7 @@ public class JSON2SurveyJSON extends Activity {
         String imageName_uriFragment = imageName + "_uriFragment";
         String imageName_contentType = imageName + "_contentType";
 
-        addStringValueToTableContentValue(tablesValues, imageName_uriFragment,
-            ScanUtils.getAppRelativeInstancesDirPath(formId, dirId) + outputPicFile.getName());
+        addStringValueToTableContentValue(tablesValues, imageName_uriFragment, outputPicFile.getName());
         addStringValueToTableContentValue(tablesValues, imageName_contentType, "image/jpg");
 
         // Add styling for this image in the css file if no css file is found
@@ -544,128 +557,123 @@ public class JSON2SurveyJSON extends Activity {
   public void createSurveyInstance(String formId) {
     ContentValues tablesValues = new ContentValues();
 
-    // Is there a better place to get the Survey application name?
+    String tableName = formId;
+
     String rowId = null;
     SQLiteDatabase db = null;
+    ArrayList<ColumnDefinition> orderedColumns = null;
+
+    StringBuilder dbValuesToWrite = new StringBuilder();
+    String uuidStr = UUID.randomUUID().toString();
+
     try {
-      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getAppNameForSurvey());
+      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getODKAppName());
 
-      String tableName = formId;
-      ArrayList<ColumnDefinition> orderedColumns;
-
-      StringBuilder dbValuesToWrite = new StringBuilder();
-      String uuidStr = UUID.randomUUID().toString();
-
-      try {
-
-        if (tableName == null) {
-          throw new Exception("formId cannot be blank!!");
-        }
-
-        // Get the fields from the output.json file that need to be created in
-        // the
-        // database table
-        JSONArray fields = new JSONArray();
-        for (String photoName : photoNames) {
-          JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName))
-              .getJSONArray("fields");
-          int photoFieldsLength = photoFields.length();
-          for (int i = 0; i < photoFieldsLength; i++) {
-            fields.put(photoFields.get(i));
-          }
-          Log.i(LOG_TAG, "Concated " + photoName);
-        }
-
-        int fieldsLength = fields.length();
-        if (fieldsLength == 0) {
-          throw new JSONException("There are no fields in the json output file.");
-        }
-
-        Cursor cursor = db.rawQuery(
-            "select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'",
-            null);
-        if (!cursor.moveToFirst()) {
-          Log.i(LOG_TAG, "No table definition found for " + tableName
-              + ". Creating new table definition");
-          orderedColumns = createSurveyTables(db, tableName, fields);
-        } else {
-          orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getAppNameForSurvey(), tableName);
-        }
-
-        String selection = scanOutputDir + "=?";
-        String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
-        cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
-
-        // Check if the instance already exists in survey
-        if (cursor.moveToFirst()) {
-          int ind = cursor.getColumnIndex(DataTableColumns.ID);
-          String foundUuidStr = cursor.getString(ind);
-          //String uriStr = ScanUtils.getSurveyUri(formId) + foudnUuidStr;
-          String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foundUuidStr);
-          setIntentToReturn(uriStr);
-          cursor.close();
-          finish();
-          return;
-        }
-
-        Log.i(LOG_TAG, "Transfering the values from the JSON output into the survey instance");
-
-        // Have to address multiple page scans
-        // Not sure what this means for survey
-        File dirToMake = null;
-        String dirId = null;
-        StringBuilder cssStr = new StringBuilder();
-        String cssDir = ScanUtils.getAppFormDirPath(formId);
-
-        boolean writeOutCustomCss = false;
-        if (fieldsLength > 0) {
-          // manufacture a rowId for this record...
-          // for directory name to store the image files
-          rowId = "uuid:" + uuidStr;
-
-          dirToMake = new File(ODKFileUtils.getInstanceFolder(ScanUtils.getAppNameForSurvey(),
-              formId, rowId));
-          dirId = dirToMake.getAbsolutePath().substring(
-              dirToMake.getAbsolutePath().lastIndexOf("/") + 1);
-
-          File customCssFile = new File(cssDir + customCssFileNameStr);
-          if (!customCssFile.exists()) {
-            writeOutCustomCss = true;
-          }
-        }
-        for (int i = 0; i < fieldsLength; i++) {
-          JSONObject field = fields.optJSONObject(i);
-
-          mapScanInstanceToSurveyInstance(field, field.getString("name"), tablesValues,
-              writeOutCustomCss, cssStr, dbValuesToWrite, dirToMake, dirId, formId);
-        }
-
-        if (tablesValues.size() > 0) {
-          // Add scan metadata here for the photo taken
-          tablesValues.put(scanOutputDir,
-              ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
-          Log.i(LOG_TAG,
-              "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
-          ODKDatabaseUtils.get().insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns,
-              tablesValues, rowId);
-
-          if (writeOutCustomCss) {
-            writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
-          }
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-        Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
+      if (tableName == null) {
+        throw new Exception("formId cannot be blank!!");
       }
+
+      // Get the fields from the output.json file that need to be created in the
+      // database table
+      JSONArray fields = new JSONArray();
+      for (String photoName : photoNames) {
+        JSONArray photoFields = JSONUtils.parseFileToJSONObject(ScanUtils.getJsonPath(photoName))
+            .getJSONArray("fields");
+        int photoFieldsLength = photoFields.length();
+        for (int i = 0; i < photoFieldsLength; i++) {
+          fields.put(photoFields.get(i));
+        }
+        Log.i(LOG_TAG, "Concated " + photoName);
+      }
+
+      int fieldsLength = fields.length();
+      if (fieldsLength == 0) {
+        throw new JSONException("There are no fields in the json output file.");
+      }
+
+      Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+          + tableName + "'", null);
+      if (!cursor.moveToFirst()) {
+        Log.i(LOG_TAG, "No table definition found for " + tableName
+            + ". Creating new table definition");
+        orderedColumns = createSurveyTables(db, tableName, fields);
+      } else {
+        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getODKAppName(),
+            tableName);
+      }
+
+      String selection = scanOutputDir + "=?";
+      String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
+      cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
+
+      // Check if the instance already exists in survey
+      if (cursor.moveToFirst()) {
+        int ind = cursor.getColumnIndex(DataTableColumns.ID);
+        //String foudnUuidStr = cursor.getString(ind);
+        //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foudnUuidStr);
+        setIntentToReturn(formId);
+        cursor.close();
+        finish();
+        return;
+      }
+
+      Log.i(LOG_TAG, "Transfering the values from the JSON output into the survey instance");
+
+      // Have to address multiple page scans
+      // Not sure what this means for survey
+      File dirToMake = null;
+      String dirId = null;
+      StringBuilder cssStr = new StringBuilder();
+      String cssDir = ScanUtils.getAppFormDirPath(formId);
+
+      boolean writeOutCustomCss = false;
+      if (fieldsLength > 0) {
+        // manufacture a rowId for this record...
+        // for directory name to store the image files
+        rowId = "uuid:" + uuidStr;
+
+        dirToMake = new File(ODKFileUtils.getInstanceFolder(ScanUtils.getODKAppName(),
+            formId, rowId));
+        dirId = dirToMake.getAbsolutePath().substring(
+            dirToMake.getAbsolutePath().lastIndexOf("/") + 1);
+
+        File customCssFile = new File(cssDir + customCssFileNameStr);
+        if (!customCssFile.exists()) {
+          writeOutCustomCss = true;
+        }
+      }
+      for (int i = 0; i < fieldsLength; i++) {
+        JSONObject field = fields.optJSONObject(i);
+
+        mapScanInstanceToSurveyInstance(field, field.getString("name"), tablesValues,
+            writeOutCustomCss, cssStr, dbValuesToWrite, dirToMake, dirId, formId);
+      }
+
+      if (tablesValues.size() > 0) {
+        // Add scan metadata here for the photo taken
+        tablesValues.put(scanOutputDir,
+            ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+        Log.i(LOG_TAG,
+            "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
+        ODKDatabaseUtils.get().insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns,
+            tablesValues, rowId);
+
+        if (writeOutCustomCss) {
+          writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
     } finally {
       if (db != null) {
         db.close();
       }
     }
 
-    //String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
-    String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId);
-    setIntentToReturn(uriStr);
+    // String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
+    //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId);
+    setIntentToReturn(formId);
     finish();
   }
 
@@ -680,12 +688,12 @@ public class JSON2SurveyJSON extends Activity {
     ContentValues tablesValues;
     String subformId = null;
     String tableName = null;
-    // Is there a better place to get the Survey application name?
     SQLiteDatabase db = null;
     String rowId = null;
+    ArrayList<ColumnDefinition> orderedColumns = null;
 
     try {
-      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getAppNameForSurvey());
+      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getODKAppName());
       // This code will only handle one subform currently
       // It will break otherwise
       JSONArray subforms = new JSONArray();
@@ -737,7 +745,6 @@ public class JSON2SurveyJSON extends Activity {
       subformId = "scan_" + subformId;
 
       tableName = subformId;
-      ArrayList<ColumnDefinition> orderedColumns;
 
       int fieldsLength = fields.length();
       if (fieldsLength == 0) {
@@ -754,7 +761,8 @@ public class JSON2SurveyJSON extends Activity {
         orderedColumns = createSurveyTablesFromFormDesigner(db, tableName, subforms
             .getJSONObject(0).getJSONObject("fields"));
       } else {
-        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getAppNameForSurvey(), tableName);
+        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getODKAppName(),
+            tableName);
       }
 
       String selection = scanOutputDir + "=?";
@@ -764,10 +772,11 @@ public class JSON2SurveyJSON extends Activity {
       // Check if the instance already exists in survey
       if (cursor.moveToFirst()) {
         int ind = cursor.getColumnIndex("_id");
-        String foudnUuidStr = cursor.getString(ind);
-        //String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
-        String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, foudnUuidStr);
-        setIntentToReturn(uriStr);
+        //String foudnUuidStr = cursor.getString(ind);
+        // String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
+        //String uriStr = ScanUtils
+        //    .getSurveyUriForInstanceAndDisplayContents(subformId, foudnUuidStr);
+        setIntentToReturn(subformId);
         cursor.close();
         finish();
         return;
@@ -810,7 +819,7 @@ public class JSON2SurveyJSON extends Activity {
         // for directory name to store the image files
         String uuidStr = UUID.randomUUID().toString();
         rowId = "uuid:" + uuidStr;
-        dirToMake = new File(ODKFileUtils.getInstanceFolder(ScanUtils.getAppNameForSurvey(),
+        dirToMake = new File(ODKFileUtils.getInstanceFolder(ScanUtils.getODKAppName(),
             subformId, rowId));
         dirId = dirToMake.getAbsolutePath().substring(
             dirToMake.getAbsolutePath().lastIndexOf("/") + 1);
@@ -869,8 +878,8 @@ public class JSON2SurveyJSON extends Activity {
     }
 
     // Return uri
-    String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, rowId);
-    setIntentToReturn(uriStr);
+    //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, rowId);
+    setIntentToReturn(subformId);
     finish();
   }
 
@@ -1255,10 +1264,16 @@ public class JSON2SurveyJSON extends Activity {
    * @return
    */
   // This function may be useful when checking for version issues?
-  private void setIntentToReturn(String uriString) {
-    Intent resultData = new Intent();
-    resultData.setData(Uri.parse(uriString));
-    setResult(RESULT_OK, resultData);
+  private void setIntentToReturn(String formId) {
+    
+    Intent intent = new Intent();
+    setResult(RESULT_OK, intent);
+    
+    Bundle args = new Bundle();
+    args.putString(APP_NAME, ScanUtils.getODKAppName());
+    args.putString(TABLE_ID, formId);
+    args.putString(FILE_NAME, ScanUtils.getTablesUriForInstanceWithScanOutputDir(formId, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))));
+    args.putString(TABLE_DISPLAY_TYPE, TABLES_DISPLAY_LIST);
+    intent.putExtras(args);
   }
-
 }

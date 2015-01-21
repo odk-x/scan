@@ -23,6 +23,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
+import org.opendatakit.common.android.utilities.UrlUtils;
+
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -45,7 +47,7 @@ public class ScanUtils {
 	
 	public static final String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 	
-	public static final String getAppNameForSurvey() {
+	public static final String getODKAppName() {
 		return appName;
 	}
 	
@@ -63,6 +65,16 @@ public class ScanUtils {
 	
 	public static String getSurveyUriForInstance(String formId, String instanceId) {
 		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId;
+	}
+	
+	public static String getTablesUriForInstance(String formId) {
+	  return "assets/" + formId + "/html/" + formId + "_list.html";
+	}
+	
+	public static String getTablesUriForInstanceWithScanOutputDir(String formId, String scanOutputDir) {
+	  // Need to encode the scan_output_directory query parameter
+	  String encodedScanOutputDir = UrlUtils.encodeSegment(scanOutputDir);
+	  return "assets/" + formId + "/html/" + formId + ".html?scan_output_directory=" + encodedScanOutputDir;
 	}
 	
 	public static String getXlsxConverterUri() {
