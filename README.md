@@ -15,6 +15,14 @@ Install swig:
 sudo apt-get install swig
 ```
 
+If you are using a Mac you can use [Homebrew](http://brew.sh/) to install swig.
+ 
+ ```bash
+ homebrew install swig
+ ```
+
+Install the NDK. Note that the newest version does NOT work. You must use version [r8d](http://dl.google.com/android/ndk/android-ndk-r8d-darwin-x86.tar.bz2). 
+
 Set the sdk path in `local.properties`
 
 Set the ndk path in `local.env.mk`
