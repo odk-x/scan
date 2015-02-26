@@ -3,11 +3,7 @@ ODKScan
 
 Setting up your environment
 ===========================
-This app is a mix of Java and native C++ code, so it can be a bit complicated to work with
-
-The [OpenCV guide here](http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/android_dev_intro.html#quick-environment-setup-for-android-development)
-suggests using the [The NVIDIA Tegra Android development pack](https://developer.nvidia.com/tegra-android-development-pack) to setup your Android development environment.
-It may take a few hours or a day to register for a Nvidia developer account in order to download it, but it can save a lot of trouble.
+This app is a mix of Java and native C++ code, so it can be a bit complicated to work with.
 
 Install swig:
 
