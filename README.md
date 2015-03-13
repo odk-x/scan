@@ -1,9 +1,9 @@
-ODKScan
-=====
+# ODKScan
 
-Setting up your environment
-===========================
+## Setting up your environment
 This app is a mix of Java and native C++ code, so it can be a bit complicated to work with.
+
+### C++ components
 
 Install swig:
 
@@ -17,38 +17,47 @@ If you are using a Mac you can use [Homebrew](http://brew.sh/) to install swig.
  homebrew install swig
  ```
 
-Install the NDK. Note that the newest version does NOT work. You must use version [r8d](http://dl.google.com/android/ndk/android-ndk-r8d-darwin-x86.tar.bz2). 
+Install the Android [NDK](https://developer.android.com/tools/sdk/ndk/index.html) and [SDK](http://developer.android.com/sdk/index.html#Other).
 
-Set the sdk path in `local.properties`
+Set the SDK path in `local.properties`
 
-Set the ndk path in `local.env.mk`
+Set the NDK path in `local.env.mk`
+
+### Android 
+
+Install [Eclipse](https://www.eclipse.org/downloads/) and the [ADT Plugin](http://developer.android.com/sdk/installing/installing-adt.html).
+
+This project depends on ODK's AndroidCommon and PlayServices projects, so be sure to clone those as well. ODK Survey and ODK Tables also integrate well with ODK Scan, but are not required.
+
+Import PlayServices and AndroidCommon into Eclipse first. Then import ODK Survey. 
 
 Now you should be ready to build.
 
-Building the project
-====================
+## Building the project
 
-To clean the project:
+### C++ components
+Open a terminal in the opendatakit.scan directory.
 
-1. Enter "make clean"
-2. Enter "ant clean"
+To clean the C++ components:
 
-To build the project:
+ ```bash
+make clean
+ ```
 
-1. Enter "make" to build the C++ components
-2. Enter "ant debug" to bulid the Java compononts and the Android application
+To build the C++ components:
 
-Alternatively, enter "ant install" in step 2 to install the Android application to the connected
-emulator or phone after the application is built.
+ ```bash
+make
+ ```
 
-If you want to set things up in eclipse take another look at the tutorial above.
-There's a good chance you will run into some problems, but many can be solved simply by doing this:
+### Android
+
+Eclipse builds the project automatically by default, but as we change the C++ we may need to manually clean and rebuild the project. Follow the steps below after building the C++:
 
 1. From the top menu bar go to Project->Clean.
 2. In the Package Explorer, right click on the project and select refresh.
 
-Calling the via by intent
-=========================
+## Calling the via by intent
 
 The ODKScan alignment code can be launched by itself via intent like so:
 
@@ -60,8 +69,7 @@ i.putExtra("outputPath", "/sdcard/ODKScan/output/taken_2013-03-25_12-46-21/outpu
 startActivity(i);
 ```
 
-Architecture
-============
+## Architecture
 
 The initial training data and form texmplates are included in the assets folder.
 When a new version of the app is first launched they are installed into the ODKScan directory by RunSetup.
@@ -72,8 +80,7 @@ The processing pipeline includes 3 main components:
 * ProcessInBG is a service that runs the ODKScan-core cord in background threads, outside of the activity, and creates notifications when it is complete.
 * DisplayProcessedForm displays the marked-up form image and allows the user to save the data to ODK Collect. It is launched from the notifications ProcessInBG creates.
 
-Source tree information
-=======================
+## Source tree information
 Quick description of the content in the root folder:
 
 * AndroidManifest.xml -- Manifest of the Android application
@@ -88,8 +95,7 @@ Quick description of the content in the root folder:
 * res -- Source tree for Java resources
 * src -- Source tree for Java components
 
-Acknowledgments:
------------
+## Acknowledgments:
 * Eleanor O'Rourke (eorourke@cs.washington.edu)
 * Nicola Dell (nixdell@cs.washington.edu)
 * Vincent Lung (vincent.lung@gmail.com)

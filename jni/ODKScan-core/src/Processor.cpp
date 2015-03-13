@@ -725,7 +725,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
 	catch(...){
-		LOGI(("Could not output segment to: " + segmentOutPath + segmentName).c_str());
+		LOGI("Could not output segment to: %s + %s", segmentOutPath.c_str(), segmentName.c_str());
 	}
 
 	return segmentJsonOut;
@@ -987,7 +987,7 @@ int detectForm(){
 		formIdx = (int)aligner.detectForm();
 	}
 	catch(cv::Exception& e){
-		LOGI(e.what());
+		LOGI("%s", e.what());
 		return -1;
 	}
 	return formIdx;
@@ -1017,7 +1017,7 @@ bool Processor::loadFeatureData(const char* templatePath){
 		return processorImpl->loadFeatureData(templatePath);
 	}
 	catch(cv::Exception& e){
-		LOGI(e.what());
+		LOGI("%s", e.what());
 		return false;
 	}
 }
