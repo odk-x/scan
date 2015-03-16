@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.json.JSONObject;
+import org.opendatakit.common.android.activities.BaseActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,7 +28,7 @@ import android.widget.LinearLayout;
 /**
  * This activity displays the image of a processed form.
  */
-public class DisplayProcessedForm extends Activity {
+public class DisplayProcessedForm extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
 
@@ -541,4 +542,18 @@ public class DisplayProcessedForm extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

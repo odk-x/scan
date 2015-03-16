@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 import org.droidparts.preference.MultiSelectListPreference;
+import org.opendatakit.common.android.activities.BasePreferenceActivity;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-public class AppSettings extends PreferenceActivity {
+public class AppSettings extends BasePreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,4 +52,8 @@ public class AppSettings extends PreferenceActivity {
 		multiSelectPreference.setEntries(templateNames);
 		multiSelectPreference.setEntryValues(templatePaths);
 	}
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

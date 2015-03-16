@@ -1,6 +1,9 @@
 package org.opendatakit.scan.android;
 
 import java.io.File;
+
+import org.opendatakit.common.android.activities.BaseActivity;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,7 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainMenu extends Activity {
+public class MainMenu extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -145,5 +148,19 @@ public class MainMenu extends Activity {
 		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(setIntent);
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 
 }

@@ -24,6 +24,7 @@ import java.util.Date;
 import org.droidparts.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opendatakit.common.android.activities.BaseActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,7 +42,7 @@ import android.widget.Toast;
  * PhotographForm launches the Android camera app to capture a form image.
  * It also creates a directory for data about the form to be stored.  
  **/
-public class PhotographForm extends Activity {
+public class PhotographForm extends BaseActivity {
 	private static final String LOG_TAG = "ODKScan";
 	private static final int TAKE_PICTURE = 12346789;
 	private String photoName;
@@ -207,4 +208,15 @@ public class PhotographForm extends Activity {
 		new File(ScanUtils.getOutputPath(photoName)).delete();
 		super.onDestroy();
 	}
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

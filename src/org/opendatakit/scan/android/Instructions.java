@@ -1,5 +1,7 @@
 package org.opendatakit.scan.android;
 
+import org.opendatakit.common.android.activities.BaseActivity;
+
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -7,7 +9,7 @@ import android.os.Bundle;
  * 
  * This activity displays the instructions on screen
  */
-public class Instructions extends Activity {
+public class Instructions extends BaseActivity {
 
 	// Initialize the application
 	@Override
@@ -27,4 +29,18 @@ public class Instructions extends Activity {
 		super.onResume();
 		
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

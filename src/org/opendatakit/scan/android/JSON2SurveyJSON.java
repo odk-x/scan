@@ -17,29 +17,27 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.aggregate.odktables.rest.entity.Column;
-import org.opendatakit.common.android.data.ColumnDefinition;
 import org.opendatakit.aggregate.odktables.rest.ElementDataType;
-import org.opendatakit.common.android.database.DatabaseFactory;
-import org.opendatakit.common.android.provider.DataTableColumns;
+import org.opendatakit.aggregate.odktables.rest.entity.Column;
+import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.common.android.data.ColumnList;
+import org.opendatakit.common.android.data.OrderedColumns;
+import org.opendatakit.common.android.data.UserTable;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
-import org.opendatakit.common.android.utilities.ODKDatabaseUtils;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
-import org.opendatakit.common.android.utilities.TableUtil;
+import org.opendatakit.database.service.OdkDbHandle;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.webkit.WebView;
 
-public class JSON2SurveyJSON extends Activity {
+public class JSON2SurveyJSON extends BaseActivity {
 
+  private static final String TAG = "JSON2SurveyJSON";
   private static final String LOG_TAG = "ODKScan";
 
   private static final String scanOutputDir = "scan_output_directory";
@@ -64,6 +62,11 @@ public class JSON2SurveyJSON extends Activity {
 
   private ArrayList<String> photoNames;
 
+  // used to communicate info through databaseAvailable() call.
+  private String templatePath;
+  
+  private String formId;
+  
   WebView myWebView;
 
   @Override
@@ -81,7 +84,7 @@ public class JSON2SurveyJSON extends Activity {
       }
     }
 
-    String templatePath = extras.getString("templatePath");
+    templatePath = extras.getString("templatePath");
     if (templatePath == null) {
       try {
         throw new Exception("Could not identify template.");
@@ -109,7 +112,7 @@ public class JSON2SurveyJSON extends Activity {
      * String formId = new File(templatePaths.get(0)).getName(); formId =
      * "scan_" + formId; xlsxFormId = formId;
      */
-    String formId = getFormIdFromFormDef(templatePath);
+    formId = getFormIdFromFormDef(templatePath);
     xlsxFormId = formId;
 
     String photoName = extras.getString("photoName");
@@ -138,45 +141,8 @@ public class JSON2SurveyJSON extends Activity {
     getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
     screenWidth = (int) (displaymetrics.widthPixels / displaymetrics.scaledDensity);
     screenHeight = (int) (displaymetrics.heightPixels / displaymetrics.scaledDensity);
-
-    // We are going to start using the FormDesigner's XLSX conversion files
-    // First we are going to check if the file exist - formDef.json
-    // If it does then we are going to go to a completely separate function for
-    // now
-    // Essentially this function will do the following things
-    // 1. Check if there is a subform in the directory
-    // 3. Loop through the output.json and create survey instances for the
-    // subforms
-    // 4. Write that data to the database
-    // 5. Move only the subform files over to the proper tables directory
-    // 6. Launch Tables - there will have to be an index.html defined for the
-    // forms
-    // or the user will have to know that they need to go to the appropriate
-    // name and
-    // view their detail and list view forms.
-    if (checkForSubforms(templatePath)) {
-      createSurveyInstanceBasedOnFormDesignerForms(templatePath);
-      return;
-    } else {
-      String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
-      File formDefFile = new File(directoryForFormDef, "formDef.json");
-
-      // If the form does exist already, there could be a versioning issue
-      if (!formDefFile.exists()) {
-        try {
-          File formDefToWrite = findFileThatEndsIn(templatePath, "formDef.json");
-          JSONObject formDefObjToWrite = getJSONFromFile(formDefToWrite);
-          String val = formDefObjToWrite.toString();
-          writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
-        } catch (Exception e) {
-          e.printStackTrace();
-          Log.e(LOG_TAG, "Could not write out formDef.json to proper tables directory " + formId);
-        }
-      }
-
-      // Check if there is a registered Survey instance or create one
-      createSurveyInstance(formId);
-    }
+    
+    // wait for databaseAvailable to do any further processing
   }
 
   /**
@@ -281,7 +247,7 @@ public class JSON2SurveyJSON extends Activity {
    * @param tableName
    * @param subformFieldsToProcess
    */
-  public ArrayList<ColumnDefinition> createSurveyTables(SQLiteDatabase db, String tableName,
+  public OrderedColumns createSurveyTables(OdkDbHandle db, String tableName,
       JSONArray fieldsToProcess) {
     List<Column> columns = new ArrayList<Column>();
 
@@ -289,7 +255,7 @@ public class JSON2SurveyJSON extends Activity {
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
 
-    ArrayList<ColumnDefinition> orderedColumns = null;
+    OrderedColumns orderedColumns = null;
 
     try {
       int fieldsLength = fieldsToProcess.length();
@@ -332,8 +298,8 @@ public class JSON2SurveyJSON extends Activity {
 
       // Create the database table with the columns
       // TODO: Not have this hardcoded to the appName of tables
-      orderedColumns = ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db,
-          ScanUtils.getODKAppName(), tableName, columns);
+      orderedColumns = Scan.getInstance().getDatabase().createOrOpenDBTableWithColumns(
+          ScanUtils.getODKAppName(), db, tableName, new ColumnList(columns));
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT create table " + tableName + " with columns");
@@ -351,7 +317,7 @@ public class JSON2SurveyJSON extends Activity {
    * @param tableName
    * @param subformFieldsToProcess
    */
-  public ArrayList<ColumnDefinition> createSurveyTablesFromFormDesigner(SQLiteDatabase db,
+  public OrderedColumns createSurveyTablesFromFormDesigner(OdkDbHandle db,
       String tableName, JSONObject subformFieldsToProcess) {
     List<Column> columns = new ArrayList<Column>();
 
@@ -359,7 +325,7 @@ public class JSON2SurveyJSON extends Activity {
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
 
-    ArrayList<ColumnDefinition> orderedColumns = null;
+    OrderedColumns orderedColumns = null;
 
     try {
       JSONArray subformFieldNames = subformFieldsToProcess.names();
@@ -395,8 +361,8 @@ public class JSON2SurveyJSON extends Activity {
 
       // Create the database table with the columns
       // TODO: Not have this hardcoded to the appName of tables
-      orderedColumns = ODKDatabaseUtils.get().createOrOpenDBTableWithColumns(db,
-          ScanUtils.getODKAppName(), tableName, columns);
+      orderedColumns = Scan.getInstance().getDatabase().createOrOpenDBTableWithColumns(
+          ScanUtils.getODKAppName(), db, tableName, new ColumnList(columns));
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT create subform table " + tableName + " with columns");
@@ -560,14 +526,14 @@ public class JSON2SurveyJSON extends Activity {
     String tableName = formId;
 
     String rowId = null;
-    SQLiteDatabase db = null;
-    ArrayList<ColumnDefinition> orderedColumns = null;
+    OdkDbHandle db = null;
+    OrderedColumns orderedColumns = null;
 
     StringBuilder dbValuesToWrite = new StringBuilder();
     String uuidStr = UUID.randomUUID().toString();
-
+    boolean successful = false;
     try {
-      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getODKAppName());
+      db = Scan.getInstance().getDatabase().openDatabase( ScanUtils.getODKAppName(), true);
 
       if (tableName == null) {
         throw new Exception("formId cannot be blank!!");
@@ -591,28 +557,27 @@ public class JSON2SurveyJSON extends Activity {
         throw new JSONException("There are no fields in the json output file.");
       }
 
-      Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
-          + tableName + "'", null);
-      if (!cursor.moveToFirst()) {
+      List<String> tableIds = Scan.getInstance().getDatabase().getAllTableIds(ScanUtils.getODKAppName(), db);
+      if ( !tableIds.contains(tableName) ) {
         Log.i(LOG_TAG, "No table definition found for " + tableName
             + ". Creating new table definition");
         orderedColumns = createSurveyTables(db, tableName, fields);
       } else {
-        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getODKAppName(),
+        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db, 
             tableName);
       }
 
       String selection = scanOutputDir + "=?";
       String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
-      cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
+      String[] empty = {};
+      UserTable data = Scan.getInstance().getDatabase().rawSqlQuery(ScanUtils.getODKAppName(), db,
+          tableName, orderedColumns, selection, selectionArgs, empty,  null, null, null);
 
       // Check if the instance already exists in survey
-      if (cursor.moveToFirst()) {
-        int ind = cursor.getColumnIndex(DataTableColumns.ID);
-        //String foudnUuidStr = cursor.getString(ind);
-        //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foudnUuidStr);
+      if (data.getNumberOfRows() >= 1) {
+        //String foundUuidStr = data.getRowAtIndex(0).getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foundUuidStr);
         setIntentToReturn(formId);
-        cursor.close();
         finish();
         return;
       }
@@ -655,19 +620,25 @@ public class JSON2SurveyJSON extends Activity {
             ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
         Log.i(LOG_TAG,
             "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
-        ODKDatabaseUtils.get().insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns,
+        Scan.getInstance().getDatabase().insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableName, orderedColumns,
             tablesValues, rowId);
 
         if (writeOutCustomCss) {
           writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
         }
       }
+      successful = true;
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
     } finally {
       if (db != null) {
-        db.close();
+        try {
+          Scan.getInstance().getDatabase().closeTransactionAndDatabase(ScanUtils.getODKAppName(), db, successful);
+        } catch (RemoteException e) {
+          e.printStackTrace();
+          Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
+        }
       }
     }
 
@@ -688,12 +659,12 @@ public class JSON2SurveyJSON extends Activity {
     ContentValues tablesValues;
     String subformId = null;
     String tableName = null;
-    SQLiteDatabase db = null;
+    OdkDbHandle db = null;
     String rowId = null;
-    ArrayList<ColumnDefinition> orderedColumns = null;
-
+    OrderedColumns orderedColumns = null;
+    boolean successful = false;
     try {
-      db = DatabaseFactory.get().getDatabase(this, ScanUtils.getODKAppName());
+      db = Scan.getInstance().getDatabase().openDatabase(ScanUtils.getODKAppName(), true);
       // This code will only handle one subform currently
       // It will break otherwise
       JSONArray subforms = new JSONArray();
@@ -753,31 +724,30 @@ public class JSON2SurveyJSON extends Activity {
 
       // For now assume that we are not creating main forms' tables or instances
       // This is for the creation of a subform db table
-      Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
-          + tableName + "'", null);
-      if (!cursor.moveToFirst()) {
+      List<String> tableIds = Scan.getInstance().getDatabase().getAllTableIds(ScanUtils.getODKAppName(), db);
+      if ( !tableIds.contains(tableName) ) {
         Log.i(LOG_TAG, "No table definition found for " + tableName
             + ". Creating new table definition");
         orderedColumns = createSurveyTablesFromFormDesigner(db, tableName, subforms
             .getJSONObject(0).getJSONObject("fields"));
       } else {
-        orderedColumns = TableUtil.get().getColumnDefinitions(db, ScanUtils.getODKAppName(),
+        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db,
             tableName);
       }
 
+      // Check if the instance already exists in survey
       String selection = scanOutputDir + "=?";
       String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
-      cursor = db.query(tableName, null, selection, selectionArgs, null, null, null);
-
-      // Check if the instance already exists in survey
-      if (cursor.moveToFirst()) {
-        int ind = cursor.getColumnIndex("_id");
-        //String foudnUuidStr = cursor.getString(ind);
-        // String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
+      String[] empty = {};
+      UserTable data = Scan.getInstance().getDatabase().rawSqlQuery(ScanUtils.getODKAppName(), db,
+          tableName, orderedColumns, selection, selectionArgs, empty,  null, null, null);
+      
+      if ( data.getNumberOfRows() >= 1 ) {
+        // String foundUuidStr = data.getRowAtIndex(0).getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        // String uriStr = ScanUtils.getSurveyUri(subformId) + foundUuidStr;
         //String uriStr = ScanUtils
-        //    .getSurveyUriForInstanceAndDisplayContents(subformId, foudnUuidStr);
+        //    .getSurveyUriForInstanceAndDisplayContents(subformId, foundUuidStr);
         setIntentToReturn(subformId);
-        cursor.close();
         finish();
         return;
       }
@@ -850,7 +820,7 @@ public class JSON2SurveyJSON extends Activity {
               ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
           Log.i(LOG_TAG,
               "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
-          ODKDatabaseUtils.get().insertDataIntoExistingDBTableWithId(db, tableName, orderedColumns,
+          Scan.getInstance().getDatabase().insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableName, orderedColumns,
               tablesValues, rowId);
 
           if (writeOutCustomCss) {
@@ -867,13 +837,18 @@ public class JSON2SurveyJSON extends Activity {
           }
         }
       }
-
+      successful = true;
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
     } finally {
       if (db != null) {
-        db.close();
+        try {
+          Scan.getInstance().getDatabase().closeTransactionAndDatabase(ScanUtils.getODKAppName(), db, successful);
+        } catch (RemoteException e) {
+          e.printStackTrace();
+          Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableName);
+        }
       }
     }
 
@@ -1275,5 +1250,58 @@ public class JSON2SurveyJSON extends Activity {
     args.putString(FILE_NAME, ScanUtils.getTablesUriForInstanceWithScanOutputDir(formId, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))));
     args.putString(TABLE_DISPLAY_TYPE, TABLES_DISPLAY_LIST);
     intent.putExtras(args);
+  }
+
+  public void databaseAvailable() {
+    if ( Scan.getInstance().getDatabase() != null ) {
+
+      // We are going to start using the FormDesigner's XLSX conversion files
+      // First we are going to check if the file exist - formDef.json
+      // If it does then we are going to go to a completely separate function for
+      // now
+      // Essentially this function will do the following things
+      // 1. Check if there is a subform in the directory
+      // 3. Loop through the output.json and create survey instances for the
+      // subforms
+      // 4. Write that data to the database
+      // 5. Move only the subform files over to the proper tables directory
+      // 6. Launch Tables - there will have to be an index.html defined for the
+      // forms
+      // or the user will have to know that they need to go to the appropriate
+      // name and
+      // view their detail and list view forms.
+      if (checkForSubforms(templatePath)) {
+        createSurveyInstanceBasedOnFormDesignerForms(templatePath);
+        return;
+      } else {
+        String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
+        File formDefFile = new File(directoryForFormDef, "formDef.json");
+
+        // If the form does exist already, there could be a versioning issue
+        if (!formDefFile.exists()) {
+          try {
+            File formDefToWrite = findFileThatEndsIn(templatePath, "formDef.json");
+            JSONObject formDefObjToWrite = getJSONFromFile(formDefToWrite);
+            String val = formDefObjToWrite.toString();
+            writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
+          } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG, "Could not write out formDef.json to proper tables directory " + formId);
+          }
+        }
+
+        // Check if there is a registered Survey instance or create one
+        createSurveyInstance(formId);
+      }
+    }
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
   }
 }

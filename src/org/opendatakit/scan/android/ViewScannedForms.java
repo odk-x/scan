@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
 
+import org.opendatakit.common.android.activities.BaseListActivity;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,7 +22,7 @@ import android.widget.TextView;
 /**
  * This activity displays a list of previously scanned forms.
  **/
-public class ViewScannedForms extends ListActivity {
+public class ViewScannedForms extends BaseListActivity {
 
 	private String[] photoNames;
 	private ArrayAdapter<String> myAdapter;
@@ -133,4 +135,8 @@ public class ViewScannedForms extends ListActivity {
 		super.onResume();
 		myAdapter.notifyDataSetChanged();
 	}
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

@@ -18,6 +18,7 @@ package org.opendatakit.scan.android;
 import java.io.IOException;
 import java.util.Date;
 
+import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.RunProcessor.Mode;
 
 import android.app.Activity;
@@ -43,7 +44,7 @@ import android.widget.TextView;
  * This activity starts the form processor and provides user feedback by
  * displaying progress dialogs and the alignment results.
  */
-public class AfterPhotoTaken extends Activity {
+public class AfterPhotoTaken extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";   
 
@@ -274,5 +275,19 @@ public class AfterPhotoTaken extends Activity {
 		content.setVisibility(View.VISIBLE);
 		processButton.setEnabled(success);
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 
 }

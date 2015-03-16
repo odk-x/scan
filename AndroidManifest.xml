@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opendatakit.scan.android"
-    android:versionCode="121"
+    android:versionCode="127"
     android:versionName="2.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="7" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="16" />
 
     <uses-feature
         android:glEsVersion="0x00020000"

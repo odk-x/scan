@@ -1,6 +1,9 @@
 package org.opendatakit.scan.android;
 
+import org.opendatakit.common.android.activities.BaseActivity;
+
 import com.bubblebot.jni.Processor;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -20,7 +23,7 @@ import android.widget.TextView;
 /**
  * This is a activity for calling scan by intent just to do alignment.
  */
-public class AlignImage extends Activity {
+public class AlignImage extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
 	
@@ -159,4 +162,18 @@ public class AlignImage extends Activity {
 		super.onPause();
 		finish();
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

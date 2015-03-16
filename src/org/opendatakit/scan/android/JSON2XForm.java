@@ -37,6 +37,7 @@ import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
+import org.opendatakit.common.android.activities.BaseActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,7 +54,7 @@ import android.util.Log;
  * This activity converts ODKScan JSON files into XForms and XForm instances for use with Collect.
  * It returns a uri for the XForm instance as a result.
  */
-public class JSON2XForm extends Activity {
+public class JSON2XForm extends BaseActivity {
 	
 	private static final String LOG_TAG = "ODKScan";
 
@@ -589,4 +590,15 @@ public class JSON2XForm extends Activity {
 			throw new Exception("Field name cannot be used in xform: " + string);
 		}
 	}
+    public void databaseAvailable() {
+      // TODO Auto-generated method stub
+      
+    }
+    public void databaseUnavailable() {
+      // TODO Auto-generated method stub
+      
+    }
+    public String getAppName() {
+      return ScanUtils.getODKAppName();
+    }
 }

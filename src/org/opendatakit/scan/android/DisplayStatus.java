@@ -3,6 +3,7 @@ package org.opendatakit.scan.android;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opendatakit.common.android.activities.BaseActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,7 +21,7 @@ import android.widget.TextView;
  * JSON  with the errorMessage and whatever other data the cpp code wants to communicate.
  * @author nathan
  */
-public class DisplayStatus extends Activity {
+public class DisplayStatus extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
 	
@@ -89,4 +90,18 @@ public class DisplayStatus extends Activity {
 			alert.show();
 		}
 	}
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }
