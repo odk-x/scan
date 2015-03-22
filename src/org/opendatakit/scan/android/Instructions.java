@@ -2,7 +2,6 @@ package org.opendatakit.scan.android;
 
 import org.opendatakit.common.android.activities.BaseActivity;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 /* Instructions activity

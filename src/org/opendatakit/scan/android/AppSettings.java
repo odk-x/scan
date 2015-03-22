@@ -7,7 +7,6 @@ import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.common.android.activities.BasePreferenceActivity;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 
 public class AppSettings extends BasePreferenceActivity {
 

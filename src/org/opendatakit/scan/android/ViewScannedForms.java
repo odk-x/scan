@@ -6,7 +6,6 @@ import java.util.Date;
 
 import org.opendatakit.common.android.activities.BaseListActivity;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;

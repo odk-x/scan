@@ -2,9 +2,6 @@ package org.opendatakit.scan.android;
 
 import org.opendatakit.common.android.activities.BaseActivity;
 
-import com.bubblebot.jni.Processor;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -18,6 +15,8 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.bubblebot.jni.Processor;
 
 //TODO: Get rid of process button.
 /**

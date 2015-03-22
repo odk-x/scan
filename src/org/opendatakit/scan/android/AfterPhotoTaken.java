@@ -21,7 +21,6 @@ import java.util.Date;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.RunProcessor.Mode;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;

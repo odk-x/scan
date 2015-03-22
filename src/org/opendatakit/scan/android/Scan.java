@@ -34,7 +34,7 @@ public class Scan extends CommonApplication {
   }
 
   @Override
-  public int getAppNameResourceId() {
+  public int getApkDisplayNameResourceId() {
     return R.string.app_name;
   }
 
