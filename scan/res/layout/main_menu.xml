@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:orientation="vertical">
+
+	<ImageView
+	    android:layout_width="match_parent"
+	    android:layout_height="80sp"
+	    android:layout_marginBottom="20sp"
+	    android:layout_marginTop="10sp"
+	    android:contentDescription="ODKScan title"
+	    android:src="@drawable/odk_scan_logo" />
+
+	<Button
+	    android:id="@+id/ScanButton"
+	    style="@style/StandardButton"
+	    android:layout_width="match_parent"
+	    android:text="@string/scan_new_form" >
+
+	</Button>
+
+	<Button
+	    android:id="@+id/ViewFormsButton"
+	    style="@style/StandardButton"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/ViewFormsButton" >
+
+	</Button>
+
+	<Button
+	    android:id="@+id/InstructionsButton"
+	    style="@style/StandardButton"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/InstructionsButton" >
+
+	</Button>
+
+	<Button
+	    android:id="@+id/SettingsButton"
+	    style="@style/StandardButton"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="@string/SettingsButton" >
+
+	</Button>
+
+	<TextView
+	    android:id="@+id/version_display"
+	    android:layout_width="fill_parent"
+	    android:layout_height="match_parent"
+	    android:layout_gravity="bottom"
+	    android:gravity="center"
+	    android:paddingBottom="1dp"
+	    android:paddingTop="6dp"
+	    android:text="version"
+	    android:textSize="21dp"
+	    android:textStyle="bold" />
+
+</LinearLayout>

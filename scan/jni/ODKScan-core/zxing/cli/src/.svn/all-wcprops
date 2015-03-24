@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/2654/trunk/cpp/cli/src
+END
+lodepng.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/2654/trunk/cpp/cli/src/lodepng.h
+END
+main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/2654/trunk/cpp/cli/src/main.cpp
+END
+jpgd.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/2654/trunk/cpp/cli/src/jpgd.cpp
+END
+ImageReaderSource.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/2654/trunk/cpp/cli/src/ImageReaderSource.cpp
+END
+lodepng.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2654/trunk/cpp/cli/src/lodepng.cpp
+END
+jpgd.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/2654/trunk/cpp/cli/src/jpgd.h
+END
+ImageReaderSource.h
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/2654/trunk/cpp/cli/src/ImageReaderSource.h
+END
