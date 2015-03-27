@@ -39,13 +39,13 @@ public class Scan extends CommonApplication {
   }
 
   @Override
-  public int getAssetZipResourceId() {
+  public int getConfigZipResourceId() {
     // unused -- modify InitializationTask to handle this tool
     return -1;
   }
 
   @Override
-  public int getFrameworkZipResourceId() {
+  public int getSystemZipResourceId() {
     // unused -- modify InitializationTask to handle this tool
     return -1;
   }

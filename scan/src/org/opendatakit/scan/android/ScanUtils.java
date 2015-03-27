@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 
+import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.common.android.utilities.UrlUtils;
 
 import android.view.View;
@@ -51,12 +52,14 @@ public class ScanUtils {
 		return appName;
 	}
 	
+   // TODO: remove trailing slash
 	public static String getAppFormDirPath(String formId) {
-		return  extStorageDir + "/opendatakit/" + appName + "/tables/" + formId + "/forms/" + formId + "/";
+		return ODKFileUtils.getFormFolder(appName, formId, formId) + File.separator;
 	}
 	
+   // TODO: remove trailing slash
 	public static String getAppInstancesDirPath(String formId) {
-		return extStorageDir + "/opendatakit/" + appName + "/tables/" + formId +  "/instances/"; 
+		return ODKFileUtils.getInstancesFolder(appName, formId) + File.separator; 
 	}
 	
 	public static String getSurveyUriForInstanceAndDisplayContents(String formId, String instanceId) {
@@ -67,10 +70,12 @@ public class ScanUtils {
 		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId;
 	}
 	
+	// TODO: place this in the correct spot
 	public static String getTablesUriForInstance(String formId) {
 	  return "assets/" + formId + "/html/" + formId + "_list.html";
 	}
 	
+   // TODO: place this in the correct spot
 	public static String getTablesUriForInstanceWithScanOutputDir(String formId, String scanOutputDir) {
 	  // Need to encode the scan_output_directory query parameter
 	  String encodedScanOutputDir = UrlUtils.encodeSegment(scanOutputDir);
@@ -81,13 +86,18 @@ public class ScanUtils {
 		return "http:///localhost:8635/" + appName + "/xlsxconverter/conversion.html";
 	}
 	
+   // TODO: remove trailing slash
 	public static String getAppRelativeInstancesDirPath(String formId, String instancesDir) 
 	{
-		return "tables/" + formId + "/instances/" + instancesDir + "/";
+		return ODKFileUtils.asRelativePath(appName, 
+		    new File(ODKFileUtils.getInstanceFolder(appName, formId, instancesDir))) + File.separator;
 	}
 
+   // TODO: move to appName-relative path and remove trailing slash
+	// unclear whether this is really an output folder or something else?
+	// e.g., a scratch directory under data or system?
 	public static String getOutputDirPath() {
-		return  appFolder + "output/";
+		return appFolder + "output/";
 	}
 
 	public static String getOutputPath(String photoName) {
