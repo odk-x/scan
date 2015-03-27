@@ -53,7 +53,7 @@ public:
         }
         std::string str = ss.str();
         const char * c = str.c_str();
-        LOGI(c);
+        LOGI("%s", c);
         usleep(1000000);
     }
 
