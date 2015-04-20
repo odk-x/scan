@@ -609,9 +609,9 @@ public class JSON2SurveyJSON extends Activity {
       // Check if the instance already exists in survey
       if (cursor.moveToFirst()) {
         int ind = cursor.getColumnIndex(DataTableColumns.ID);
-        //String foudnUuidStr = cursor.getString(ind);
+        String foundUuidStr = cursor.getString(ind);
         //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, foudnUuidStr);
-        setIntentToReturn(formId);
+        setIntentToReturn(formId, foundUuidStr);
         cursor.close();
         finish();
         return;
@@ -673,7 +673,7 @@ public class JSON2SurveyJSON extends Activity {
 
     // String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
     //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId);
-    setIntentToReturn(formId);
+    setIntentToReturn(formId, rowId);
     finish();
   }
 
@@ -772,11 +772,11 @@ public class JSON2SurveyJSON extends Activity {
       // Check if the instance already exists in survey
       if (cursor.moveToFirst()) {
         int ind = cursor.getColumnIndex("_id");
-        //String foudnUuidStr = cursor.getString(ind);
+        String foundUuidStr = cursor.getString(ind);
         // String uriStr = ScanUtils.getSurveyUri(subformId) + foudnUuidStr;
         //String uriStr = ScanUtils
         //    .getSurveyUriForInstanceAndDisplayContents(subformId, foudnUuidStr);
-        setIntentToReturn(subformId);
+        setIntentToReturn(subformId, foundUuidStr);
         cursor.close();
         finish();
         return;
@@ -879,7 +879,7 @@ public class JSON2SurveyJSON extends Activity {
 
     // Return uri
     //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, rowId);
-    setIntentToReturn(subformId);
+    setIntentToReturn(subformId, rowId);
     finish();
   }
 
@@ -1264,16 +1264,22 @@ public class JSON2SurveyJSON extends Activity {
    * @return
    */
   // This function may be useful when checking for version issues?
-  private void setIntentToReturn(String formId) {
+  private void setIntentToReturn(String formId, String rowId) {
     
     Intent intent = new Intent();
-    setResult(RESULT_OK, intent);
     
+    /* Uncomment to launch Tables
     Bundle args = new Bundle();
     args.putString(APP_NAME, ScanUtils.getODKAppName());
     args.putString(TABLE_ID, formId);
     args.putString(FILE_NAME, ScanUtils.getTablesUriForInstanceWithScanOutputDir(formId, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1))));
     args.putString(TABLE_DISPLAY_TYPE, TABLES_DISPLAY_LIST);
     intent.putExtras(args);
+    */
+    
+    // Launch Survey
+    intent.setData(Uri.parse(ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId)));
+    
+    setResult(RESULT_OK, intent);
   }
 }
