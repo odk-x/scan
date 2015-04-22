@@ -368,6 +368,7 @@ private:
 
 
 //Creates a number classifier
+// TODO: Rename this, since it no longer trains anything
 void trainNumberClassifier(const Json::Value& classifier)
 {
 	//Currently classifier directory does nothing. Need to remove it.
@@ -377,7 +378,6 @@ void trainNumberClassifier(const Json::Value& classifier)
 	//Hardcoding some values for now based on the size of the box in the training set
 	//Want to change this later.
 	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
-	numberClassifier.train(40, 53);
 	trainedNumberClassifier = true;
 
 	LOGI("Trained number classifier...");

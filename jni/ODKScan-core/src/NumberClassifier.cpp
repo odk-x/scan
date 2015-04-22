@@ -436,6 +436,19 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 
 	Json::Value output;
 	cv::Mat query_pixels;
+  vector<double> features;
+
+  // TODO: Don't hard code this
+  string weight_file_path = "/storage/emulated/0/ODKScan/training_models/numbers/mlp_all_classes.txt";
+
+  ifstream infile(weight_file_path.c_str());
+  int num_hidden_units;
+
+  infile >> NUM_CLASSES;
+  infile >> num_hidden_units;
+  infile >> EXTRACTION_ALG;
+  set_num_classes(NUM_CLASSES);
+  set_extraction_alg(EXTRACTION_ALG);
 
 	//add some pixels to give it a little buffer
 	int expandedHeight = classifier_height + (0.25*classifier_height);
@@ -452,8 +465,27 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 	//std::string queryPixelsName = ss2.str();
 	//cv::imwrite(queryPixelsName, query_pixels);
 
-	pre_process(query_pixels, classifier_height, classifier_width);
-	int guess = c_process(query_pixels);
+  get_data(query_pixels, features);
+
+	vector<vector<double> > W(features.size() + 1, vector<double>(num_hidden_units, 0));
+	vector<vector<double> > V(num_hidden_units + 1, vector<double>(NUM_CLASSES, 0));
+
+	for(int i = 0; i < W.size(); i++)
+	{
+		for(int j = 0; j < W[i].size(); j++)
+		{
+			infile >> W[i][j];
+		}
+	}
+	for(int i = 0; i < V.size(); i++)
+	{
+		for(int j = 0; j < V[i].size(); j++)
+		{
+			infile >> V[i][j];
+		}
+	}
+
+	int guess = mlp_two_layer_predict_class(features, W, V);
 
 	output["classification"] = guess;
 	output["value"] = guess;
@@ -461,110 +493,4 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 	output["type"] = "number";
 
 	return output;
-}
-
-/* Counts the number of black pixels in the given segment of the image */
-int NumberClassifier::get_black_pixels(const cv::Mat& img, int segment)
-{
-    cv::Mat i_segment = img(rois.at(segment));
-    if ((1 << segment) & (TOP_BIT | MIDDLE_BIT | BOTTOM_BIT))
-    {
-        bitwise_and(i_segment, h_mask.get_mask(segment), i_segment);
-    }
-    else if ((1 << segment) & (TOP_LEFT_BIT | TOP_RIGHT_BIT | BOTTOM_LEFT_BIT | BOTTOM_RIGHT_BIT))
-    {
-        bitwise_and(i_segment, v_mask.get_mask(segment), i_segment);
-    }
-
-    //temporarily hardcoding these values. Need to change them later.
-    total_pixels = 15*15;
-
-    int returnNumber = total_pixels - cv::countNonZero(i_segment);
-
-    //debugging
-    //std::stringstream ss;
-    //ss << "segment " << segment << " total_pixels " << total_pixels << " number black pixels " << returnNumber;
-    //std::string str = ss.str();
-    //const char * c = str.c_str();
-    //LOGI(c);
-    //end debugging
-
-    return returnNumber;
-}
-
-/* This function iterates through a training directory and calls
- * t_process() on each image in the directory. Can be used by any
- * ML classifier as a generic train function */
-void NumberClassifier::train(int box_width, int box_height) {
-	int n = t_numbers;
-    if (n < 0) {
-    	LOGI("Error opening number training directory");
-    }
-    while (n--) {
-        std::string img_name = std::string(t_list[n]->d_name);
-        int img_num = img_name.at(0) - 0x30;
-        cv::Mat img = cv::imread(t_dir + img_name, CV_LOAD_IMAGE_COLOR);
-        if (img.empty())
-            LOGI("Number training image not loaded");
-
-        else {
-            pre_process(img, box_height, box_width);
-            t_process(img, img_num);
-        }
-        delete t_list[n];
-    }
-    delete t_list;
-}
-
-/* This adds the number of pixels in each segment to the stats
- * object which keeps track of the mean and variance of each
- * segment for each number during training */
-void NumberClassifier::t_process(const cv::Mat& img, int img_num)
-{
-    for (int i = 0; i < NUM_SEGMENTS; i++) {
-        int black_pixels = get_black_pixels(img, i);
-        stats.add_seg(img_num, i, black_pixels);
-
-        //debugging
-        //std::stringstream ss;
-        //ss << "img num " << img_num << " i " << i << " black pixels " << black_pixels;
-        //std::string str = ss.str();
-        //const char * c = str.c_str();
-        //LOGI(c);
-        //end debugging
-    }
-}
-
-/* This calculates the probability that the current image is 0-9
- * (thus it calculates 10 different probabilities). Assumes that the
- * pixel counts form a normal distribution */
-int NumberClassifier::c_process(const cv::Mat& img) {
-
-	//stats.print_stats();
-
-	float max_prod = 0;
-    int max_num = -1;
-    float prod = 0;
-    for (int num = 0; num < 10; num++) {
-        prod = 1.0;
-        for (int seg = 0; seg < NUM_SEGMENTS; seg++) {
-            int black_pixels = get_black_pixels(img, seg);
-            float newProd = stats.get_prob(num, seg, black_pixels);
-            prod *= newProd;
-
-            //debugging
-            //std::stringstream ss;
-            //ss << "seg " << seg << " get_prob " << newProd << " black pixels " << black_pixels;
-            //std::string str = ss.str();
-            //const char * c = str.c_str();
-            //LOGI(c);
-            //end debugging
-
-        }
-        if (prod > max_prod) {
-            max_prod = prod;
-			max_num = num;
-        }
-    }
-    return max_num;
 }

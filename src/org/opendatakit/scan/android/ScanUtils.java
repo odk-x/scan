@@ -125,6 +125,14 @@ public class ScanUtils {
 	public static String getFormViewHTMLDir() {
 		return appFolder + "transcription/";
 	}
+	
+	public static String getTrainedModelDir(String classifier) {
+		return appFolder + "training_models/" + classifier + "/";
+	}
+	
+	public static String getNumberClassifierModel() {
+		return getTrainedModelDir("numbers") + "mlp_all_classes.txt";
+	}
 
 	public static void displayImageInWebView(WebView myWebView, String imagePath) {
 		myWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
