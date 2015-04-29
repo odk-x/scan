@@ -290,6 +290,14 @@ public class JSON2SurveyJSON extends Activity {
     // Always add the scan output directory to the table definition
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
+    
+    // Now we will always add the output.json file to the table
+    columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI, "[\""
+        + rawOutputFileName + "_contentType\",\"" + rawOutputFileName + "_uriFragment\"]"));
+    columns.add(new Column(rawOutputFileName + "_contentType", "contentType", ElementDataType.string
+        .name(), "[]"));
+    columns.add(new Column(rawOutputFileName + "_uriFragment", "uriFragment", ElementDataType.rowpath
+        .name(), "[]"));
 
     ArrayList<ColumnDefinition> orderedColumns = null;
 
@@ -356,10 +364,19 @@ public class JSON2SurveyJSON extends Activity {
   public ArrayList<ColumnDefinition> createSurveyTablesFromFormDesigner(SQLiteDatabase db,
       String tableName, JSONObject subformFieldsToProcess) {
     List<Column> columns = new ArrayList<Column>();
-
+    
     // Always add the scan output directory to the table definition
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
+
+    // Now we will always add the output.json file to the table
+    columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI, "[\""
+        + rawOutputFileName + "_contentType\",\"" + rawOutputFileName + "_uriFragment\"]"));
+    columns.add(new Column(rawOutputFileName + "_contentType", "contentType", ElementDataType.string
+        .name(), "[]"));
+    columns.add(new Column(rawOutputFileName + "_uriFragment", "uriFragment", ElementDataType.rowpath
+        .name(), "[]"));
+    
 
     ArrayList<ColumnDefinition> orderedColumns = null;
 
