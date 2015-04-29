@@ -887,6 +887,32 @@ public class JSON2SurveyJSON extends Activity {
             }
           }
         }
+        
+        // Copy raw output values
+        if (fieldsLength > 0) {
+  	      String fullFileName = rawOutputFileName + "_" + dirId + ".json";
+  	      InputStream fis = new FileInputStream(ScanUtils.getJsonPath(photoNames.get(photoNames.size() - 1)));
+  	      File outputFile = new File(dirToMake.getAbsolutePath(), fullFileName);
+  	      FileOutputStream fos = new FileOutputStream(outputFile.getAbsolutePath());
+  	      // Transfer bytes from in to out
+  	      byte[] buf = new byte[1024];
+  	      int len;
+  	      while ((len = fis.read(buf)) > 0) {
+  	        fos.write(buf, 0, len);
+  	      }
+  	      fos.close();
+  	      fis.close();
+  	      // ---End of copying
+  	      
+  	     
+  	      // database changes require that images have a field named
+  	      // image_uriFragment and image_contentType
+  	      String rawOutputFileName_uriFragment = rawOutputFileName + "_uriFragment";
+  	      String rawOutputFileName_contentType = rawOutputFileName + "_contentType";
+  	      
+  	      tablesValues.put(rawOutputFileName_uriFragment, fullFileName);
+  	      tablesValues.put(rawOutputFileName_contentType, "application/json");
+        }
 
         // For each subgroup check if it is ready to be written out or not
         if (tablesValues.size() > 0) {
