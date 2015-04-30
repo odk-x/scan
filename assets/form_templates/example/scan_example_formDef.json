@@ -334,6 +334,21 @@
         "type": "string",
         "name": "scan_output_directory",
         "_row_num": 2
+      },
+      {
+        "type": "object",
+        "name": "raw_output",
+        "elementType": "mimeUri",
+        "properties": {
+          "uriFragment": {
+            "type": "rowpath"
+          },
+          "contentType": {
+            "type": "string",
+            "default": "application/json"
+          }
+        },
+        "_row_num": 3
       }
     ],
     "settings": [
@@ -471,6 +486,28 @@
           }
         ],
         "elementKey": "scan_output_directory"
+      },
+      "raw_output": {
+        "type": "object",
+        "_defn": [
+          {
+            "_row_num": 3,
+            "section_name": "model"
+          }
+        ],
+        "elementType": "mimeUri",
+        "properties": {
+          "uriFragment": {
+            "type": "rowpath",
+            "elementKey": "raw_output_uriFragment"
+          },
+          "contentType": {
+            "type": "string",
+            "default": "application/json",
+            "elementKey": "raw_output_contentType"
+          }
+        },
+        "elementKey": "raw_output"
       },
       "qrcode_image0": {
         "_defn": [
