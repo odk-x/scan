@@ -465,6 +465,8 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 	//std::string queryPixelsName = ss2.str();
 	//cv::imwrite(queryPixelsName, query_pixels);
 
+	cv::resize(query_pixels, query_pixels, cv::Size(50,70), 0, 0, cv::INTER_AREA);
+
   get_data(query_pixels, features);
 
 	vector<vector<double> > W(features.size() + 1, vector<double>(num_hidden_units, 0));
