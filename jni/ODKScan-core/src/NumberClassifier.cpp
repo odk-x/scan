@@ -489,10 +489,18 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 
 	int guess = mlp_two_layer_predict_class(features, W, V);
 
-	output["classification"] = guess;
-	output["value"] = guess;
+  // Blank numbers are classified as "10". Pass that out as
+  // an empty string instead.
+  if (guess == 10) {
+	  output["classification"] = " ";
+	  output["value"] = " ";
+	  output["type"] = "string";
+  } else {
+	  output["classification"] = guess;
+	  output["value"] = guess;
+	  output["type"] = "number";
+  }
 	output["confidence"] = 1;
-	output["type"] = "number";
 
 	return output;
 }

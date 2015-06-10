@@ -100,18 +100,13 @@ public class JSON2SurveyJSON extends Activity {
       templatePaths.add(templatePath);
     }
 
-    // String rootTemplatePath = templatePaths.get(0);
+    // If there are multiple pages, we want to get the formId from the root path
+    String rootTemplatePath = templatePath;
+    if (templatePaths.size() > 1) {
+    	rootTemplatePath = templatePaths.get(0);
+    }
 
-    // Set the formId to use for this newly created form
-    // We used to just take the directory name from the
-    // templatePath and add scan to make for formId name
-    // in the case of forms without subforms - Now we are
-    // getting the name from the generated formDef.json
-    /*
-     * String formId = new File(templatePaths.get(0)).getName(); formId =
-     * "scan_" + formId; xlsxFormId = formId;
-     */
-    String formId = getFormIdFromFormDef(templatePath);
+    String formId = getFormIdFromFormDef(rootTemplatePath);
     xlsxFormId = formId;
 
     String photoName = extras.getString("photoName");
@@ -156,8 +151,8 @@ public class JSON2SurveyJSON extends Activity {
     // or the user will have to know that they need to go to the appropriate
     // name and
     // view their detail and list view forms.
-    if (checkForSubforms(templatePath)) {
-      createSurveyInstanceBasedOnFormDesignerForms(templatePath);
+    if (checkForSubforms(rootTemplatePath)) {
+      createSurveyInstanceBasedOnFormDesignerForms(rootTemplatePath);
       return;
     } else {
       String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
@@ -166,7 +161,7 @@ public class JSON2SurveyJSON extends Activity {
       // If the form does exist already, there could be a versioning issue
       if (!formDefFile.exists()) {
         try {
-          File formDefToWrite = findFileThatEndsIn(templatePath, "formDef.json");
+          File formDefToWrite = findFileThatEndsIn(rootTemplatePath, "formDef.json");
           JSONObject formDefObjToWrite = getJSONFromFile(formDefToWrite);
           String val = formDefObjToWrite.toString();
           writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
@@ -256,7 +251,7 @@ public class JSON2SurveyJSON extends Activity {
    * 
    * @param templatePath
    */
-  public boolean checkForSubforms(String templatePath) {
+  public boolean checkForSubforms(String templatePath) { // TODO: How does this work with multipage forms?
     // Right now the assumption is only one subform
     // definition is possible
     boolean hasSubform = false;
@@ -292,6 +287,7 @@ public class JSON2SurveyJSON extends Activity {
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
     
     // Now we will always add the output.json file to the table
+    // TODO: What about multi-page forms?
     columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI, "[\""
         + rawOutputFileName + "_contentType\",\"" + rawOutputFileName + "_uriFragment\"]"));
     columns.add(new Column(rawOutputFileName + "_contentType", "contentType", ElementDataType.string

@@ -75,7 +75,7 @@ public class DisplayProcessedForm extends Activity {
 			//subsequent invocations of the Scan activities in order to store
 			//so they can be combined into a single xform on the final invocation.
 			final File nextPageTemplatePath = new File(templatePath, "nextPage");
-			morePagesToScan = nextPageTemplatePath.exists();
+			morePagesToScan = nextPageTemplatePath.exists(); //TODO: This doesn't work on the "View Scanned forms" path.
 			if(morePagesToScan){
 				Button nextPage = (Button) findViewById(R.id.nextPageBtn);
 				nextPage.setVisibility(View.VISIBLE);
