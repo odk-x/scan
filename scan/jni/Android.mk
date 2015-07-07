@@ -24,7 +24,7 @@ ZXING_SRCS := $(wildcard $(LOCAL_PATH)/ODKScan-core/zxing/core/src/zxing/*.cpp) 
 BIGINT_SRCS := $(wildcard $(LOCAL_PATH)/ODKScan-core/zxing/core/src/bigint/*.cc)
 
 #Remove the local path prefix from the srcs and put them in a single list
-ODKSCAN_SRCS := $(subst $(LOCAL_PATH),, $(CORE_SRCS) $(JSON_PARSER_SRCS) $(ZXING_SRCS) $(BIGINT_SRCS))
+ODKSCAN_SRCS := $(subst $(LOCAL_PATH),., $(CORE_SRCS) $(JSON_PARSER_SRCS) $(ZXING_SRCS) $(BIGINT_SRCS))
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/ODKScan-core/src
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/ODKScan-core/jsoncpp-src-0.5.0/include

@@ -368,6 +368,7 @@ private:
 
 
 //Creates a number classifier
+// TODO: Rename this, since it no longer trains anything
 void trainNumberClassifier(const Json::Value& classifier)
 {
 	//Currently classifier directory does nothing. Need to remove it.
@@ -377,7 +378,6 @@ void trainNumberClassifier(const Json::Value& classifier)
 	//Hardcoding some values for now based on the size of the box in the training set
 	//Want to change this later.
 	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
-	numberClassifier.train(40, 53);
 	trainedNumberClassifier = true;
 
 	LOGI("Trained number classifier...");
@@ -725,7 +725,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
 	catch(...){
-		LOGI(("Could not output segment to: " + segmentOutPath + segmentName).c_str());
+		LOGI("Could not output segment to: %s + %s", segmentOutPath.c_str(), segmentName.c_str());
 	}
 
 	return segmentJsonOut;
@@ -987,7 +987,7 @@ int detectForm(){
 		formIdx = (int)aligner.detectForm();
 	}
 	catch(cv::Exception& e){
-		LOGI(e.what());
+		LOGI("%s", e.what());
 		return -1;
 	}
 	return formIdx;
@@ -1017,7 +1017,7 @@ bool Processor::loadFeatureData(const char* templatePath){
 		return processorImpl->loadFeatureData(templatePath);
 	}
 	catch(cv::Exception& e){
-		LOGI(e.what());
+		LOGI("%s", e.what());
 		return false;
 	}
 }

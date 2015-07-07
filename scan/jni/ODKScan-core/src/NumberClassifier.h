@@ -8,6 +8,7 @@
 #include "configuration.h"
 #include "SegmentMask.h"
 #include "PixelStats.h"
+#include "two_layer_mlp.h"
 #include <json/json.h>
 
 // Number of segments per image
@@ -111,10 +112,8 @@ public:
         };
     
     Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location, int classifier_height, int classifier_width);
-    //void classify(void);
     void print_results(void);
     void print_rois(void);
-    void train(int box_width, int box_height);
 };
 
 #endif //_NUMBER_CLASSIFIER_H_

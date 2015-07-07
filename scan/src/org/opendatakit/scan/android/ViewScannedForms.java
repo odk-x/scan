@@ -83,7 +83,7 @@ public class ViewScannedForms extends BaseListActivity {
 				if (templateName != null && templateName.length() != 0) {
 					nameView.setText(templateName);
 				}
-				
+								
 				//ND restructuring to try and put view scanned forms back in
 				/*try {
 					String templatePath = ScanUtils.getTemplatePath(photoName);
@@ -123,11 +123,14 @@ public class ViewScannedForms extends BaseListActivity {
 					int position, long id) {
 
 				String photoName = photoNames[position];
+				String[] parts = photoName.split("_");
+				String templateName = parts[0];
 
 				if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
 					Intent intent = new Intent(getApplication(),
 							DisplayProcessedForm.class);
 					intent.putExtra("photoName", photoName);
+					intent.putExtra("templatePath", ScanUtils.getTemplateDirPath() + templateName);
 					startActivity(intent);
 				} 
 				//This is old and should never be called

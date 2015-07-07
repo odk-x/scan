@@ -62,12 +62,12 @@ public class ScanUtils {
 		return ODKFileUtils.getInstancesFolder(appName, formId) + File.separator; 
 	}
 	
-	public static String getSurveyUriForInstanceAndDisplayContents(String formId, String instanceId) {
-		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId + "&screenPath=survey/_contents";
+	public static String getSurveyUriForInstanceAndDisplayContents(String tableId, String formId, String instanceId) {
+		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + tableId + "/" + formId + "/#instanceId=" + instanceId + "&screenPath=survey/_contents";
 	}
 	
-	public static String getSurveyUriForInstance(String formId, String instanceId) {
-		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + formId + "/#instanceId=" + instanceId;
+	public static String getSurveyUriForInstance(String tableId, String formId, String instanceId) {
+		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + tableId + "/" + formId + "/#instanceId=" + instanceId;
 	}
 	
 	// TODO: place this in the correct spot
@@ -134,6 +134,14 @@ public class ScanUtils {
 
 	public static String getFormViewHTMLDir() {
 		return appFolder + "transcription/";
+	}
+	
+	public static String getTrainedModelDir(String classifier) {
+		return appFolder + "training_models/" + classifier + "/";
+	}
+	
+	public static String getNumberClassifierModel() {
+		return getTrainedModelDir("numbers") + "mlp_all_classes.txt";
 	}
 
 	public static void displayImageInWebView(WebView myWebView, String imagePath) {

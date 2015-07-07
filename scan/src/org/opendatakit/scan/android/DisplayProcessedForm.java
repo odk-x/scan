@@ -90,7 +90,7 @@ public class DisplayProcessedForm extends BaseActivity {
 			//subsequent invocations of the Scan activities in order to store
 			//so they can be combined into a single xform on the final invocation.
 			final File nextPageTemplatePath = new File(templatePath, "nextPage");
-			morePagesToScan = nextPageTemplatePath.exists();
+			morePagesToScan = nextPageTemplatePath.exists(); //TODO: This doesn't work on the "View Scanned forms" path.
 			if(morePagesToScan){
 				Button nextPage = (Button) findViewById(R.id.nextPageBtn);
 				nextPage.setVisibility(View.VISIBLE);
@@ -162,7 +162,7 @@ public class DisplayProcessedForm extends BaseActivity {
 				save2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						// Launch Tables
+						/* Uncomment if you want Scan to launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						} 
@@ -172,7 +172,8 @@ public class DisplayProcessedForm extends BaseActivity {
 								exportToTables(2);
 							}
 						}
-						/* Uncomment if you want Scan to launch Survey
+						*/
+						// Uncomment if you want Scan to launch Survey
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}	 
@@ -181,7 +182,7 @@ public class DisplayProcessedForm extends BaseActivity {
 							if(surveyIntent.getData() == null) {
 								exportToSurvey(2);
 							}
-						}*/
+						}
 						
 					}
 				});
@@ -189,7 +190,8 @@ public class DisplayProcessedForm extends BaseActivity {
 				transcribe2Data.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						// Launch Tables
+
+						/* Uncomment to Launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						}
@@ -206,7 +208,8 @@ public class DisplayProcessedForm extends BaseActivity {
 								}
 							}
 						}
-						/* Uncomment if you want Scan to launch Survey
+						*/
+						// Launch Survey
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}
@@ -222,7 +225,7 @@ public class DisplayProcessedForm extends BaseActivity {
 									startActivity(surveyIntent);
 								}
 							}
-						}*/
+						}
 					}
 				});
 			}
@@ -306,12 +309,13 @@ public class DisplayProcessedForm extends BaseActivity {
 	 */
 	public Intent makeSurveyIntent() {
 		// Initialize the intent that will start Survey.
-		Intent intent = new Intent();
+		Intent intent =  getPackageManager().getLaunchIntentForPackage("org.opendatakit.survey.android");
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		
 		intent.setAction(Intent.ACTION_EDIT);
+		intent.addCategory(Intent.CATEGORY_DEFAULT);
 		
 		//Start indicates that the form should be launched from the first question
 		//rather than the prompt list.
@@ -440,7 +444,7 @@ public class DisplayProcessedForm extends BaseActivity {
 	 * @param requestCode
 	 */
 	public void exportToCollect(int requestCode) {
-		showDialog(0);
+		// TODO: showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
@@ -455,7 +459,7 @@ public class DisplayProcessedForm extends BaseActivity {
 	 * @param requestCode
 	 */
 	public void exportToSurvey(int requestCode) {
-		showDialog(0);
+		// TODO: showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
@@ -470,7 +474,7 @@ public class DisplayProcessedForm extends BaseActivity {
 	 * @param requestCode
 	 */
 	public void exportToTables(int requestCode) {
-		showDialog(0);
+		// TODO: showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
@@ -480,7 +484,7 @@ public class DisplayProcessedForm extends BaseActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		dismissDialog(0);
+		// TODO: dismissDialog(0);
 		// Changed the code to only launch intents if the result was ok
 		if (resultCode == Activity.RESULT_OK) {
 			if (requestCode == 0 || requestCode == 1) {
@@ -495,12 +499,12 @@ public class DisplayProcessedForm extends BaseActivity {
 				Button save2Data = (Button) findViewById(R.id.save2Btn);
 				save2Data.setEnabled(false);
 				save2Data.setText("saved");
-				// Launch tables
+				/* Uncomment to launch tables
 				tablesIntent.putExtras(data);
-				tablesIntent.setData(data.getData());
-				/* Uncomment to launch survey
+				tablesIntent.setData(data.getData()); */
+				// Launch survey
 				surveyIntent.putExtras(data);
-				surveyIntent.setData(data.getData());*/
+				surveyIntent.setData(data.getData());
 			}
 			
 			if (requestCode == 1) {
@@ -511,18 +515,20 @@ public class DisplayProcessedForm extends BaseActivity {
 			
 			if (requestCode == 3) {
 				//dismissDialog(1);
-				// Launch tables
+
+				/* Uncomment to Launch tables
 				Log.i(LOG_TAG, "Starting Tables...");
 				boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
 				if (tablesInstalled) {
 					startActivity(tablesIntent);
 				}
-			   /* Uncomment to launch survey
+				*/
+			   // Launch survey
 				Log.i(LOG_TAG, "Starting Survey...");
 				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
 				if (surveyInstalled) {
 					startActivity(surveyIntent);
-				}*/
+				}
 			}
 		}
 
