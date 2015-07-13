@@ -1,0 +1,5 @@
+include ':scan_app'
+include ':androidlibrary:androidlibrary_lib'
+project(':androidlibrary:androidlibrary_lib').setProjectDir(new File('../androidlibrary/androidlibrary_lib'))
+include ':androidcommon:androidcommon_lib'
+project(':androidcommon:androidcommon_lib').setProjectDir(new File('../androidcommon/androidcommon_lib'))

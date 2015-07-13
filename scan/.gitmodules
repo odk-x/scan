@@ -1,6 +1,0 @@
-[submodule "jni/ODKScan-core"]
-	path = jni/ODKScan-core
-	url = git://github.com/nathanathan/ODKScan-core.git
-[submodule "assets/transcription"]
-	path = assets/transcription
-	url = git@github.com:nathanathan/transcription.git
