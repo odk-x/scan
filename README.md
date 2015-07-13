@@ -1,4 +1,16 @@
-# ODKScan
+# scan
+
+This project is __*actively maintained*__
+
+It is part of the ODK 2.0 Android tools suite.
+
+ODK Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK Tables or ODK Survey. 
+
+The developer [wiki](https://github.com/opendatakit/opendatakit/wiki) (including release notes) and
+[issues tracker](https://github.com/opendatakit/opendatakit/issues) are located under
+the [**opendatakit**](https://github.com/opendatakit/opendatakit) project.
+
+The Google group for software engineering questions is: [opendatakit-developers@](https://groups.google.com/forum/#!forum/opendatakit-developers)
 
 ## Setting up your environment
 This app is a mix of Java and native C++ code, so it can be a bit complicated to work with.
