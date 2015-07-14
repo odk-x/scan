@@ -91,21 +91,37 @@ The processing pipeline includes 3 main components:
 Quick description of the content in the root folder:
 
 .
+
 |-- bubblebot\_lib          -- Source tree for C++ components
+
     |-- OpenCV-2.3.1        -- OpenCV library
+
     |-- local.env.mk        -- Build configuration and local path to NDK
+
     |-- default.properties  -- Default build properties
+
     |-- Makefile            -- Makefile for C++ components
+
     |-- jni                 -- Source tree for C++ components
+
 |-- scan\_app               -- Source tree for Java components
+
     |-- src
+
        |-- main
+
           |-- jniLibs       -- C++ build output
+
           |-- res           -- Source tree for Android resources
+
           |-- java
+
              |-- org
+
                 |-- opendatakit
+
                    |-- scan
+
                       |-- android   -- The most relevant Java code lives here
 
 ## Acknowledgments:
