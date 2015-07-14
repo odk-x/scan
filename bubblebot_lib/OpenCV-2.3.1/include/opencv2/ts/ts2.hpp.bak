@@ -1,0 +1,87 @@
+#ifndef __OPENCV_GTESTCV2_HPP__
+#define __OPENCV_GTESTCV2_HPP__
+
+#include "opencv2/ts/ts_gtest.h"
+#include "opencv2/core/core.hpp"
+
+// additional Mat types to work with Google Test
+#define CV_8UC5 CV_8UC(5)
+#define CV_8UC6 CV_8UC(6)
+#define CV_8UC7 CV_8UC(7)
+#define CV_8UC8 CV_8UC(8)
+#define CV_8UC9 CV_8UC(9)
+#define CV_8UC10 CV_8UC(10)
+
+#define CV_8SC5 CV_8SC(5)
+#define CV_8SC6 CV_8SC(6)
+#define CV_8SC7 CV_8SC(7)
+#define CV_8SC8 CV_8SC(8)
+#define CV_8SC9 CV_8SC(9)
+#define CV_8SC10 CV_8SC(10)
+
+#define CV_16UC5 CV_16UC(5)
+#define CV_16UC6 CV_16UC(6)
+#define CV_16UC7 CV_16UC(7)
+#define CV_16UC8 CV_16UC(8)
+#define CV_16UC9 CV_16UC(9)
+#define CV_16UC10 CV_16UC(10)
+
+#define CV_16SC5 CV_16SC(5)
+#define CV_16SC6 CV_16SC(6)
+#define CV_16SC7 CV_16SC(7)
+#define CV_16SC8 CV_16SC(8)
+#define CV_16SC9 CV_16SC(9)
+#define CV_16SC10 CV_16SC(10)
+
+#define CV_32SC5 CV_32SC(5)
+#define CV_32SC6 CV_32SC(6)
+#define CV_32SC7 CV_32SC(7)
+#define CV_32SC8 CV_32SC(8)
+#define CV_32SC9 CV_32SC(9)
+#define CV_32SC10 CV_32SC(10)
+
+#define CV_32FC5 CV_32FC(5)
+#define CV_32FC6 CV_32FC(6)
+#define CV_32FC7 CV_32FC(7)
+#define CV_32FC8 CV_32FC(8)
+#define CV_32FC9 CV_32FC(9)
+#define CV_32FC10 CV_32FC(10)
+
+#define CV_64FC5 CV_64FC(5)
+#define CV_64FC6 CV_64FC(6)
+#define CV_64FC7 CV_64FC(7)
+#define CV_64FC8 CV_64FC(8)
+#define CV_64FC9 CV_64FC(9)
+#define CV_64FC10 CV_64FC(10)
+
+//Macros for testing CVError
+#define EXPECT_CVERROR(statement) EXPECT_THROW(statement, cv::Exception)
+#define EXPECT_NO_CVERROR(statement) EXPECT_NO_THROW(statement)
+
+
+#define EXPECT_MAT_EMPTY(mat) {}
+#define EXPECT_MAT_EQ_SIZE(src, dst) {}
+
+namespace cvtest
+{
+
+typedef void (ArrayInArrayOut)(const cv::InputArray& _src, cv::OutputArray _dst);
+
+class CV_EXPORTS CVTest : public ::testing::Test
+{
+public:
+    static cv::Mat randomMat(int rows, int cols, int type, bool useRoi = false, uint64 seed = -1);
+    static cv::Mat randomMat(int rows, int cols, int type, double minVal, double maxVal, bool useRoi = false, uint64 seed = -1);
+
+    static double getMinVal(int depth);
+    static double getMaxVal(int depth);
+
+    static unsigned int crc32(const cv::Mat& m);
+
+
+    void stdArgsTest(ArrayInArrayOut method, int dataType = CV_8U);
+};
+
+}
+
+#endif //__OPENCV_GTESTCV2_HPP__
