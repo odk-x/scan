@@ -132,14 +132,9 @@ public class ViewScannedForms extends BaseListActivity {
 					intent.putExtra("photoName", photoName);
 					intent.putExtra("templatePath", ScanUtils.getTemplateDirPath() + templateName);
 					startActivity(intent);
-				} 
-				//This is old and should never be called
-				else if (new File(ScanUtils.getAlignedPhotoPath(photoName))
-						.exists()) {
-					Intent intent = new Intent(getApplication(), AfterPhotoTaken.class);
-					intent.putExtra("photoName", photoName);
-					intent.putExtra("preAligned", true);
-					startActivity(intent);
+				}
+				else {
+					// TODO: Throw an error
 				}
 			}
 		});

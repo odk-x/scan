@@ -155,7 +155,7 @@ public class MainMenu extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		// This override is used in order to avoid going back to the
-		// AfterPhotoTaken activity.
+		// DisplayProcessedForm activity.
 		Intent setIntent = new Intent(Intent.ACTION_MAIN);
 		setIntent.addCategory(Intent.CATEGORY_HOME);
 		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

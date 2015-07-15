@@ -73,12 +73,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="AfterPhotoTaken"
-            android:configChanges="orientation|keyboardHidden|keyboard"
-            android:label="@string/after_photo_taken_activity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name="org.opendatakit.scan.android.AlignImage"
             android:configChanges="orientation|keyboardHidden|keyboard"
             android:screenOrientation="portrait" >

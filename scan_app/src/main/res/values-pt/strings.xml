@@ -20,13 +20,6 @@
     <string name="calibrate">Calibrate</string>
     <string name="doFormDetection">Do Form Detection</string>
 
-    <!-- AfterPhotoTaken -->
-    <string name="process_form">processar fotos</string>
-    <string name="retake_photo">tirar fotos</string>
-    <string name="aligning_form">alinhar ficha</string>
-    <string name="processing_form">processar ficha</string>
-    <string name="could_not_register">Sorry, the form could not be registered.</string>
-
     <!-- Popup menu -->
     <string name="save_data">Save Data</string>
     <string name="display_data">Display Data</string>
