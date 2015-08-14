@@ -17,13 +17,13 @@ apply plugin: 'com.android.application'
 
 android {
     // The following are set in the common.gradle file
-    compileSdkVersion(compileVersion)
+    compileSdkVersion(20)
     buildToolsVersion(buildTools)
 
     defaultConfig {
         applicationId(groupId + scanName)
         minSdkVersion(minVersion)
-        targetSdkVersion(targetVersion)
+        targetSdkVersion(19)
         versionCode(releaseVersionCode)
         versionName(versionCodeName)
     }
