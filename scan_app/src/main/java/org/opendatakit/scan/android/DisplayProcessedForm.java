@@ -46,6 +46,33 @@ public class DisplayProcessedForm extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
 
+	public enum RequestCode {
+		SAVE,
+		TRANSCRIBE;
+
+        public static RequestCode fromInt(int toConvert) {
+            switch(toConvert) {
+                case 0:
+                    return SAVE;
+                case 1:
+                    return TRANSCRIBE;
+                default:
+                    return null;
+            }
+        }
+
+        public static int toInt(RequestCode toConvert) {
+            switch(toConvert) {
+                case SAVE:
+                    return 0;
+                case TRANSCRIBE:
+                    return 1;
+                default:
+                    return -1;
+            }
+        }
+	}
+
 	private String photoName;
 	private String templatePath;
 	WebView myWebView;
@@ -132,7 +159,7 @@ public class DisplayProcessedForm extends BaseActivity {
 						//tablesIntent is still null if Tables not installed.
 						if(tablesIntent != null) {
 							if(tablesIntent.getData() == null) {
-								exportToTables(2);
+								exportToTables(RequestCode.SAVE);
 							}
 						}
 						*/
@@ -140,10 +167,10 @@ public class DisplayProcessedForm extends BaseActivity {
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}	 
-						//surveyIntent is still null if Survey not installed.
+						//TODO: surveyIntent is still null if Survey not installed.
 						if(surveyIntent != null) {
 							if(surveyIntent.getData() == null) {
-								exportToSurvey(2);
+								exportToSurvey(RequestCode.SAVE);
 							}
 						}
 						
@@ -158,10 +185,10 @@ public class DisplayProcessedForm extends BaseActivity {
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
 						}
-						//tablesIntent is still null if Tables not installed.
+						//TODO: tablesIntent is still null if Tables not installed.
 						if(tablesIntent != null) {
 							if(tablesIntent.getData() == null) {
-								exportToTables(3);
+								exportToTables(RequestCode.TRANSCRIBE);
 							} else {
 								//The scan data has already been exported
 								//so just start Tables.
@@ -176,10 +203,10 @@ public class DisplayProcessedForm extends BaseActivity {
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
 						}
-						//surveyIntent is still null if Survey not installed.
+						//TODO: surveyIntent is still null if Survey not installed.
 						if(surveyIntent != null) {
 							if(surveyIntent.getData() == null) {
-								exportToSurvey(3);
+								exportToSurvey(RequestCode.TRANSCRIBE);
 							} else {
 								//The scan data has already been exported
 								//so just start Tables.
@@ -357,13 +384,13 @@ public class DisplayProcessedForm extends BaseActivity {
 	 * after the export activity returns a result.
 	 * @param requestCode
 	 */
-	public void exportToSurvey(int requestCode) {
+	public void exportToSurvey(RequestCode requestCode) {
 		// TODO: showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
 		createInstanceIntent.putExtra("photoName", photoName);
-		startActivityForResult(createInstanceIntent, requestCode);
+		startActivityForResult(createInstanceIntent, RequestCode.toInt(requestCode));
 	}
 	
 	/**
@@ -372,25 +399,23 @@ public class DisplayProcessedForm extends BaseActivity {
 	 * after the export activity returns a result.
 	 * @param requestCode
 	 */
-	public void exportToTables(int requestCode) {
+	public void exportToTables(RequestCode requestCode) {
 		// TODO: showDialog(0);
 		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
 		createInstanceIntent.putExtra("photoName", photoName);
-		startActivityForResult(createInstanceIntent, requestCode);
+		startActivityForResult(createInstanceIntent, RequestCode.toInt(requestCode));
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCodeInt, int resultCode, Intent data) {
 		// TODO: dismissDialog(0);
-		// Changed the code to only launch intents if the result was ok
+        RequestCode requestCode = RequestCode.fromInt(requestCodeInt);
+
+		// Only launch intents if the result was ok
 		if (resultCode == Activity.RESULT_OK) {
-			if (requestCode == 0 || requestCode == 1) {
-				// TODO: Adjust requestCodes
-			}
-			
-			if (requestCode == 2 || requestCode == 3) {
+			if (requestCode == RequestCode.SAVE || requestCode == RequestCode.TRANSCRIBE) {
 				Button saveData = (Button) findViewById(R.id.saveBtn);
 				saveData.setEnabled(false);
 				saveData.setText("saved");
@@ -402,12 +427,7 @@ public class DisplayProcessedForm extends BaseActivity {
 				surveyIntent.setData(data.getData());
 			}
 			
-			if (requestCode == 1) {
-				//dismissDialog(0);
-				// TODO: Adjust request codes
-			}
-			
-			if (requestCode == 3) {
+			if (requestCode == RequestCode.TRANSCRIBE) {
 				//dismissDialog(1);
 
 				/* Uncomment to Launch tables
@@ -426,7 +446,7 @@ public class DisplayProcessedForm extends BaseActivity {
 			}
 		}
 
-		super.onActivityResult(requestCode, resultCode, data);
+		super.onActivityResult(requestCodeInt, resultCode, data);
 	}
 
 	@Override
