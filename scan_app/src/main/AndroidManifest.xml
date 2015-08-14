@@ -73,15 +73,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.opendatakit.scan.android.AlignImage"
-            android:configChanges="orientation|keyboardHidden|keyboard"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-		        <action android:name="org.opendatakit.scan.android.ALIGN" />
-		        <category android:name="android.intent.category.DEFAULT"/>
-		    </intent-filter>
-        </activity>
-        <activity
             android:name="DisplayStatus"
 			android:label="status"
             android:screenOrientation="portrait"  >
