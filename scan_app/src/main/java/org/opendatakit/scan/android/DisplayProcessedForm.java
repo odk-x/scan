@@ -53,8 +53,6 @@ public class DisplayProcessedForm extends BaseActivity {
 	private Bundle extras;
 
 	private boolean morePagesToScan = false;
-
-	private Intent collectIntent;
 	
 	private Intent surveyIntent;
 	
@@ -127,41 +125,6 @@ public class DisplayProcessedForm extends BaseActivity {
 				saveData.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
-						if(collectIntent == null) {
-							collectIntent = makeCollectIntent();
-						} 
-						//collectIntent is still null if Collect not installed.
-						if(collectIntent != null) {
-							if(collectIntent.getData() == null) {
-								exportToCollect(0);
-							}
-						}
-						
-					}
-				});
-				Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
-				transcribeData.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) {
-						Log.i(LOG_TAG, "Using template: " + templatePath);
-						if(collectIntent == null) {
-							collectIntent = makeCollectIntent();
-						}
-						//collectIntent is still null if Collect not installed.
-						if(collectIntent != null) {
-							if(collectIntent.getData() == null) {
-								exportToCollect(1);
-							} else {
-								//The scan data has already been exported
-								//so just start collect.
-								startActivity(collectIntent);
-							}
-						}
-					}
-				});
-				Button save2Data = (Button) findViewById(R.id.save2Btn);
-				save2Data.setOnClickListener(new View.OnClickListener() {
-					public void onClick(View v) {
-						Log.i(LOG_TAG, "Using template: " + templatePath);
 						/* Uncomment if you want Scan to launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
@@ -186,8 +149,8 @@ public class DisplayProcessedForm extends BaseActivity {
 						
 					}
 				});
-				Button transcribe2Data = (Button) findViewById(R.id.transcribe2Btn);
-				transcribe2Data.setOnClickListener(new View.OnClickListener() {
+				Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
+				transcribeData.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
 
@@ -250,56 +213,6 @@ public class DisplayProcessedForm extends BaseActivity {
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-	}
-	
-	/**
-	 * Creates an intent for launching collect.
-	 * May return null if collect is not installed.
-	 * @return
-	 */
-	public Intent makeCollectIntent() {
-		// Initialize the intent that will start collect.
-		Intent intent = new Intent();
-		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.setComponent(new ComponentName("org.odk.collect.android",
-				"org.odk.collect.android.activities.FormEntryActivity"));
-		
-		//Use the intent to see if collect is installed.
-		PackageManager packMan = getPackageManager();
-		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
-			// ////////////
-			Log.i(LOG_TAG, "Collect is not installed.");
-			// ////////////		
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("ODK Collect was not found on this device.")
-					.setCancelable(false)
-					.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int id) {
-							Intent goToMarket = new Intent(Intent.ACTION_VIEW)
-						    	.setData(Uri.parse("market://details?id=org.odk.collect.android"));
-							startActivity(goToMarket);
-							dialog.cancel();
-						}
-					})
-					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int id) {
-							dialog.cancel();
-						}
-					});
-			AlertDialog alert = builder.create();
-			alert.show();
-			return null;
-		}
-		
-		intent.setAction(Intent.ACTION_EDIT);
-		
-		//Start indicates that the form should be launched from the first question
-		//rather than the prompt list.
-		intent.putExtra("start", true);
-		return intent;
 	}
 	
 	/**
@@ -376,7 +289,7 @@ public class DisplayProcessedForm extends BaseActivity {
 					//})
 					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
-								int id) {
+											int id) {
 							dialog.cancel();
 						}
 					});
@@ -437,20 +350,6 @@ public class DisplayProcessedForm extends BaseActivity {
 		builder.setCancelable(false);
 		return builder.create();
 	}
-	/**
-	 * Exports the Scan JSON data to collect.
-	 * If the requestCode is 1 collect will be launched
-	 * after the export activity returns a result.
-	 * @param requestCode
-	 */
-	public void exportToCollect(int requestCode) {
-		// TODO: showDialog(0);
-		Intent createInstanceIntent = new Intent(getApplication(), JSON2XForm.class);
-		createInstanceIntent.putExtras(extras);
-		createInstanceIntent.putExtra("templatePath", templatePath);
-		createInstanceIntent.putExtra("photoName", photoName);
-		startActivityForResult(createInstanceIntent, requestCode);
-	}
 	
 	/**
 	 * Exports the Scan JSON data to Survey.
@@ -488,17 +387,13 @@ public class DisplayProcessedForm extends BaseActivity {
 		// Changed the code to only launch intents if the result was ok
 		if (resultCode == Activity.RESULT_OK) {
 			if (requestCode == 0 || requestCode == 1) {
-				Button saveData = (Button) findViewById(R.id.saveBtn);
-				saveData.setEnabled(false);
-				saveData.setText("saved");
-				collectIntent.putExtras(data);
-				collectIntent.setData(data.getData());
+				// TODO: Adjust requestCodes
 			}
 			
 			if (requestCode == 2 || requestCode == 3) {
-				Button save2Data = (Button) findViewById(R.id.save2Btn);
-				save2Data.setEnabled(false);
-				save2Data.setText("saved");
+				Button saveData = (Button) findViewById(R.id.saveBtn);
+				saveData.setEnabled(false);
+				saveData.setText("saved");
 				/* Uncomment to launch tables
 				tablesIntent.putExtras(data);
 				tablesIntent.setData(data.getData()); */
@@ -509,8 +404,7 @@ public class DisplayProcessedForm extends BaseActivity {
 			
 			if (requestCode == 1) {
 				//dismissDialog(0);
-				Log.i(LOG_TAG, "Starting Collect...");	
-				startActivity(collectIntent);
+				// TODO: Adjust request codes
 			}
 			
 			if (requestCode == 3) {

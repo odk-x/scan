@@ -42,10 +42,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="JSON2XForm"
-            android:screenOrientation="portrait" >
-        </activity>
         <!-- Added to be able to translate the Scan code to JSON -->
         <activity
             android:name="JSON2SurveyJSON"
