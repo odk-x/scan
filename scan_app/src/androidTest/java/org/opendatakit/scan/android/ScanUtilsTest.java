@@ -16,6 +16,8 @@ package org.opendatakit.scan.android;
 
 import android.test.AndroidTestCase;
 
+import org.opendatakit.scan.android.utils.ScanUtils;
+
 public class ScanUtilsTest extends AndroidTestCase {
   private static final String APP_NAME = "tables";
 

@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,15 +20,16 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.utils.JSONUtils;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +43,7 @@ import android.widget.LinearLayout;
 /**
  * This activity displays the image of a processed form.
  */
-public class DisplayProcessedForm extends BaseActivity {
+public class DisplayProcessedFormActivity extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
 
@@ -76,15 +77,15 @@ public class DisplayProcessedForm extends BaseActivity {
 	private String photoName;
 	private String templatePath;
 	WebView myWebView;
-	
+
 	private Bundle extras;
 
 	private boolean morePagesToScan = false;
-	
+
 	private Intent surveyIntent;
-	
+
 	private Intent tablesIntent;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,7 +97,7 @@ public class DisplayProcessedForm extends BaseActivity {
 				throw new Exception("This activity must be lauched with a photoName specified in the extras.");
 			}
 			photoName = extras.getString("photoName");
-			
+
 			templatePath = extras.getString("templatePath");
 			if(templatePath == null){
 				//Since the template path is not in the extras we'll try to get it from the json output.
@@ -104,11 +105,11 @@ public class DisplayProcessedForm extends BaseActivity {
 				outputJSON.getString("templatePath");
 				//templatePath = outputJSON.getString("templatePath");
 			}
-			
+
 			Log.i(LOG_TAG, "Enabling buttons and attaching handlers...");
-			
+
 			//How multi-page forms are handled:
-			//If there is a nextPage directory in the template directory 
+			//If there is a nextPage directory in the template directory
 			//Scan will assume it is processing a multipage form
 			//where the template for the next page is in the nextPage directory.
 			//In the extras, the prevTemplatePaths and prevPhotoPaths arrays are passed through
@@ -121,7 +122,7 @@ public class DisplayProcessedForm extends BaseActivity {
 				nextPage.setVisibility(View.VISIBLE);
 				nextPage.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
-						Intent intent = new Intent(getApplication(), PhotographForm.class);
+						Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
 						String[] templatePaths = { nextPageTemplatePath.toString() };
 						intent.putExtra("templatePaths", templatePaths);
 						ArrayList<String> prevTemplatePaths = extras.getStringArrayList("prevTemplatePaths");
@@ -155,7 +156,7 @@ public class DisplayProcessedForm extends BaseActivity {
 						/* Uncomment if you want Scan to launch Tables
 						if(tablesIntent == null) {
 							tablesIntent = makeTablesIntent();
-						} 
+						}
 						//tablesIntent is still null if Tables not installed.
 						if(tablesIntent != null) {
 							if(tablesIntent.getData() == null) {
@@ -166,14 +167,14 @@ public class DisplayProcessedForm extends BaseActivity {
 						// Uncomment if you want Scan to launch Survey
 						if(surveyIntent == null) {
 							surveyIntent = makeSurveyIntent();
-						}	 
+						}
 						//TODO: surveyIntent is still null if Survey not installed.
 						if(surveyIntent != null) {
 							if(surveyIntent.getData() == null) {
 								exportToSurvey(RequestCode.SAVE);
 							}
 						}
-						
+
 					}
 				});
 				Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
@@ -223,7 +224,7 @@ public class DisplayProcessedForm extends BaseActivity {
 			ScanUtils.displayImageInWebView(
 					(WebView) findViewById(R.id.webview2),
 					ScanUtils.getMarkedupPhotoPath(photoName));
-			
+
 		} catch (Exception e) {
 			// Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -241,7 +242,7 @@ public class DisplayProcessedForm extends BaseActivity {
 			alert.show();
 		}
 	}
-	
+
 	/**
 	 * Creates an intent for launching survey.
 	 * May return null if survey is not installed.
@@ -253,10 +254,10 @@ public class DisplayProcessedForm extends BaseActivity {
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		
+
 		intent.setAction(Intent.ACTION_EDIT);
 		intent.addCategory(Intent.CATEGORY_DEFAULT);
-		
+
 		//Start indicates that the form should be launched from the first question
 		//rather than the prompt list.
 		// Not sure if this start parameter is still necessary in Survey
@@ -274,18 +275,18 @@ public class DisplayProcessedForm extends BaseActivity {
 	   // final String TABLE_DISPLAY_ACTIVITY =
 	   //     "org.opendatakit.tables.activities.TableDisplayActivity";
 	   // Intent intent = new Intent(TABLE_DISPLAY_ACTIVITY);
-	    
+
 	   //Old Way
 		Intent intent = getPackageManager().getLaunchIntentForPackage("org.opendatakit.tables");
-	    
+
 		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.setAction(Intent.ACTION_VIEW);
-		
+
 		return intent;
 	}
-	
+
 	/**
 	 * Creates an intent for launching survey.
 	 * May return null if survey is not installed.
@@ -293,14 +294,14 @@ public class DisplayProcessedForm extends BaseActivity {
 	 */
 	public boolean checkForSurveyInstallation(Intent intent) {
 		boolean installed = true;
-		
+
 		//Use the intent to see if survey is installed.
 		//this assumes that you have action and data specified
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
 			// ////////////
 			Log.i(LOG_TAG, "Survey is not installed.");
-			// ////////////		
+			// ////////////
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("ODK Survey was not found on this device.")
 					.setCancelable(false)
@@ -324,10 +325,10 @@ public class DisplayProcessedForm extends BaseActivity {
 			alert.show();
 			installed = false;
 		}
-		
+
 		return installed;
 	}
-	
+
 	/**
 	 * Creates an intent for launching tables.
 	 * May return null if tables is not installed.
@@ -335,14 +336,14 @@ public class DisplayProcessedForm extends BaseActivity {
 	 */
 	public boolean checkForTablesInstallation(Intent intent) {
 		boolean installed = true;
-		
+
 		//Use the intent to see if tables is installed.
 		//this assumes that you have action and data specified
 		PackageManager packMan = getPackageManager();
 		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
 			// ////////////
 			Log.i(LOG_TAG, "Tables is not installed.");
-			// ////////////		
+			// ////////////
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("ODK Tables was not found on this device.")
 					.setCancelable(false)
@@ -366,10 +367,10 @@ public class DisplayProcessedForm extends BaseActivity {
 			alert.show();
 			installed = false;
 		}
-		
+
 		return installed;
 	}
-	
+
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -377,7 +378,7 @@ public class DisplayProcessedForm extends BaseActivity {
 		builder.setCancelable(false);
 		return builder.create();
 	}
-	
+
 	/**
 	 * Exports the Scan JSON data to Survey.
 	 * If the requestCode is 3 Survey will be launched
@@ -386,13 +387,13 @@ public class DisplayProcessedForm extends BaseActivity {
 	 */
 	public void exportToSurvey(RequestCode requestCode) {
 		// TODO: showDialog(0);
-		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
+		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSONActivity.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
 		createInstanceIntent.putExtra("photoName", photoName);
 		startActivityForResult(createInstanceIntent, RequestCode.toInt(requestCode));
 	}
-	
+
 	/**
 	 * Exports the Scan JSON data to Tables.
 	 * If the requestCode is 3 Tables will be launched
@@ -401,7 +402,7 @@ public class DisplayProcessedForm extends BaseActivity {
 	 */
 	public void exportToTables(RequestCode requestCode) {
 		// TODO: showDialog(0);
-		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSON.class);
+		Intent createInstanceIntent = new Intent(getApplication(), JSON2SurveyJSONActivity.class);
 		createInstanceIntent.putExtras(extras);
 		createInstanceIntent.putExtra("templatePath", templatePath);
 		createInstanceIntent.putExtra("photoName", photoName);
@@ -426,7 +427,7 @@ public class DisplayProcessedForm extends BaseActivity {
 				surveyIntent.putExtras(data);
 				surveyIntent.setData(data.getData());
 			}
-			
+
 			if (requestCode == RequestCode.TRANSCRIBE) {
 				//dismissDialog(1);
 
@@ -463,12 +464,12 @@ public class DisplayProcessedForm extends BaseActivity {
 		Intent intent;
 		int itemId = item.getItemId();
 		if (itemId == R.id.scanNewForm) {
-			intent = new Intent(getApplication(), PhotographForm.class);
+			intent = new Intent(getApplication(), PhotographFormActivity.class);
 			startActivity(intent);
 			finish();
 			return true;
 		} else if (itemId == R.id.startOver) {
-			intent = new Intent(getApplication(), MainMenu.class);
+			intent = new Intent(getApplication(), MainMenuActivity.class);
 			startActivity(intent);
 			finish();
 			return true;
@@ -479,12 +480,12 @@ public class DisplayProcessedForm extends BaseActivity {
 
   public void databaseAvailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getAppName() {

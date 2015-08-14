@@ -12,12 +12,14 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,24 +36,24 @@ import android.widget.TextView;
  * JSON  with the errorMessage and whatever other data the cpp code wants to communicate.
  * @author nathan
  */
-public class DisplayStatus extends BaseActivity {
+public class DisplayStatusActivity extends BaseActivity {
 
 	private static final String LOG_TAG = "ODKScan";
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		displayStatus(getIntent());
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
 		displayStatus(intent);
 	}
-	
+
 	protected void displayStatus(Intent intent) {
 		try {
 			setContentView(R.layout.status);
@@ -60,13 +62,13 @@ public class DisplayStatus extends BaseActivity {
 			if (extras == null) {
 				throw new Exception("Missing extras in the bundle.");
 			}
-			
+
 			String photoName = extras.getString("photoName");
 			Log.i(LOG_TAG, ScanUtils.getPhotoPath(photoName));
 			ScanUtils.displayImageInWebView(
 					(WebView) findViewById(R.id.webview),
 					ScanUtils.getPhotoPath(photoName));
-			
+
 			if(extras.containsKey("result")){
 				JSONObject result = new JSONObject();
 				try {
@@ -74,18 +76,18 @@ public class DisplayStatus extends BaseActivity {
 				} catch (JSONException e) {
 					result.put("errorMessage", "Unparsable JSON: " + extras.getString("result"));
 				}
-				
+
 				String errorMessage = result.optString("errorMessage");
-				
+
 				if(errorMessage != null){
 					((TextView) findViewById(R.id.statusMessage)).setText(errorMessage);
 				}
-				
+
 			} else {
 				((TextView) findViewById(R.id.statusMessage)).setText("Once this image is processed a notification will appear in your notification tray.");
 			}
-			
-			
+
+
 		} catch (Exception e) {
 			// Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -106,12 +108,12 @@ public class DisplayStatus extends BaseActivity {
 
   public void databaseAvailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getAppName() {

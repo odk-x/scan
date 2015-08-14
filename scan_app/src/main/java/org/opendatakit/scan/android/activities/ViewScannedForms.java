@@ -12,13 +12,15 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
 
 import org.opendatakit.common.android.activities.BaseListActivity;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -46,7 +48,7 @@ public class ViewScannedForms extends BaseListActivity {
 		super.onCreate(savedInstanceState);
 
 		File dir = new File(ScanUtils.getOutputDirPath());
-		
+
 		photoNames = dir.list(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				return (new File(dir, name)).isDirectory();
@@ -62,7 +64,7 @@ public class ViewScannedForms extends BaseListActivity {
 						: createView(parent);
 
 				String photoName = photoNames[position];
-								
+
 				TextView photoStatus = (TextView) view
 						.findViewById(R.id.photoStatus);
 				if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
@@ -79,19 +81,19 @@ public class ViewScannedForms extends BaseListActivity {
 
 				String[] parts = photoName.split("_");
 				String templateName = parts[0];
-				
+
 				if (templateName != null && templateName.length() != 0) {
 					nameView.setText(templateName);
 				}
-								
+
 				//ND restructuring to try and put view scanned forms back in
 				/*try {
 					String templatePath = ScanUtils.getTemplatePath(photoName);
 					Log.i("SCAN", "templatePath " + templatePath);
-					
+
 					String templateName = new File(templatePath).getName();
 					Log.i("SCAN", "templateName " + templateName);
-					
+
 					if (templateName != null && templateName.length() != 0) {
 						nameView.setText(templateName);
 					}
@@ -128,7 +130,7 @@ public class ViewScannedForms extends BaseListActivity {
 
 				if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
 					Intent intent = new Intent(getApplication(),
-							DisplayProcessedForm.class);
+							DisplayProcessedFormActivity.class);
 					intent.putExtra("photoName", photoName);
 					intent.putExtra("templatePath", ScanUtils.getTemplateDirPath() + templateName);
 					startActivity(intent);

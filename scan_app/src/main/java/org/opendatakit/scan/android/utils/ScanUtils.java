@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -45,51 +45,51 @@ public class ScanUtils {
 	public static final boolean DebugMode = false;
 
 	public static final String appFolder = Environment.getExternalStorageDirectory().getPath() + "/ODKScan/";
-	
+
 	public static final String extStorageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-	
+
 	public static final String getODKAppName() {
 		return appName;
 	}
-	
+
    // TODO: remove trailing slash
 	public static String getAppFormDirPath(String formId) {
 		return ODKFileUtils.getFormFolder(appName, formId, formId) + File.separator;
 	}
-	
+
    // TODO: remove trailing slash
 	public static String getAppInstancesDirPath(String formId) {
-		return ODKFileUtils.getInstancesFolder(appName, formId) + File.separator; 
+		return ODKFileUtils.getInstancesFolder(appName, formId) + File.separator;
 	}
-	
+
 	public static String getSurveyUriForInstanceAndDisplayContents(String tableId, String formId, String instanceId) {
 		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + tableId + "/" + formId + "/#instanceId=" + instanceId + "&screenPath=survey/_contents";
 	}
-	
+
 	public static String getSurveyUriForInstance(String tableId, String formId, String instanceId) {
 		return "content://org.opendatakit.common.android.provider.forms/"+ appName +"/" + tableId + "/" + formId + "/#instanceId=" + instanceId;
 	}
-	
+
 	// TODO: place this in the correct spot
 	public static String getTablesUriForInstance(String formId) {
 	  return "assets/" + formId + "/html/" + formId + "_list.html";
 	}
-	
+
    // TODO: place this in the correct spot
 	public static String getTablesUriForInstanceWithScanOutputDir(String formId, String scanOutputDir) {
 	  // Need to encode the scan_output_directory query parameter
 	  String encodedScanOutputDir = UrlUtils.encodeSegment(scanOutputDir);
 	  return "assets/" + formId + "/html/" + formId + ".html?scan_output_directory=" + encodedScanOutputDir;
 	}
-	
+
 	public static String getXlsxConverterUri() {
 		return "http:///localhost:8635/" + appName + "/xlsxconverter/conversion.html";
 	}
-	
+
    // TODO: remove trailing slash
-	public static String getAppRelativeInstancesDirPath(String formId, String instancesDir) 
+	public static String getAppRelativeInstancesDirPath(String formId, String instancesDir)
 	{
-		return ODKFileUtils.asRelativePath(appName, 
+		return ODKFileUtils.asRelativePath(appName,
 		    new File(ODKFileUtils.getInstanceFolder(appName, formId, instancesDir))) + File.separator;
 	}
 
@@ -135,11 +135,11 @@ public class ScanUtils {
 	public static String getFormViewHTMLDir() {
 		return appFolder + "transcription/";
 	}
-	
+
 	public static String getTrainedModelDir(String classifier) {
 		return appFolder + "training_models/" + classifier + "/";
 	}
-	
+
 	public static String getNumberClassifierModel() {
 		return getTrainedModelDir("numbers") + "mlp_all_classes.txt";
 	}
@@ -178,11 +178,11 @@ public class ScanUtils {
 		StringBuilder text = new StringBuilder();
 		BufferedReader br = new BufferedReader(new FileReader(new File(filePath)));
 		String line;
-		
+
 		while ((line = br.readLine()) != null) {
 			text.append(line);
 		}
-		
+
 		br.close();
 
 		return text.toString();

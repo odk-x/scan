@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -25,6 +25,8 @@ import org.droidparts.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.services.ProcessFormService;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,10 +41,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 /**
- * PhotographForm launches the Android camera app to capture a form image.
- * It also creates a directory for data about the form to be stored.  
+ * PhotographFormActivity launches the Android camera app to capture a form image.
+ * It also creates a directory for data about the form to be stored.
  **/
-public class PhotographForm extends BaseActivity {
+public class PhotographFormActivity extends BaseActivity {
 	private static final String LOG_TAG = "ODKScan";
 	private static final int TAKE_PICTURE = 12346789;
 	private String photoName;
@@ -50,14 +52,14 @@ public class PhotographForm extends BaseActivity {
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
     private Intent processPhoto;
 	private Date activityCreateTime;
-    
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		try{
 			activityCreateTime = new Date();
 			photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
-			
+
 			Bundle extras = getIntent().getExtras();
 			if(extras == null) {
 				extras = new Bundle();
@@ -74,7 +76,7 @@ public class PhotographForm extends BaseActivity {
 						.fromPersistedPreferenceValue(settings.getString(
 								"select_templates", ""));
 				extras.putStringArray("templatePaths", templatePaths);
-				
+
 				if (templatePaths.length > 0)
 				{
 					String[] parts = templatePaths[0].split("/");
@@ -82,20 +84,20 @@ public class PhotographForm extends BaseActivity {
 					photoName = templateName + "_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
 				}
 			}
-			
-	    	String inputPath = ScanUtils.getPhotoPath(photoName);
-	    	String outputPath = ScanUtils.getOutputPath(photoName);
-	    	String[] templatePaths = extras.getStringArray("templatePaths");
-	    	
-	    	//This is the configuration JSON passed into ODKScan-core
-	    	//see: https://github.com/UW-ICTD/ODKScan-core/blob/master/processViaJSON.md
+
+		String inputPath = ScanUtils.getPhotoPath(photoName);
+		String outputPath = ScanUtils.getOutputPath(photoName);
+		String[] templatePaths = extras.getStringArray("templatePaths");
+
+		//This is the configuration JSON passed into ODKScan-core
+		//see: https://github.com/UW-ICTD/ODKScan-core/blob/master/processViaJSON.md
 			JSONObject config = new JSONObject();
 	        config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
 	        config.put("inputImage", inputPath);
 	        config.put("outputDirectory", outputPath);
 	        config.put("templatePaths", new JSONArray(Arrays.asList(templatePaths)));
-	        
-			processPhoto = new Intent(this, ProcessInBG.class);
+
+			processPhoto = new Intent(this, ProcessFormService.class);
 			processPhoto.putExtras(extras);
 			processPhoto.putExtra("photoName", photoName);
 	        processPhoto.putExtra("config", config.toString());
@@ -103,8 +105,8 @@ public class PhotographForm extends BaseActivity {
 			//Try to create an output folder
 			boolean createSuccess = new File(outputPath).mkdirs();
 			if(!createSuccess){
-				new Exception("Could not create output folder [" + 
-						outputPath + 
+				new Exception("Could not create output folder [" +
+						outputPath +
 						"].\n There may be a problem with the device's storage.");
 			}
 			//Create an output directory for the segments
@@ -112,13 +114,13 @@ public class PhotographForm extends BaseActivity {
 			if(!segDirSuccess){
 				new Exception("Could not create output folder for segments.");
 			}
-			
+
 			Uri imageUri = Uri.fromFile( new File(ScanUtils.getPhotoPath(photoName)) );
 			Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 			intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			startActivityForResult(intent, TAKE_PICTURE);
-			
+
 		} catch (Exception e) {
 			//Display an error dialog if something goes wrong.
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -142,7 +144,7 @@ public class PhotographForm extends BaseActivity {
 		if (requestCode == TAKE_PICTURE) {
 			finishActivity(TAKE_PICTURE);
 			if (resultCode == Activity.RESULT_OK) {
-				
+
 				File destFile = new File(ScanUtils.getPhotoPath(photoName));
 				if( !destFile.exists() ) {
 					Toast.makeText(getApplicationContext(), "Could not save photo.", Toast.LENGTH_LONG).show();
@@ -151,21 +153,21 @@ public class PhotographForm extends BaseActivity {
 				}
 
 				Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
-				
+
 				//The android camera app saves an additional copy of the image.
 				//The following query is used to find it and remove it.
 				String[] projection = new String[]{
 				     MediaStore.Images.ImageColumns._ID,
 				     MediaStore.Images.ImageColumns.DATA,
-				     MediaStore.Images.ImageColumns.DATE_TAKEN};     
+				     MediaStore.Images.ImageColumns.DATE_TAKEN};
 
 				final Cursor cursor = managedQuery(
 				     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null,
-				     MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"); 
+				     MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
 
 				if(cursor != null && cursor.getCount() > 0){
 					cursor.moveToFirst();
-					
+
 					File outfile = new File(cursor.getString(1));
 					if( !outfile.exists() || outfile.lastModified() < activityCreateTime.getTime() ) {
 						// Removing this message as it is confusing to the user
@@ -200,7 +202,7 @@ public class PhotographForm extends BaseActivity {
 			finish();
 		}
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		//Try to remove the forms directory if the photo couldn't be captured:
@@ -210,11 +212,11 @@ public class PhotographForm extends BaseActivity {
 	}
   public void databaseAvailable() {
     // TODO Auto-generated method stub
-    
+
   }
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
   public String getAppName() {
     return ScanUtils.getODKAppName();

@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +41,9 @@ import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.database.service.OdkDbHandle;
+import org.opendatakit.scan.android.utils.JSONUtils;
+import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.android.application.Scan;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -51,23 +54,23 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.webkit.WebView;
 
-public class JSON2SurveyJSON extends BaseActivity {
+public class JSON2SurveyJSONActivity extends BaseActivity {
 
-  private static final String TAG = "JSON2SurveyJSON";
+  private static final String TAG = "JSON2SurveyJSONActivity";
   private static final String LOG_TAG = "ODKScan";
 
   private static final String scanOutputDir = "scan_output_directory";
-  
+
   private static final String rawOutputFileName = "raw";
-  
+
   private static final String APP_NAME = "appName";
-  
+
   private static final String TABLE_ID = "tableId";
-  
+
   private static final String FILE_NAME = "filename";
-  
+
   private static final String TABLE_DISPLAY_TYPE = "tableDisplayViewType";
-  
+
   private static final String TABLES_DISPLAY_LIST = "LIST";
 
   private static String xlsxFormId;
@@ -82,9 +85,9 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   // used to communicate info through databaseAvailable() call.
   private String rootTemplatePath;
-  
+
   private String formId;
-  
+
   WebView myWebView;
 
   @Override
@@ -122,7 +125,7 @@ public class JSON2SurveyJSON extends BaseActivity {
     // If there are multiple pages, we want to get the formId from the root path
     rootTemplatePath = templatePath;
     if (templatePaths.size() > 1) {
-    	rootTemplatePath = templatePaths.get(0);
+	rootTemplatePath = templatePaths.get(0);
     }
 
     formId = getFormIdFromFormDef(rootTemplatePath);
@@ -160,17 +163,17 @@ public class JSON2SurveyJSON extends BaseActivity {
 
     // wait for databaseAvailable to do any further processing
   }
-  
+
   @Override
   public void onPostResume() {
-	  
+
     super.onPostResume();
     Scan.getInstance().establishDatabaseConnectionListener(this);
   }
 
   /**
    * Check for formId in formDef.json for forms without subforms
-   * 
+   *
    * @param templatePath
    */
   public String getFormIdFromFormDef(String templatePath) {
@@ -193,7 +196,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Check for formId in formDef.json for forms without subforms
-   * 
+   *
    * @param templatePath
    * @param suffix
    */
@@ -215,7 +218,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Get formDef.json output for non-subform forms
-   * 
+   *
    * @param formDef
    * @return jsonOutput
    * @throws Exception
@@ -240,7 +243,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Checking if there are sub_forms
-   * 
+   *
    * @param templatePath
    */
   public boolean checkForSubforms(String templatePath) { // TODO: How does this work with multipage forms?
@@ -265,7 +268,7 @@ public class JSON2SurveyJSON extends BaseActivity {
   /**
    * Creating the database table needed from the information provided by the
    * Scan app
-   * 
+   *
    * @param db
    * @param tableName
    * @param subformFieldsToProcess
@@ -277,7 +280,7 @@ public class JSON2SurveyJSON extends BaseActivity {
     // Always add the scan output directory to the table definition
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
-    
+
     // Now we will always add the output.json file to the table
     // TODO: What about multi-page forms?
     columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI, "[\""
@@ -344,7 +347,7 @@ public class JSON2SurveyJSON extends BaseActivity {
    * Creating the database table needed from the information provided by the
    * form designer. This is used for the subforms case since we can't loop
    * through it as we normally would.
-   * 
+   *
    * @param db
    * @param tableName
    * @param subformFieldsToProcess
@@ -352,7 +355,7 @@ public class JSON2SurveyJSON extends BaseActivity {
   public OrderedColumns createSurveyTablesFromFormDesigner(OdkDbHandle db,
       String tableName, JSONObject subformFieldsToProcess) {
     List<Column> columns = new ArrayList<Column>();
-    
+
     // Always add the scan output directory to the table definition
     // This is used to map a Survey instance with a Scan photo
     columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
@@ -364,7 +367,7 @@ public class JSON2SurveyJSON extends BaseActivity {
         .name(), "[]"));
     columns.add(new Column(rawOutputFileName + "_uriFragment", "uriFragment", ElementDataType.rowpath
         .name(), "[]"));
-    
+
 
     OrderedColumns orderedColumns = null;
 
@@ -558,7 +561,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Add a survey instance into the database
-   * 
+   *
    * @param formId
    */
   public void createSurveyInstance(String formId) {
@@ -604,7 +607,7 @@ public class JSON2SurveyJSON extends BaseActivity {
             + ". Creating new table definition");
         orderedColumns = createSurveyTables(db, tableId, fields);
       } else {
-        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db, 
+        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db,
             tableId);
       }
 
@@ -653,7 +656,7 @@ public class JSON2SurveyJSON extends BaseActivity {
         mapScanInstanceToSurveyInstance(field, field.getString("name"), tablesValues,
             writeOutCustomCss, cssStr, dbValuesToWrite, dirToMake, dirId, formId);
       }
-      
+
       // Copy raw output values
       if (fieldsLength > 0) {
 	      String fullFileName = rawOutputFileName + "_" + dirId + ".json";
@@ -669,13 +672,13 @@ public class JSON2SurveyJSON extends BaseActivity {
 	      fos.close();
 	      fis.close();
 	      // ---End of copying
-	      
-	     
+
+
 	      // database changes require that images have a field named
 	      // image_uriFragment and image_contentType
 	      String rawOutputFileName_uriFragment = rawOutputFileName + "_uriFragment";
 	      String rawOutputFileName_contentType = rawOutputFileName + "_contentType";
-	      
+
 	      tablesValues.put(rawOutputFileName_uriFragment, fullFileName);
 	      tablesValues.put(rawOutputFileName_contentType, "application/json");
       }
@@ -718,7 +721,7 @@ public class JSON2SurveyJSON extends BaseActivity {
    * This is essentially the same things as the as the createSurveyInstance - I
    * am just doing this for a quick demo These things will have to be cleaned
    * up!!!
-   * 
+   *
    * @param templatePath
    */
   public void createSurveyInstanceBasedOnFormDesignerForms(String templatePath) {
@@ -807,7 +810,7 @@ public class JSON2SurveyJSON extends BaseActivity {
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase().rawSqlQuery(ScanUtils.getODKAppName(), db,
           tableId, orderedColumns, selection, selectionArgs, empty,  null, null, null);
-      
+
       if ( data.getNumberOfRows() >= 1 ) {
         String foundUuidStr = data.getRowAtIndex(0).getRawDataOrMetadataByElementKey(DataTableColumns.ID);
         //String uriStr = ScanUtils
@@ -877,31 +880,31 @@ public class JSON2SurveyJSON extends BaseActivity {
             }
           }
         }
-        
+
         // Copy raw output values
         if (fieldsLength > 0) {
-  	      String fullFileName = rawOutputFileName + "_" + dirId + ".json";
-  	      InputStream fis = new FileInputStream(ScanUtils.getJsonPath(photoNames.get(photoNames.size() - 1)));
-  	      File outputFile = new File(dirToMake.getAbsolutePath(), fullFileName);
-  	      FileOutputStream fos = new FileOutputStream(outputFile.getAbsolutePath());
-  	      // Transfer bytes from in to out
-  	      byte[] buf = new byte[1024];
-  	      int len;
-  	      while ((len = fis.read(buf)) > 0) {
-  	        fos.write(buf, 0, len);
-  	      }
-  	      fos.close();
-  	      fis.close();
-  	      // ---End of copying
-  	      
-  	     
-  	      // database changes require that images have a field named
-  	      // image_uriFragment and image_contentType
-  	      String rawOutputFileName_uriFragment = rawOutputFileName + "_uriFragment";
-  	      String rawOutputFileName_contentType = rawOutputFileName + "_contentType";
-  	      
-  	      tablesValues.put(rawOutputFileName_uriFragment, fullFileName);
-  	      tablesValues.put(rawOutputFileName_contentType, "application/json");
+	      String fullFileName = rawOutputFileName + "_" + dirId + ".json";
+	      InputStream fis = new FileInputStream(ScanUtils.getJsonPath(photoNames.get(photoNames.size() - 1)));
+	      File outputFile = new File(dirToMake.getAbsolutePath(), fullFileName);
+	      FileOutputStream fos = new FileOutputStream(outputFile.getAbsolutePath());
+	      // Transfer bytes from in to out
+	      byte[] buf = new byte[1024];
+	      int len;
+	      while ((len = fis.read(buf)) > 0) {
+	        fos.write(buf, 0, len);
+	      }
+	      fos.close();
+	      fis.close();
+	      // ---End of copying
+
+
+	      // database changes require that images have a field named
+	      // image_uriFragment and image_contentType
+	      String rawOutputFileName_uriFragment = rawOutputFileName + "_uriFragment";
+	      String rawOutputFileName_contentType = rawOutputFileName + "_contentType";
+
+	      tablesValues.put(rawOutputFileName_uriFragment, fullFileName);
+	      tablesValues.put(rawOutputFileName_contentType, "application/json");
         }
 
         // For each subgroup check if it is ready to be written out or not
@@ -952,7 +955,7 @@ public class JSON2SurveyJSON extends BaseActivity {
   /**
    * Function to check whether or not to write a String value into ContentValues
    * - we don't want to insert empty strings
-   * 
+   *
    * @param tableValue
    * @param key
    * @param value
@@ -966,7 +969,7 @@ public class JSON2SurveyJSON extends BaseActivity {
   /**
    * Callback function for after XLSXConverter JavaScript returns this was used
    * with the buildSurveyFormDef function
-   * 
+   *
    * @param val
    * @deprecated
    */
@@ -978,7 +981,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Write out string data to a file in a given directory
-   * 
+   *
    * @param directory
    * @param fileName
    * @param data
@@ -1002,7 +1005,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Check that the string is a valid xml tag
-   * 
+   *
    * @param string
    * @throws Exception
    */
@@ -1017,7 +1020,7 @@ public class JSON2SurveyJSON extends BaseActivity {
   /**
    * Builds an XFrom from a JSON template and writes it out to the specified
    * file. It builds it as a string which really isn't the best way to go.
-   * 
+   *
    * @param templatePaths
    * @return jsonOutputString
    * @throws Exception
@@ -1307,7 +1310,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Check if any of the provided file paths were modified after the given date.
-   * 
+   *
    * @param templatePaths
    * @param lastModified
    * @return
@@ -1324,16 +1327,16 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   /**
    * Check if any of the provided file paths were modified after the given date.
-   * 
+   *
    * @param templatePaths
    * @param lastModified
    * @return
    */
   // This function may be useful when checking for version issues?
   private void setIntentToReturn(String tableId, String formId, String rowId) {
-    
+
     Intent intent = new Intent();
-    
+
     /* Uncomment to launch Tables
     Bundle args = new Bundle();
     args.putString(APP_NAME, ScanUtils.getODKAppName());
@@ -1342,10 +1345,10 @@ public class JSON2SurveyJSON extends BaseActivity {
     args.putString(TABLE_DISPLAY_TYPE, TABLES_DISPLAY_LIST);
     intent.putExtras(args);
     */
-    
+
     // Launch Survey
     intent.setData(Uri.parse(ScanUtils.getSurveyUriForInstanceAndDisplayContents(tableId, formId, rowId)));
-    
+
     setResult(RESULT_OK, intent);
   }
 
@@ -1395,7 +1398,7 @@ public class JSON2SurveyJSON extends BaseActivity {
 
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getAppName() {

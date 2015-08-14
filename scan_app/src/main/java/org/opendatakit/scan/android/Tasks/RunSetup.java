@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.Tasks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,20 +23,23 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Handler;
 import android.util.Log;
+
+import org.opendatakit.scan.android.utils.ScanUtils;
+
 /**
  * The RunSetup extracts everything in the assets folder to the ODKScan folder.
  * It also does some version control stuff.
  * It runs on a separate thread so as to avoid locking up the UI.
  */
 public class RunSetup implements Runnable {
-	
+
 	private static final String LOG_TAG = "ODKScan";
-	
+
 	private SharedPreferences settings;
 	private AssetManager assets;
 	private Handler handler;
 	private int appVersionCode;
-	
+
 	public RunSetup(Handler handler, SharedPreferences settings, AssetManager assets, int appVersionCode){
 		this.handler = handler;
 		this.settings = settings;
@@ -46,33 +49,33 @@ public class RunSetup implements Runnable {
 	public void run() {
 
 		SharedPreferences.Editor editor = settings.edit();
-		
+
 		// Create output dir if it doesn't exist
 		new File(ScanUtils.getOutputDirPath()).mkdirs();
-		
+
 		try {
 			//Creates a .nomedia file to prevent the images from showing up in the gallery.
 			new File(ScanUtils.appFolder + ".nomedia").createNewFile();
-			
+
 			File trainingExamplesDir =  new File(ScanUtils.getTrainingExampleDirPath());
 			File formTemplatesDir = new File(ScanUtils.getTemplateDirPath());
-			
+
 			//TODO: When new examples/templates are added to the assets dir they should be added here as well.
 			//It would be nice to automatically delete examples/templates in the assets dir.
 			rmdir(new File(trainingExamplesDir, "bubbles"));
 			rmdir(new File(trainingExamplesDir, "squre_checkboxes"));
 			rmdir(new File(formTemplatesDir, "example"));
 			rmdir(new File(ScanUtils.getFormViewHTMLDir()));
-			
+
 			if(!settings.contains("select_templates")){
 				//If there is no data for which templates to use, use the example template as default
 				editor.putString("select_templates", ScanUtils.getTemplateDirPath() + "example");
 			}
-			
+
 			extractAssets(new File(""), new File(ScanUtils.appFolder));
-			
+
 			editor.putInt("version", appVersionCode);
-			
+
 		} catch (IOException e) {
 			// TODO: Terminate the app if this fails.
 			e.printStackTrace();
@@ -92,11 +95,11 @@ public class RunSetup implements Runnable {
 		outputDir.mkdirs();
 		String[] assetNames = assets.list(assetsDir.toString());
 		for(int i = 0; i < assetNames.length; i++){
-			
+
 			File nextAssetsDir = new File(assetsDir, assetNames[i]);
 			File nextOutputDir = new File(outputDir, assetNames[i]);
-			
-			
+
+
 			if(assets.list(nextAssetsDir.toString()).length == 0){
 				copyAsset(nextAssetsDir, nextOutputDir);
 			}
@@ -112,9 +115,9 @@ public class RunSetup implements Runnable {
 	 * @throws IOException
 	 */
 	protected void copyAsset(File assetDir, File outputDir) throws IOException {
-		
+
 		Log.i(LOG_TAG, "Copying " + assetDir + " to " + outputDir.toString());
-		
+
 		InputStream fis = assets.open(assetDir.toString());
 
 		outputDir.createNewFile();
@@ -135,7 +138,7 @@ public class RunSetup implements Runnable {
 	 * @param dir
 	 */
 	public void rmdir(File dir){
-		
+
 		if(dir.exists()){
 			String[] files = dir.list();
 			for(int i = 0; i < files.length; i++){

@@ -13,10 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.services;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opendatakit.scan.android.activities.DisplayProcessedFormActivity;
+import org.opendatakit.scan.android.activities.DisplayStatusActivity;
 
 import com.bubblebot.jni.Processor;
 
@@ -39,18 +41,18 @@ import java.util.LinkedList;
  * This service invokes the cpp image processing code to run in the background.
  * It creates a notification that it's processing an image and updates it when it completes.
  */
-public class ProcessInBG extends Service {
+public class ProcessFormService extends Service {
 	//Android has an IntentService class which fits the queuing requirement nicely
-	//but I'm not using it because it seems like it will be easier to deal with the 
+	//but I'm not using it because it seems like it will be easier to deal with the
 	//notifications for enqueued jobs this way.
 	/*
 	 * Ideas:
 	 * 1. Update notifications when alignment finished and allow previews of it.
 	 * 2. For multipage forms, the user could be prompted to take the next picture as soon as alignment completes.
 	 */
-	
+
 	private static final String LOG_TAG = "ODKScan";
-	
+
 	/**
 	 * This process is a singleton. Every time an activity "starts" it
 	 * a new thread is created to do the processing code and added to this queue.
@@ -78,7 +80,7 @@ public class ProcessInBG extends Service {
 			activeThread = nextJob;
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startid) {
@@ -93,106 +95,106 @@ public class ProcessInBG extends Service {
 			if (configJSON == null) {
 				throw new Exception("config property is not in extras.");
 			}
-			
-	    	final int notificationId = (int) (Math.random() * 9999999);
-			final NotificationManager notificationManager = (NotificationManager) 
+
+		final int notificationId = (int) (Math.random() * 9999999);
+			final NotificationManager notificationManager = (NotificationManager)
 	                getSystemService(Context.NOTIFICATION_SERVICE);
 			final Context context = getApplicationContext();
-			
+
 	        int icon = android.R.drawable.status_bar_item_background;
 	        CharSequence tickerText = "Processing form...";
 	        long when = System.currentTimeMillis();
-	        Intent waitingIntent = new Intent(context, DisplayStatus.class);
+	        Intent waitingIntent = new Intent(context, DisplayStatusActivity.class);
 	        waitingIntent.putExtras(extras);
 	        Notification notification = new Notification(icon, tickerText, when);
 	        notification.setLatestEventInfo(context, "ODK Scan", "Processing form...",
 	                PendingIntent.getActivity(context, 0, waitingIntent, 0));
 	        notificationManager.notify(notificationId , notification);
-	        
-	    	//A subprocess is used to run the OpenCV code.
-	    	//I tried doing it synchronously inside this service but it locks up the UI.
-	    	
+
+		//A subprocess is used to run the OpenCV code.
+		//I tried doing it synchronously inside this service but it locks up the UI.
+
 	        /**
 	         * This handler gets called with the result json when
 	         * the scan cpp code finishes processing an image.
 	         */
-	    	final Handler handler = new Handler(new Handler.Callback() {
+		final Handler handler = new Handler(new Handler.Callback() {
 	            public boolean handleMessage(Message message) {
-	            	Bundle messageData = message.getData();
-	            	
-	            	JSONObject result = new JSONObject();
-	            	String errorMessage = "";
-	            	
-	            	if(messageData != null) {
+			Bundle messageData = message.getData();
+
+			JSONObject result = new JSONObject();
+			String errorMessage = "";
+
+			if(messageData != null) {
 						try {
 							result = new JSONObject(messageData.getString("result"));
 							errorMessage = result.optString("errorMessage");
 						} catch (JSONException e) {
 							Log.i(LOG_TAG, "Unparsable JSON: " + messageData.getString("result"));
 						}
-	            	} else {
-	            		messageData = new Bundle();
-	            		Toast.makeText(context,
-	    	        			"Error: Empty data bundle given to handler.",
-	    	        			Toast.LENGTH_LONG).show();
-	            	}
-	    	        CharSequence contentTitle = "ODK Scan";
-	    	        
+			} else {
+				messageData = new Bundle();
+				Toast.makeText(context,
+						"Error: Empty data bundle given to handler.",
+						Toast.LENGTH_LONG).show();
+			}
+		        CharSequence contentTitle = "ODK Scan";
+
 					//Assume an error for the default notification.
-	    	        int icon = android.R.drawable.stat_notify_error;
-	    	        CharSequence contentText = "Error processing form.";
-	    	        CharSequence tickerText = contentText;
-	    	        long when = System.currentTimeMillis();
-	    	        Intent notificationIntent = new Intent(context, DisplayStatus.class);
-	    	        
-	    	        if(errorMessage.length() == 0) {
-	    	        	extras.putString("templatePath", result.optString("templatePath"));
-	    	        	contentText = "Successfully processed image!";
-	    	        	tickerText = contentText;
-	    	        	icon = android.R.drawable.stat_notify_more;
-	    	        	notificationIntent = new Intent(context, DisplayProcessedForm.class);
-	    	        }
-	    	        
-	    	        //Pass along the data from the intent that started this service.
-	    	        notificationIntent.putExtras(extras);
-	    	        //Pass along the message data to the notification activity.
-	    	        notificationIntent.putExtras(messageData);
-	    	        Notification notification = new Notification(icon, tickerText, when);
-	    	        //Make it so notifications are canceled on click
-	    	        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-	    	        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationId,
-	    	                notificationIntent, 0);
-	    	        notification.setLatestEventInfo(context, contentTitle, contentText,
-	    	                contentIntent);
-	    	        
+		        int icon = android.R.drawable.stat_notify_error;
+		        CharSequence contentText = "Error processing form.";
+		        CharSequence tickerText = contentText;
+		        long when = System.currentTimeMillis();
+		        Intent notificationIntent = new Intent(context, DisplayStatusActivity.class);
+
+		        if(errorMessage.length() == 0) {
+				extras.putString("templatePath", result.optString("templatePath"));
+				contentText = "Successfully processed image!";
+				tickerText = contentText;
+				icon = android.R.drawable.stat_notify_more;
+				notificationIntent = new Intent(context, DisplayProcessedFormActivity.class);
+		        }
+
+		        //Pass along the data from the intent that started this service.
+		        notificationIntent.putExtras(extras);
+		        //Pass along the message data to the notification activity.
+		        notificationIntent.putExtras(messageData);
+		        Notification notification = new Notification(icon, tickerText, when);
+		        //Make it so notifications are canceled on click
+		        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationId,
+		                notificationIntent, 0);
+		        notification.setLatestEventInfo(context, contentTitle, contentText,
+		                contentIntent);
+
 					notificationManager.notify(notificationId , notification);
-	    	        
+
 					Log.i(LOG_TAG, "Finished active thread status: " + activeThread.getState());
 					activeThread = null;
-	            	updateProcessingQueue();
+			updateProcessingQueue();
 					return true;
 	            }
-	    	});
-	    	
-	    	Thread pThread = new Thread(new Runnable() {
-	    		public void run() {	
-	    			//The JNI object that connects to the ODKScan-core code.
-	    			final Processor mProcessor = new Processor();//ScanUtils.appFolder
-	    			Bundle outputData = new Bundle();
-	    			
+		});
+
+		Thread pThread = new Thread(new Runnable() {
+			public void run() {
+				//The JNI object that connects to the ODKScan-core code.
+				final Processor mProcessor = new Processor();//ScanUtils.appFolder
+				Bundle outputData = new Bundle();
+
                     Log.i(LOG_TAG, "Using data = " + configJSON);
-    				String result = mProcessor.processViaJSON(configJSON);
-    				
+				String result = mProcessor.processViaJSON(configJSON);
+
 					outputData.putString("result", result);
-	    			Message msg = new Message();
-	    			msg.setData(outputData);
-	    			handler.sendMessage(msg);
-	    		}
-	    	});
-	    	
-	    	processingQueue.offer(pThread);
-	    	updateProcessingQueue();
-	    	
+				Message msg = new Message();
+				msg.setData(outputData);
+				handler.sendMessage(msg);
+			}
+		});
+
+		processingQueue.offer(pThread);
+		updateProcessingQueue();
+
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Background processing exception!");
 			Log.e(LOG_TAG, e.toString());
@@ -200,7 +202,7 @@ public class ProcessInBG extends Service {
 		return startid;
 	}
 
-	
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub

@@ -25,15 +25,15 @@
           android:name="org.opendatakit.database.RUN_DATABASE"
           android:protectionLevel="signature" />
     <uses-permission android:name="org.opendatakit.database.RUN_DATABASE" />
-    
+
     <application
-        android:name="org.opendatakit.scan.android.Scan"
+        android:name=".application.Scan"
         android:icon="@drawable/icon"
         android:largeHeap="true"
         android:label="ODK Scan"
         android:theme="@android:style/Theme.Light" >
         <activity
-            android:name="MainMenu"
+            android:name=".activities.MainMenuActivity"
             android:label="ODK Scan"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -44,24 +44,24 @@
         </activity>
         <!-- Added to be able to translate the Scan code to JSON -->
         <activity
-            android:name="JSON2SurveyJSON"
-            android:screenOrientation="portrait" 
+            android:name=".activities.JSON2SurveyJSONActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
         </activity>
         <activity
-            android:name="PhotographForm"
+            android:name=".activities.PhotographFormActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="ViewScannedForms"
+            android:name=".activities.ViewScannedForms"
             android:label="@string/view_bubble_forms_activity" >
         </activity>
         <activity
-            android:name="Instructions"
+            android:name=".activities.InstructionsActivity"
             android:label="@string/bubble_instructions_activity" >
         </activity>
         <activity
-            android:name="DisplayProcessedForm"
+            android:name=".activities.DisplayProcessedFormActivity"
             android:label="@string/display_processed_form_activity"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -69,20 +69,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="DisplayStatus"
+            android:name=".activities.DisplayStatusActivity"
 			android:label="status"
             android:screenOrientation="portrait"  >
         </activity>
         <activity
-            android:name="AppSettings"
+            android:name=".activities.AppSettingsActivity"
             android:label="Settings" >
         </activity>
-        
+
         <service
-        android:name=".ProcessInBG"
+        android:name="services.ProcessFormService"
         android:label="ODK Scan Background" >
    		</service>
-    
+
     </application>
 
 </manifest>

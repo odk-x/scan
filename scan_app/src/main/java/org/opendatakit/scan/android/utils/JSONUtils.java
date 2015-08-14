@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -90,7 +90,7 @@ public class JSONUtils {
 		while ((line = br.readLine()) != null) {
 			text.append(line);
 		}
-		
+
 		br.close();
 
 		return new JSONObject(text.toString());

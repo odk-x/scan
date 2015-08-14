@@ -12,11 +12,14 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.Tasks.RunSetup;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -33,7 +36,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainMenu extends BaseActivity {
+public class MainMenuActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +64,14 @@ public class MainMenu extends BaseActivity {
 			if (appVersionCode == 0 || storedVersionCode < appVersionCode) {
 				final ProgressDialog pd = ProgressDialog.show(this, "Please wait...",
 						"Extracting assets", true);
-				
-		    	final Handler handler = new Handler(new Handler.Callback() {
+
+			final Handler handler = new Handler(new Handler.Callback() {
 		            public boolean handleMessage(Message message) {
-		            	pd.dismiss();
+				pd.dismiss();
 						return true;
 		            }
-		    	});
-		    	
+			});
+
 				Thread thread = new Thread(new RunSetup(handler, settings,
 						getAssets(), appVersionCode));
 				thread.start();
@@ -98,7 +101,7 @@ public class MainMenu extends BaseActivity {
 		Button scanForm = (Button) findViewById(R.id.ScanButton);
 		scanForm.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), PhotographForm.class);
+				Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -115,7 +118,7 @@ public class MainMenu extends BaseActivity {
 		Button instructions = (Button) findViewById(R.id.InstructionsButton);
 		instructions.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), Instructions.class);
+				Intent intent = new Intent(getApplication(), InstructionsActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -123,7 +126,7 @@ public class MainMenu extends BaseActivity {
 		Button settingsButton = (Button) findViewById(R.id.SettingsButton);
 		settingsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), AppSettings.class);
+				Intent intent = new Intent(getApplication(), AppSettingsActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -155,7 +158,7 @@ public class MainMenu extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		// This override is used in order to avoid going back to the
-		// DisplayProcessedForm activity.
+		// DisplayProcessedFormActivity activity.
 		Intent setIntent = new Intent(Intent.ACTION_MAIN);
 		setIntent.addCategory(Intent.CATEGORY_HOME);
 		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -164,12 +167,12 @@ public class MainMenu extends BaseActivity {
 
   public void databaseAvailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getAppName() {

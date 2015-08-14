@@ -12,23 +12,25 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.os.Bundle;
 
-/* Instructions activity
- * 
+/* InstructionsActivity activity
+ *
  * This activity displays the instructions on screen
  */
-public class Instructions extends BaseActivity {
+public class InstructionsActivity extends BaseActivity {
 
 	// Initialize the application
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.bubble_instructions); // Setup the UI
 	}
 
@@ -40,17 +42,17 @@ public class Instructions extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 	}
 
   public void databaseAvailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public void databaseUnavailable() {
     // TODO Auto-generated method stub
-    
+
   }
 
   public String getAppName() {

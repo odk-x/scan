@@ -12,17 +12,19 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 import java.io.FilenameFilter;
 
 import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.common.android.activities.BasePreferenceActivity;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.os.Bundle;
 
-public class AppSettings extends BasePreferenceActivity {
+public class AppSettingsActivity extends BasePreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

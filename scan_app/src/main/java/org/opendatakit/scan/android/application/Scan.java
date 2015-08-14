@@ -12,9 +12,10 @@
  * the License.
  */
 
-package org.opendatakit.scan.android;
+package org.opendatakit.scan.android.application;
 
 import org.opendatakit.common.android.application.CommonApplication;
+import org.opendatakit.scan.android.R;
 
 public class Scan extends CommonApplication {
 
@@ -56,4 +57,3 @@ public class Scan extends CommonApplication {
   }
 
 }
-
