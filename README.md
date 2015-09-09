@@ -15,7 +15,7 @@ the [**opendatakit**](https://github.com/opendatakit/opendatakit) project.
 The Google group for software engineering questions is: [opendatakit-developers@](https://groups.google.com/forum/#!forum/opendatakit-developers)
 
 ## Setting up your environment
-This app makes use of the NDK, which is not yet fully integrated into the Android Studio/Gradle environment. Rebuilding the C++ is not necessary if you only want to modify the Java side, but to do NDK work you will need to complete the below steps until Android Studio 1.3 and Gradle plugin 2.5 are released.
+This app makes use of the NDK, which is not yet fully integrated into the Android Studio/Gradle environment. Rebuilding the C++ is not necessary if you only want to modify the Java side, but to do NDK work you will need to complete the below steps until Android Studio fully supports NDK development.
 
 We currently have only tested this process on Linux and Mac.
 
@@ -39,9 +39,24 @@ Set the NDK path in `local.env.mk`
 
 ### Android
 
+General instructions for setting up an ODK 2.0 environment can be found at our [DevEnv Setup wiki page](https://github.com/opendatakit/opendatakit/wiki/DevEnv-Setup)
+
 Install [Android Studio](http://developer.android.com/tools/studio/index.html) and the [SDK](http://developer.android.com/sdk/index.html#Other).
 
-This project depends on ODK's [androidlibrary](https://github.com/opendatakit/androidlibrary) and [androidcommon](https://github.com/opendatakit/androidcommon) projects, so be sure to clone those into the same parent directory as Scan. ODK [Core](https://github.com/opendatakit/core) must also be installed on your device, whether by installing the APK or by cloning the project and deploying it. ODK [Survey](https://github.com/opendatakit/survey) and ODK [Tables](https://github.com/opendatakit/tables) also integrate well with ODK Scan, but are not required.
+This project depends on ODK's [androidlibrary](https://github.com/opendatakit/androidlibrary) and [androidcommon](https://github.com/opendatakit/androidcommon) projects; their binaries will be downloaded automatically fom our maven repository during the build phase. If you wish to modify them yourself, you must clone them into the same parent directory as scan. You directory stucture should resemble the following:
+
+        |-- odk
+
+            |-- androidcommon
+
+            |-- androidlibrary
+
+            |-- scan
+
+
+  * Note that this only applies if you are modifying the library projects. If you use the maven dependencies (the default option), the projects will not show up in your directory. 
+    
+ODK [Core](https://github.com/opendatakit/core) __MUST__ be installed on your device, whether by installing the APK or by cloning the project and deploying it. ODK [Survey](https://github.com/opendatakit/survey) and ODK [Tables](https://github.com/opendatakit/tables) also integrate well with ODK Scan, but are not required.
 
 Now you should be ready to build.
 
