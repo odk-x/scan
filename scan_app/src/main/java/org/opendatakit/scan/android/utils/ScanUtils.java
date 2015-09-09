@@ -41,7 +41,7 @@ public class ScanUtils {
 	private ScanUtils() {
 	}
 
-	public static final String appName = "tables";
+	public static final String appName = "scan";
 	public static final boolean DebugMode = false;
 
 	public static final String appFolder = Environment.getExternalStorageDirectory().getPath() + "/ODKScan/";
