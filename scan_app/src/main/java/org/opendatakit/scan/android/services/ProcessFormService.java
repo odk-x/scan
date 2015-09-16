@@ -81,7 +81,6 @@ public class ProcessFormService extends Service {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startid) {
 		try {

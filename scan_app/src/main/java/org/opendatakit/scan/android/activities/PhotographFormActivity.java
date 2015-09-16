@@ -51,13 +51,11 @@ public class PhotographFormActivity extends BaseActivity {
     private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd_kk-mm-ss");
     private Intent processPhoto;
-	private Date activityCreateTime;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		try{
-			activityCreateTime = new Date();
 			photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
 
 			Bundle extras = getIntent().getExtras();
@@ -154,41 +152,6 @@ public class PhotographFormActivity extends BaseActivity {
 
 				Log.d(LOG_TAG, "Captured photo: " + ScanUtils.getPhotoPath(photoName));
 
-				//The android camera app saves an additional copy of the image.
-				//The following query is used to find it and remove it.
-				String[] projection = new String[]{
-				     MediaStore.Images.ImageColumns._ID,
-				     MediaStore.Images.ImageColumns.DATA,
-				     MediaStore.Images.ImageColumns.DATE_TAKEN};
-
-				final Cursor cursor = managedQuery(
-				     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null,
-				     MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
-
-				if(cursor != null && cursor.getCount() > 0){
-					cursor.moveToFirst();
-
-					File outfile = new File(cursor.getString(1));
-					if( !outfile.exists() || outfile.lastModified() < activityCreateTime.getTime() ) {
-						// Removing this message as it is confusing to the user
-						/*Toast.makeText(getApplicationContext(),
-								"Could not find original photo duplicate.",
-								Toast.LENGTH_LONG).show();*/
-						Log.d(LOG_TAG, "Could not find original photo duplicate.");
-					} else {
-						//Ideally this would just rename the photo to move it to the ODKScan folder,
-						//but that can fail in a number of ways.
-						//see: outfile.renameTo(new File(ScanUtils.getOutputPath(photoName)));
-						//So instead an extra photo is create in the ODKScan folder via the extra_output intent parameter
-						//and the original is deleted.
-						boolean success = outfile.delete();
-						if(!success){
-							Toast.makeText(getApplicationContext(),
-									"Could not remove original photo duplicate from DCIM folder.",
-									Toast.LENGTH_LONG).show();
-						}
-					}
-				}
 				startService(processPhoto);
 			}
 			else{
