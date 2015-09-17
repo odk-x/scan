@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId(groupId + scanName)
         minSdkVersion(minVersion)
-        targetSdkVersion(19)
+        targetSdkVersion(targetVersion)
         versionCode(releaseVersionCode)
         versionName(versionCodeName)
     }
