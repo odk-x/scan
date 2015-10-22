@@ -14,7 +14,9 @@
 <!-- For Preferences -->
 <string name="calibrate">Calibrate</string>
 <string name="doFormDetection">Do Form Detection</string>
-    
+<string name="template_to_use">Template to Use</string>
+<string name="specify_form_type">Set to scan \"%s\" form template</string>
+
 <!-- For Main Screen -->
 <string name="Health_Center">Health Center</string>
 <string name="the_current_health_center_is">The current health center is:</string>

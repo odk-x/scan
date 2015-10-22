@@ -15,31 +15,28 @@
  */
 package org.opendatakit.scan.android.activities;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-
-import org.droidparts.preference.MultiSelectListPreference;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.scan.android.services.ProcessFormService;
-import org.opendatakit.scan.android.utils.ScanUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.scan.android.services.ProcessFormService;
+import org.opendatakit.scan.android.utils.ScanUtils;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 /**
  * PhotographFormActivity launches the Android camera app to capture a form image.
  * It also creates a directory for data about the form to be stored.
@@ -70,9 +67,8 @@ public class PhotographFormActivity extends BaseActivity {
 				SharedPreferences settings = PreferenceManager
 						.getDefaultSharedPreferences(getApplicationContext());
 				Log.d(LOG_TAG, "Captured photo: ");
-				String[] templatePaths = MultiSelectListPreference
-						.fromPersistedPreferenceValue(settings.getString(
-								"select_templates", ""));
+				String[] templatePaths = {settings.getString(
+								"select_templates", "")};
 				extras.putStringArray("templatePaths", templatePaths);
 
 				if (templatePaths.length > 0)

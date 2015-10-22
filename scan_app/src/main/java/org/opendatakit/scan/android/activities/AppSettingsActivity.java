@@ -14,15 +14,14 @@
 
 package org.opendatakit.scan.android.activities;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
-import org.droidparts.preference.MultiSelectListPreference;
+import android.os.Bundle;
+import android.preference.ListPreference;
 import org.opendatakit.common.android.activities.BasePreferenceActivity;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
-import android.os.Bundle;
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class AppSettingsActivity extends BasePreferenceActivity {
 
@@ -37,7 +36,7 @@ public class AppSettingsActivity extends BasePreferenceActivity {
 		// This will become slow and it would be nice to be able to
 		// download/delete templates.
 		// Plus if we put it on the main page it will be one less click.
-		MultiSelectListPreference multiSelectPreference = (MultiSelectListPreference) findPreference("select_templates");
+		final ListPreference templatePreference = (ListPreference) findPreference("select_templates");
 
 		// // Get the available templates:
 		File dir = new File(ScanUtils.getTemplateDirPath());
@@ -64,8 +63,8 @@ public class AppSettingsActivity extends BasePreferenceActivity {
 					+ templateNames[i];
 		}
 
-		multiSelectPreference.setEntries(templateNames);
-		multiSelectPreference.setEntryValues(templatePaths);
+		templatePreference.setEntries(templateNames);
+		templatePreference.setEntryValues(templatePaths);
 	}
 
   public String getAppName() {
