@@ -577,8 +577,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     String uuidStr = UUID.randomUUID().toString();
     boolean successful = false;
     try {
-      db = Scan.getInstance().getDatabase().openDatabase( ScanUtils.getODKAppName(), true);
-
+      db = Scan.getInstance().getDatabase().openDatabase( ScanUtils.getODKAppName());
+      Scan.getInstance().getDatabase().beginTransaction( ScanUtils.getODKAppName(), db);
       if (tableId == null) {
         throw new Exception("formId cannot be blank!!");
       }
@@ -733,7 +733,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     OrderedColumns orderedColumns = null;
     boolean successful = false;
     try {
-      db = Scan.getInstance().getDatabase().openDatabase(ScanUtils.getODKAppName(), true);
+      db = Scan.getInstance().getDatabase().openDatabase(ScanUtils.getODKAppName());
+      Scan.getInstance().getDatabase().beginTransaction(ScanUtils.getODKAppName(), db);
       // This code will only handle one subform currently
       // It will break otherwise
       JSONArray subforms = new JSONArray();
