@@ -16,6 +16,7 @@ package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 
+import android.text.Html;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.Tasks.RunSetup;
@@ -133,7 +134,7 @@ public class MainMenuActivity extends BaseActivity {
 	}
 
 	/**
-	 * Throw an excpetion is there is no storage or not enough space.
+	 * Throw an exception if there is no storage or not enough space.
 	 * @throws Exception
 	 */
 	private void checkSDCard() throws Exception {
@@ -155,7 +156,28 @@ public class MainMenuActivity extends BaseActivity {
 		}
 	}
 
-	@Override
+   private void updateScanButtonText(SharedPreferences settings) {
+      Button scanForm = (Button) findViewById(R.id.ScanButton);
+      String[] templatePaths = {settings.getString("select_templates", "")};
+      String templateName = "";
+      if (templatePaths.length > 0) {
+         String[] parts = templatePaths[0].split("/");
+         templateName = parts[parts.length-1];
+      }
+      String newText = String.format(getString(R.string.scan_new_form), templateName);
+      CharSequence styledText = Html.fromHtml(newText);
+
+      scanForm.setText(styledText);
+	 }
+   @Override
+   public void onResume() {
+      super.onResume();
+      SharedPreferences settings = PreferenceManager
+          .getDefaultSharedPreferences(getApplicationContext());
+      updateScanButtonText(settings);
+   }
+
+  @Override
 	public void onBackPressed() {
 		// This override is used in order to avoid going back to the
 		// DisplayProcessedFormActivity activity.
