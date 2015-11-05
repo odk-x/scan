@@ -166,6 +166,7 @@ public class PhotographFormActivity extends BaseActivity {
 	protected void onDestroy() {
 		//Try to remove the forms directory if the photo couldn't be captured:
 		//Note: this won't delete the folder if it has any files in it.
+		new File(ScanUtils.getOutputPath(photoName) + "/segments").delete();
 		new File(ScanUtils.getOutputPath(photoName)).delete();
 		super.onDestroy();
 	}
