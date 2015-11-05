@@ -61,8 +61,7 @@ public class TemplateNameDisplayTest {
     private static final String PREFERENCE_KEY = "select_templates";
 
     @Rule
-    public ActivityTestRule<MainMenuActivity> mActivityRule =
-            new ActivityTestRule<MainMenuActivity>(MainMenuActivity.class);
+    public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(MainMenuActivity.class);
 
     @Test
     public void changeTemplateNameDisplay_AppSettings() {
@@ -75,13 +74,13 @@ public class TemplateNameDisplayTest {
         onView(withText(TEMPLATE_TO_USE)).perform(click());
 
         //Check template name is displayed in summary
-        onData(withKey(PREFERENCE_KEY))
-                .onChildView(withText(
-                                String.format(
-                                        mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
-                                        TEMPLATE_TO_USE)
+        onView(withId(android.R.id.summary)).check(matches(withText(
+                        String.format(
+                                mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
+                                TEMPLATE_TO_USE
                         )
-                ).check(matches(isDisplayed()));
+                )
+        ));
     }
 
     @Test
