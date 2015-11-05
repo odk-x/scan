@@ -20,7 +20,7 @@
 <!-- For Main Screen -->
 <string name="Health_Center">Health Center</string>
 <string name="the_current_health_center_is">The current health center is:</string>
-<string name="scan_new_form">Scan New Form</string>
+<string name="scan_new_form">Scan New Form&lt;br/>&lt;i>%s&lt;/i></string>
 <string name="ViewFormsButton">View Scanned Forms</string>
 <string name="InstructionsButton">Instructions</string>
 <string name="SettingsButton">Settings</string>
