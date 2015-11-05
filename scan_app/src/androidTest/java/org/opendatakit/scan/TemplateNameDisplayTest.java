@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 
 import android.app.Activity;
 import android.preference.Preference;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
@@ -92,7 +93,7 @@ public class TemplateNameDisplayTest {
         //Change template and go back to MainMenu
         onData(withKey(PREFERENCE_KEY)).perform(click());
         onView(withText(TEMPLATE_TO_USE)).perform(click());
-        onData(withKey(PREFERENCE_KEY)).perform(pressBack());
+        Espresso.pressBack();
 
         //check template name is displayed on ScanButton
         onView(withId(R.id.ScanButton)).check(matches(withText(
