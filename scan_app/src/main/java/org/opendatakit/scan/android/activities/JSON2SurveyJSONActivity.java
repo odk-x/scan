@@ -271,7 +271,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
    *
    * @param db
    * @param tableName
-   * @param subformFieldsToProcess
+   * @param fieldsToProcess
+   * @return
    */
   public OrderedColumns createSurveyTables(OdkDbHandle db, String tableName,
       JSONArray fieldsToProcess) {
@@ -331,7 +332,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         }
       }
 
-      // Create the database table with the columns
+      // Create the database table with the columns or verify that it has exactly these columns
       // TODO: Not have this hardcoded to the appName of tables
       orderedColumns = Scan.getInstance().getDatabase().createOrOpenDBTableWithColumns(
           ScanUtils.getODKAppName(), db, tableName, new ColumnList(columns));
@@ -564,7 +565,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
    *
    * @param formId
    */
-  public void createSurveyInstance(String formId) {
+  public synchronized void createSurveyInstance(String formId) {
     ContentValues tablesValues = new ContentValues();
 
     String tableId = formId;
@@ -575,12 +576,9 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
     StringBuilder dbValuesToWrite = new StringBuilder();
     String uuidStr = UUID.randomUUID().toString();
-    boolean successful = false;
     try {
-      db = Scan.getInstance().getDatabase().openDatabase( ScanUtils.getODKAppName());
-      Scan.getInstance().getDatabase().beginTransaction( ScanUtils.getODKAppName(), db);
       if (tableId == null) {
-        throw new Exception("formId cannot be blank!!");
+        throw new Exception("tableId cannot be blank!!");
       }
 
       // Get the fields from the output.json file that need to be created in the
@@ -601,15 +599,9 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         throw new JSONException("There are no fields in the json output file.");
       }
 
-      List<String> tableIds = Scan.getInstance().getDatabase().getAllTableIds(ScanUtils.getODKAppName(), db);
-      if ( !tableIds.contains(tableId) ) {
-        Log.i(LOG_TAG, "No table definition found for " + tableId
-            + ". Creating new table definition");
-        orderedColumns = createSurveyTables(db, tableId, fields);
-      } else {
-        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db,
-            tableId);
-      }
+       db = Scan.getInstance().getDatabase().openDatabase( ScanUtils.getODKAppName());
+
+       orderedColumns = createSurveyTables(db, tableId, fields);
 
       String selection = scanOutputDir + "=?";
       String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
@@ -620,7 +612,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       // Check if the instance already exists in survey
       if (data.getNumberOfRows() >= 1) {
         String foundUuidStr = data.getRowAtIndex(0).getRawDataOrMetadataByElementKey(DataTableColumns.ID);
-        setIntentToReturn(tableId, formId, foundUuidStr);
+        setIntentToReturn(tableId, formId, foundUuidStr, RESULT_OK);
         finish();
         return;
       }
@@ -687,33 +679,32 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         // Add scan metadata here for the photo taken
         tablesValues.put(scanOutputDir,
             ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+
+        if (writeOutCustomCss) {
+           writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
+        }
+
         Log.i(LOG_TAG,
             "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
         Scan.getInstance().getDatabase().insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableId, orderedColumns,
             tablesValues, rowId);
-
-        if (writeOutCustomCss) {
-          writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
-        }
       }
-      successful = true;
+       setIntentToReturn(tableId, formId, rowId, RESULT_OK);
     } catch (Exception e) {
+      // there was a problem -- report incomplete action
+      setIntentToReturn(tableId, formId, rowId, RESULT_CANCELED);
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
     } finally {
       if (db != null) {
         try {
-          Scan.getInstance().getDatabase().closeTransactionAndDatabase(ScanUtils.getODKAppName(), db, successful);
+           Scan.getInstance().getDatabase().closeDatabase(ScanUtils.getODKAppName(), db);
         } catch (RemoteException e) {
           e.printStackTrace();
           Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
         }
       }
     }
-
-    // String uriStr = ScanUtils.getSurveyUri(formId) + rowId;
-    //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(formId, rowId);
-    setIntentToReturn(tableId, formId, rowId);
     finish();
   }
 
@@ -731,10 +722,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     OdkDbHandle db = null;
     String rowId = null;
     OrderedColumns orderedColumns = null;
-    boolean successful = false;
     try {
       db = Scan.getInstance().getDatabase().openDatabase(ScanUtils.getODKAppName());
-      Scan.getInstance().getDatabase().beginTransaction(ScanUtils.getODKAppName(), db);
       // This code will only handle one subform currently
       // It will break otherwise
       JSONArray subforms = new JSONArray();
@@ -792,18 +781,9 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         throw new JSONException("There are no fields in the json output file.");
       }
 
-      // For now assume that we are not creating main forms' tables or instances
-      // This is for the creation of a subform db table
-      List<String> tableIds = Scan.getInstance().getDatabase().getAllTableIds(ScanUtils.getODKAppName(), db);
-      if ( !tableIds.contains(tableId) ) {
-        Log.i(LOG_TAG, "No table definition found for " + tableId
-            + ". Creating new table definition");
-        orderedColumns = createSurveyTablesFromFormDesigner(db, tableId, subforms
+      // create or verify that the table matches our table definition.
+      orderedColumns = createSurveyTablesFromFormDesigner(db, tableId, subforms
             .getJSONObject(0).getJSONObject("fields"));
-      } else {
-        orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils.getODKAppName(), db,
-            tableId);
-      }
 
       // Check if the instance already exists in survey
       String selection = scanOutputDir + "=?";
@@ -816,7 +796,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         String foundUuidStr = data.getRowAtIndex(0).getRawDataOrMetadataByElementKey(DataTableColumns.ID);
         //String uriStr = ScanUtils
         //    .getSurveyUriForInstanceAndDisplayContents(subformId, foundUuidStr);
-        setIntentToReturn(tableId, subformId, foundUuidStr);
+        setIntentToReturn(tableId, subformId, foundUuidStr, RESULT_OK);
         finish();
         return;
       }
@@ -913,43 +893,42 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
           // Add scan metadata here for the photo taken
           tablesValues.put(scanOutputDir,
               ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+
+           if (writeOutCustomCss) {
+              writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
+              writeOutCustomCss = false;
+           }
+           // Move only formDef.json over for now if it doesn't exist already
+           String directoryForSurveyFormDef = ScanUtils.getAppFormDirPath(subformId);
+           File surveyFormDef = new File(directoryForSurveyFormDef, "formDef.json");
+           if (!surveyFormDef.exists()) {
+              String jsonPath = new File(templatePath, subformId + "_formDef.json").getAbsolutePath();
+              String val = JSONUtils.parseFileToJSONObject(jsonPath).toString();
+              writeOutToFile(ScanUtils.getAppFormDirPath(subformId), "formDef.json", val);
+           }
+
           Log.i(LOG_TAG,
               "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
           Scan.getInstance().getDatabase().insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableId, orderedColumns,
               tablesValues, rowId);
-
-          if (writeOutCustomCss) {
-            writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
-            writeOutCustomCss = false;
-          }
-          // Move only formDef.json over for now if it doesn't exist already
-          String directoryForSurveyFormDef = ScanUtils.getAppFormDirPath(subformId);
-          File surveyFormDef = new File(directoryForSurveyFormDef, "formDef.json");
-          if (!surveyFormDef.exists()) {
-            String jsonPath = new File(templatePath, subformId + "_formDef.json").getAbsolutePath();
-            String val = JSONUtils.parseFileToJSONObject(jsonPath).toString();
-            writeOutToFile(ScanUtils.getAppFormDirPath(subformId), "formDef.json", val);
-          }
         }
       }
-      successful = true;
+       setIntentToReturn(tableId, subformId, rowId, RESULT_OK);
     } catch (Exception e) {
+       // indicate that the processing did not complete successfully
+       setIntentToReturn(tableId, subformId, rowId, RESULT_CANCELED);
       e.printStackTrace();
       Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
     } finally {
       if (db != null) {
         try {
-          Scan.getInstance().getDatabase().closeTransactionAndDatabase(ScanUtils.getODKAppName(), db, successful);
+          Scan.getInstance().getDatabase().closeDatabase(ScanUtils.getODKAppName(), db);
         } catch (RemoteException e) {
           e.printStackTrace();
           Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
         }
       }
     }
-
-    // Return uri
-    //String uriStr = ScanUtils.getSurveyUriForInstanceAndDisplayContents(subformId, rowId);
-    setIntentToReturn(tableId, subformId, rowId);
     finish();
   }
 
@@ -965,19 +944,6 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     if (value != "") {
       tableValue.put(key, value);
     }
-  }
-
-  /**
-   * Callback function for after XLSXConverter JavaScript returns this was used
-   * with the buildSurveyFormDef function
-   *
-   * @param val
-   * @deprecated
-   */
-  public void javascriptCallFinished(String val) {
-    Log.i(LOG_TAG, "The formDef.json from xlsxconverter is" + val);
-    writeOutToFile(ScanUtils.getAppFormDirPath(xlsxFormId), "formDef.json", val);
-    createSurveyInstance(xlsxFormId);
   }
 
   /**
@@ -1019,322 +985,16 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
   }
 
   /**
-   * Builds an XFrom from a JSON template and writes it out to the specified
-   * file. It builds it as a string which really isn't the best way to go.
-   *
-   * @param templatePaths
-   * @return jsonOutputString
-   * @throws Exception
-   * @deprecated
-   */
-  public static String buildSurveyFormDef(ArrayList<String> templatePaths) throws Exception {
-
-    String jsonOutputString = "";
-    String title = new File(templatePaths.get(0)).getName();
-    String id = "scan_" + title;
-
-    JSONArray initFields = new JSONArray();
-    for (String templatePath : templatePaths) {
-      String jsonPath = new File(templatePath, "template.json").getAbsolutePath();
-      JSONArray templateFields = JSONUtils.applyInheritance(
-          JSONUtils.parseFileToJSONObject(jsonPath)).getJSONArray("fields");
-
-      int templateFieldsLength = templateFields.length();
-      for (int i = 0; i < templateFieldsLength; i++) {
-        initFields.put(templateFields.get(i));
-      }
-      Log.i(LOG_TAG, "Concated " + templatePath);
-    }
-
-    JSONArray fields = new JSONArray();
-    int initFieldsLength = initFields.length();
-
-    // Make fields array with no null values
-    for (int i = 0; i < initFieldsLength; i++) {
-      JSONObject field = initFields.optJSONObject(i);
-      if (field != null) {
-        fields.put(initFields.getJSONObject(i));
-      } else {
-        Log.i(LOG_TAG, "Null");
-      }
-    }
-
-    int fieldsLength = fields.length();
-
-    // Get the field names and labels:
-    String[] fieldNames = new String[fieldsLength];
-    String[] fieldLabels = new String[fieldsLength];
-    for (int i = 0; i < fieldsLength; i++) {
-      JSONObject field = fields.getJSONObject(i);
-      if (field.has("name")) {
-        fieldNames[i] = validate(field.getString("name"));
-        fieldLabels[i] = field.optString("label", fieldNames[i]);
-      } else {
-        Log.i(LOG_TAG, "Field " + i + " has no name.");
-        // throw new JSONException("Field " + i + " has no name or label.");
-      }
-    }
-
-    Log.i(LOG_TAG, "Writing output json string to store in Survey...");
-
-    // Three worksheets need to be created for Survey - survey, choices, and
-    // settings.
-    // scanOutputDir is added to the model worksheet because we need that to
-    // map a Scan photo to a Survey instance, but we don't want to create a
-    // prompt in Survey.
-    // Choices can be blank if there are no select type questions on the form.
-    JSONObject surveyJson = new JSONObject();
-
-    // Fill out the settings Sheet first
-    JSONArray settingsList = new JSONArray();
-
-    // settings form_id
-    JSONObject formIdObj = new JSONObject();
-    formIdObj.put("setting_name", "form_id");
-    formIdObj.put("value", id);
-    settingsList.put(formIdObj);
-
-    // settings form_version
-    // set this to today's date in the format yyyyMMdd
-    String format = "yyyyMMdd";
-    SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
-    String formVerStr = sdf.format(new Date());
-    JSONObject formVerObj = new JSONObject();
-    formVerObj.put("setting_name", "form_version");
-    formVerObj.put("value", formVerStr);
-    settingsList.put(formVerObj);
-
-    // settings survey
-    JSONObject formSurveyObj = new JSONObject();
-    formSurveyObj.put("setting_name", "survey");
-    formSurveyObj.put("display.title", id);
-    settingsList.put(formSurveyObj);
-
-    // Create other worksheets
-    JSONArray surveyList = new JSONArray();
-    JSONArray choicesList = new JSONArray();
-    JSONArray modelList = new JSONArray();
-
-    // Add _row_num to the survey worksheet
-    // to enable table of contents
-    int rowNum = 1;
-    String rowName = "__rowNum__";
-
-    for (int i = 0; i < fieldsLength; i++) {
-      JSONObject field = fields.getJSONObject(i);
-
-      JSONArray segments = field.optJSONArray("segments");
-      if (segments != null) {
-        if (segments.length() > 0) {
-          JSONObject begScreen = new JSONObject();
-          begScreen.put("clause", "begin screen");
-          begScreen.put(rowName, rowNum++);
-          surveyList.put(begScreen);
-        }
-        for (int j = 0; j < segments.length(); j++) {
-          JSONObject imagePrompt = new JSONObject();
-          String imageName = field.getString("name") + "_image" + j;
-          imagePrompt.put("name", imageName);
-          imagePrompt.put("type", "read_only_image");
-          imagePrompt.put(rowName, rowNum++);
-          surveyList.put(imagePrompt);
-        }
-      }
-
-      JSONObject prompt = new JSONObject();
-      String type = field.getString("type");
-      if (type.equals("note")) {
-        // Not sure what to do with a note here
-      } else if (type.equals("int")) {
-        // If there is a default value, use assign prompt
-        // to set the default value in Survey
-        if (field.has("default")) {
-          JSONObject def = new JSONObject();
-          def.put("calculation", field.getString("default"));
-          def.put("name", field.getString("name"));
-          def.put("type", "assign");
-        }
-        String label = field.optString("label");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        }
-        prompt.put("name", field.getString("name"));
-        prompt.put("type", "integer");
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-      } else if (type.equals("string") || type.equals("input")) {
-        String label = field.optString("label");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        }
-        prompt.put("name", field.getString("name"));
-        prompt.put("type", "text");
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-      } else if (type.equals("select") || type.equals("select1") || type.equals("select_many")) {
-        String label = field.optString("label");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        }
-        prompt.put("name", field.getString("name"));
-
-        // Set the correct type
-        if (type.equals("select_many")) {
-          prompt.put("type", "select_multiple");
-        } else {
-          prompt.put("type", "select_one");
-        }
-
-        String param = field.optString("param");
-        if (!param.equals("")) {
-          prompt.put("values_list", param);
-        } else {
-          param = field.getString("name") + "_choices";
-          prompt.put("values_list", param);
-
-        }
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-
-        // Get the items from the first segment.
-        boolean addChoiceList = true;
-        if (choicesList.length() > 0) {
-          for (int k = 0; k < choicesList.length(); k++) {
-            JSONObject ch = choicesList.getJSONObject(k);
-            String chList = ch.getString("choice_list_name");
-            if (chList.equals(param)) {
-              // If we already have this choice list,
-              // don't add it again!!
-              addChoiceList = false;
-            }
-          }
-        }
-        if (segments != null && addChoiceList) {
-          JSONObject segment = segments.optJSONObject(0);
-          if (segment != null) {
-            JSONArray items = segment.getJSONArray("items");
-            for (int j = 0; j < items.length(); j++) {
-              // This is the old way of doing this with param
-              JSONObject item = items.getJSONObject(j);
-              JSONObject choice = new JSONObject();
-              choice.put("choice_list_name", param);
-              // Not sure of the best way to deal with this currently!!
-              if (item.has("value")) {
-                choice.put("data_value", item.getString("value"));
-
-                String itemLabel = item.optString("label");
-                itemLabel = itemLabel == "" ? item.getString("value") : itemLabel;
-                choice.put("display.text", itemLabel);
-              } else {
-                // If the item does not have a param - do it the new way
-                // This is done with grid values
-                if (field.getJSONArray("grid_values") != null) {
-                  JSONArray gridValues = field.getJSONArray("grid_values");
-                  choice.put("data_value", "" + gridValues.getString(j));
-                  choice.put("display.text", "" + gridValues.getString(j));
-                }
-              }
-              choicesList.put(choice);
-            }
-          }
-        }
-
-      } else if (type.equals("qrcode")) {
-        // Interpreting this as text since I don't
-        // think we want users to rescan things here?
-        String label = field.optString("label");
-        String param = field.optString("param");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        } else if (!param.equals("")) {
-          prompt.put("display.text", param);
-        }
-        prompt.put("name", field.getString("name"));
-        prompt.put("type", "text");
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-        // New types added
-      } else if (type.equals("box")) {
-        String label = field.optString("label");
-        String param = field.optString("param");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        } else if (!param.equals("")) {
-          prompt.put("display.text", param);
-        }
-        prompt.put("name", field.getString("name"));
-        prompt.put("type", "text");
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-      } else if (type.equals("tally")) {
-        String label = field.optString("label");
-        if (!label.equals("")) {
-          prompt.put("display.text", label);
-        }
-        prompt.put("name", field.getString("name"));
-        prompt.put("type", "integer");
-        prompt.put(rowName, rowNum++);
-        surveyList.put(prompt);
-      }
-      if (segments != null) {
-        if (segments.length() > 0) {
-          JSONObject endScreen = new JSONObject();
-          endScreen.put("clause", "end screen");
-          endScreen.put(rowName, rowNum++);
-          surveyList.put(endScreen);
-        }
-      }
-
-    }
-
-    // Add the Scan metadata into the model worksheet
-    JSONObject scanMetadata = new JSONObject();
-    scanMetadata.put("name", scanOutputDir);
-    scanMetadata.put("type", "string");
-    modelList.put(scanMetadata);
-
-    // Add the choices, settings, and survey object to the survey json
-    if (choicesList.length() > 0) {
-      surveyJson.put("choices", choicesList);
-    }
-    surveyJson.put("model", modelList);
-    surveyJson.put("settings", settingsList);
-    surveyJson.put("survey", surveyList);
-
-    jsonOutputString = surveyJson.toString();
-
-    // Write JSON that is sent to xlsxconverter to a file for inspection
-    writeOutToFile(ScanUtils.getAppFormDirPath("example"), "intermediate.json", jsonOutputString);
-
-    return jsonOutputString;
-  }
-
-  /**
    * Check if any of the provided file paths were modified after the given date.
    *
-   * @param templatePaths
-   * @param lastModified
-   * @return
-   */
-  // This function may be useful when checking for version issues?
-  private boolean anyModifiedAfter(ArrayList<String> templatePaths, long lastModified) {
-    for (String tp : templatePaths) {
-      if (new File(tp).lastModified() > lastModified) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Check if any of the provided file paths were modified after the given date.
+   * This function may be useful when checking for version issues?
    *
-   * @param templatePaths
-   * @param lastModified
-   * @return
+   * @param tableId
+   * @param formId
+   * @param rowId
+   * @param resultCode e.g., RESULT_OK
    */
-  // This function may be useful when checking for version issues?
-  private void setIntentToReturn(String tableId, String formId, String rowId) {
+  private void setIntentToReturn(String tableId, String formId, String rowId, int resultCode) {
 
     Intent intent = new Intent();
 
@@ -1350,7 +1010,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     // Launch Survey
     intent.setData(Uri.parse(ScanUtils.getSurveyUriForInstanceAndDisplayContents(tableId, formId, rowId)));
 
-    setResult(RESULT_OK, intent);
+    setResult(resultCode, intent);
   }
 
   public void databaseAvailable() {
