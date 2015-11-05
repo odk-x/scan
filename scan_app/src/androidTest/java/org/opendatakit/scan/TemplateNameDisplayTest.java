@@ -98,7 +98,8 @@ public class TemplateNameDisplayTest {
         //check template name is displayed on ScanButton
         onView(withId(R.id.ScanButton)).check(matches(withText(
                 Html.fromHtml(
-                        String.format(mActivityRule.getActivity().getResources().getString(R.string.scan_new_form),
+                        String.format(
+                                mActivityRule.getActivity().getResources().getString(R.string.scan_new_form),
                                 TEMPLATE_TO_USE)
                 ).toString()
         )));
