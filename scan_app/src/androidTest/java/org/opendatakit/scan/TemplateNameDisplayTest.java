@@ -74,7 +74,7 @@ public class TemplateNameDisplayTest {
         onData(withKey(PREFERENCE_KEY)).perform(click());
         onView(withText(TEMPLATE_TO_USE)).perform(click());
 
-        //check template name is displayed in summary
+        //Check template name is displayed in summary
         onData(withKey(PREFERENCE_KEY))
                 .onChildView(withText(
                                 String.format(
@@ -95,7 +95,7 @@ public class TemplateNameDisplayTest {
         onView(withText(TEMPLATE_TO_USE)).perform(click());
         Espresso.pressBack();
 
-        //check template name is displayed on ScanButton
+        //Check template name is displayed on ScanButton
         onView(withId(R.id.ScanButton)).check(matches(withText(
                 Html.fromHtml(
                         String.format(
