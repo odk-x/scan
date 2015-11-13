@@ -139,16 +139,34 @@ public class ViewScannedFormsTest {
         //Go to View Scanned Forms
         onView(withId(R.id.ViewFormsButton)).perform(click());
 
-        //Click on the first scanned form
-        onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
+        //if first item is green, activity should land on Display Processed Form
+        //if otherwise, should stay on the same activity
+        try {
+            //check color
+            onData(anything()).atPosition(0).onChildView(withId(R.id.photoStatus)).check(
+                    matches(ColorMatcher.withTextColor(Color.parseColor("#00FF00")))
+            );
 
-        //Check if DisplayProcessedForm activity is brought up
-        onView(withId(android.R.id.title)).check(
-                matches(withText(
-                        mActivityRule.getActivity().getResources()
-                                .getString(R.string.display_processed_form_activity))
-                )
-        );
+            //click first item
+            onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
+            //check title
+            onView(withId(android.R.id.title)).check(
+                    matches(withText(
+                                    mActivityRule.getActivity().getResources()
+                                            .getString(R.string.display_processed_form_activity))
+                    )
+            );
+        } catch (junit.framework.AssertionFailedError e) {
+            //click first item
+            onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
+            //check title
+            onView(withId(android.R.id.title)).check(
+                    matches(withText(
+                                    mActivityRule.getActivity().getResources()
+                                            .getString(R.string.view_bubble_forms_activity))
+                    )
+            );
+        }
     }
 
     private String[] getPhotoNames() {
