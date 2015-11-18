@@ -62,6 +62,7 @@ public class MainMenuActivity extends BaseActivity {
 
             final Handler handler = new Handler(new Handler.Callback() {
                public boolean handleMessage(Message message) {
+                  updateTemplateText();
                   pd.dismiss();
                   return true;
                }
@@ -74,22 +75,31 @@ public class MainMenuActivity extends BaseActivity {
          AlertDialog.Builder builder = new AlertDialog.Builder(this);
          builder.setMessage(e.toString()).setCancelable(false)
              .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                       dialog.cancel();
-                       finish();
-                    }
-                 });
+                public void onClick(DialogInterface dialog, int id) {
+                   dialog.cancel();
+                   finish();
+                }
+             });
          AlertDialog alert = builder.create();
          alert.show();
       }
 
       hookupButtonHandlers();
+      updateTemplateText();
    }
 
    private void hookupButtonHandlers() {
 
       Button scanForm = (Button) findViewById(R.id.ScanButton);
       scanForm.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
+            startActivity(intent);
+         }
+      });
+
+      Button processImage = (Button) findViewById(R.id.ProcessImageButton);
+      processImage.setOnClickListener(new View.OnClickListener() {
          public void onClick(View v) {
             Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
             startActivity(intent);
@@ -145,25 +155,31 @@ public class MainMenuActivity extends BaseActivity {
       }
    }
 
-   private void updateScanButtonText(SharedPreferences settings) {
+   private void updateTemplateText() {
+      SharedPreferences settings = PreferenceManager
+          .getDefaultSharedPreferences(getApplicationContext());
+
       Button scanForm = (Button) findViewById(R.id.ScanButton);
+      Button processImage = (Button) findViewById(R.id.ProcessImageButton);
+
       String[] templatePaths = { settings.getString("select_templates", "") };
       String templateName = "";
+
       if (templatePaths.length > 0) {
          String[] parts = templatePaths[0].split("/");
          templateName = parts[parts.length - 1];
       }
-      String newText = String.format(getString(R.string.scan_new_form), templateName);
-      CharSequence styledText = Html.fromHtml(newText);
 
-      scanForm.setText(styledText);
+      String newScanText = String.format(getString(R.string.scan_new_form), templateName);
+      String newProcessText = String.format(getString(R.string.ProcessImageButton), templateName);
+
+      scanForm.setText(Html.fromHtml(newScanText));
+      processImage.setText(Html.fromHtml(newProcessText));
    }
 
    @Override public void onResume() {
       super.onResume();
-      SharedPreferences settings = PreferenceManager
-          .getDefaultSharedPreferences(getApplicationContext());
-      updateScanButtonText(settings);
+      updateTemplateText();
    }
 
    @Override public void onBackPressed() {

@@ -22,6 +22,14 @@
 	</Button>
 
 	<Button
+			android:id="@+id/ProcessImageButton"
+			style="@style/StandardButton"
+			android:layout_width="match_parent"
+			android:text="@string/ProcessImageButton" >
+
+	</Button>
+
+	<Button
 	    android:id="@+id/ViewFormsButton"
 	    style="@style/StandardButton"
 	    android:layout_width="match_parent"
