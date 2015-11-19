@@ -82,45 +82,45 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class PhotographFormTest {
-    @Rule
-    public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(MainMenuActivity.class);
+   @Rule
+   public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(MainMenuActivity.class);
 
-    //block external intents
-    @Before
-    public void stubAllExternalIntents() {
-        intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
-    }
+   //block external intents
+   @Before
+   public void stubAllExternalIntents() {
+      intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
+   }
 
-    @Test
-    public void scanNewForm_cancel() {
-        //get list of outputs before "Scan New Form"
-        String[] photoNames = getPhotoNames();
+   @Test
+   public void scanNewForm_cancel() {
+      //get list of outputs before "Scan New Form"
+      String[] photoNames = getPhotoNames();
 
-        //Click "Scan New Form" and cancel
-        //Cancel is handled by intent stubbing ( stubAllExternalIntents() )
-        onView(withId(R.id.ScanButton)).perform(click());
-        intended(hasAction(MediaStore.ACTION_IMAGE_CAPTURE));
+      //Click "Scan New Form" and cancel
+      //Cancel is handled by intent stubbing ( stubAllExternalIntents() )
+      onView(withId(R.id.ScanButton)).perform(click());
+      intended(hasAction(MediaStore.ACTION_IMAGE_CAPTURE));
 
-        //List of expected entries
-        List<Matcher<? super String>> photoList = new ArrayList<>();
-        for (String s : photoNames) {
-            photoList.add(is(s));
-        }
+      //List of expected entries
+      List<Matcher<? super String>> photoList = new ArrayList<>();
+      for (String s : photoNames) {
+         photoList.add(is(s));
+      }
 
-        //Check if there are extra entries
-        //If no extra entries exist, no exception will be thrown
-        //If extra entries exist, test fails
-        //Very ugly but it works
-        try {
-            onData(not(anyOf(photoList))).check(doesNotExist());
-        } catch (RuntimeException e) {}
-    }
+      //Check if there are extra entries
+      //If no extra entries exist, no exception will be thrown
+      //If extra entries exist, test fails
+      //Very ugly but it works
+      try {
+         onData(not(anyOf(photoList))).check(doesNotExist());
+      } catch (RuntimeException e) {}
+   }
 
-    private String[] getPhotoNames() {
-        return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return (new File(dir, name)).isDirectory();
-            }
-        });
-    }
+   private String[] getPhotoNames() {
+      return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
+         public boolean accept(File dir, String name) {
+            return (new File(dir, name)).isDirectory();
+         }
+      });
+   }
 }

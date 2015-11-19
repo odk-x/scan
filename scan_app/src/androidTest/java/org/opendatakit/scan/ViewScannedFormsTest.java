@@ -69,111 +69,95 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class ViewScannedFormsTest {
-    @Rule
-    public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(MainMenuActivity.class);
+@RunWith(AndroidJUnit4.class) @LargeTest public class ViewScannedFormsTest {
+   @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
+       MainMenuActivity.class);
 
-    @Test
-    public void viewForms_displayEntries() {
-        String[] photoNames = getPhotoNames();
+   //Pre-condition to all tests in this class
+   //there must be at least one scanned form
+   @Before public void hasAtLeastOneForm() {
+      onView(withId(R.id.ViewFormsButton)).perform(click());
+      onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
+   }
 
-        //Go to View Scanned Forms
-        onView(withId(R.id.ViewFormsButton)).perform(click());
+   @Test public void viewForms_displayEntries() {
+      String[] photoNames = getPhotoNames();
 
-        //Check if each output is displayed
-        for (String s : photoNames) {
-            onData(is(s)).check(matches(isCompletelyDisplayed()));
-        }
+      //Check if each output is displayed
+      for (String s : photoNames) {
+         onData(is(s)).check(matches(isCompletelyDisplayed()));
+      }
 
-        //List of expected entries
-        List<Matcher<? super String>> photoList = new ArrayList<>();
-        for (String s : photoNames) {
-            photoList.add(is(s));
-        }
+      //List of expected entries
+      List<Matcher<? super String>> photoList = new ArrayList<>();
+      for (String s : photoNames) {
+         photoList.add(is(s));
+      }
 
-        //Check if there are extra entries
-        //If no extra entries exist, no exception will be thrown
-        //If extra entries exist, test fails
-        //Very ugly but it works
-        try {
-            onData(not(anyOf(photoList))).check(doesNotExist());
-        } catch (RuntimeException e) {}
-    }
+      //Check if there are extra entries
+      //If no extra entries exist, no exception will be thrown
+      //If extra entries exist, test fails
+      //Very ugly but it works
+      try {
+         onData(not(anyOf(photoList))).check(doesNotExist());
+      } catch (RuntimeException e) {
+      }
+   }
 
-    @Test
-    public void viewForms_displayEntriesMetadata() {
-        String[] photoNames = getPhotoNames();
+   @Test public void viewForms_displayEntriesMetadata() {
+      String[] photoNames = getPhotoNames();
 
-        //Go to View Scanned Forms
-        onView(withId(R.id.ViewFormsButton)).perform(click());
+      //Check if metadata of each output is displayed correctly
+      for (String s : photoNames) {
+         //check PhotoStatus
+         int color = Color.parseColor("#FF0000"); //red
+         if (new File(ScanUtils.getJsonPath(s)).exists()) {
+            color = Color.parseColor("#00FF00"); //green
+         } else if (new File(ScanUtils.getAlignedPhotoPath(s)).exists()) {
+            color = Color.parseColor("#FFFF00"); //yellow
+         }
+         onData(is(s)).onChildView(withId(R.id.photoStatus))
+             .check(matches(ColorMatcher.withTextColor(color)));
 
-        //Check if metadata of each output is displayed correctly
-        for (String s : photoNames) {
-            //check PhotoStatus
-            int color = Color.parseColor("#FF0000"); //red
-            if (new File(ScanUtils.getJsonPath(s)).exists()) {
-                color = Color.parseColor("#00FF00"); //green
-            } else if (new File(ScanUtils.getAlignedPhotoPath(s)).exists()) {
-                color = Color.parseColor("#FFFF00"); //yellow
-            }
-            onData(is(s)).onChildView(withId(R.id.photoStatus)).check(
-                    matches(ColorMatcher.withTextColor(color))
-            );
+         //Check templateName
+         onData(is(s)).onChildView(withId(R.id.templateName))
+             .check(matches(withText(s.split("_")[0])));
 
-            //Check templateName
-            onData(is(s)).onChildView(withId(R.id.templateName)).check(
-                    matches(withText(s.split("_")[0]))
-            );
+         //Check createdTime
+         onData(is(s)).onChildView(withId(R.id.createdTime)).check(matches(
+             withText(new Date(new File(ScanUtils.getPhotoPath(s)).lastModified()).toString())));
+      }
+   }
 
-            //Check createdTime
-            onData(is(s)).onChildView(withId(R.id.createdTime)).check(
-                    matches(withText(new Date(new File(ScanUtils.getPhotoPath(s)).lastModified()).toString()))
-            );
-        }
-    }
+   @Test public void viewForms_DisplayProcessedForm() {
+      //if first item is green, activity should land on Display Processed Form
+      //if otherwise, should stay on the same activity
+      try {
+         //check color
+         onData(anything()).atPosition(0).onChildView(withId(R.id.photoStatus))
+             .check(matches(ColorMatcher.withTextColor(Color.parseColor("#00FF00"))));
 
-    @Test
-    public void viewForms_DisplayProcessedForm() {
-        //Go to View Scanned Forms
-        onView(withId(R.id.ViewFormsButton)).perform(click());
+         //click first item
+         onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
+         //check title
+         onView(withId(android.R.id.title)).check(matches(withText(
+                     mActivityRule.getActivity().getResources()
+                         .getString(R.string.display_processed_form_activity))));
+      } catch (junit.framework.AssertionFailedError e) {
+         //click first item
+         onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
+         //check title
+         onView(withId(android.R.id.title)).check(matches(withText(
+                     mActivityRule.getActivity().getResources()
+                         .getString(R.string.view_bubble_forms_activity))));
+      }
+   }
 
-        //if first item is green, activity should land on Display Processed Form
-        //if otherwise, should stay on the same activity
-        try {
-            //check color
-            onData(anything()).atPosition(0).onChildView(withId(R.id.photoStatus)).check(
-                    matches(ColorMatcher.withTextColor(Color.parseColor("#00FF00")))
-            );
-
-            //click first item
-            onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
-            //check title
-            onView(withId(android.R.id.title)).check(
-                    matches(withText(
-                                    mActivityRule.getActivity().getResources()
-                                            .getString(R.string.display_processed_form_activity))
-                    )
-            );
-        } catch (junit.framework.AssertionFailedError e) {
-            //click first item
-            onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
-            //check title
-            onView(withId(android.R.id.title)).check(
-                    matches(withText(
-                                    mActivityRule.getActivity().getResources()
-                                            .getString(R.string.view_bubble_forms_activity))
-                    )
-            );
-        }
-    }
-
-    private String[] getPhotoNames() {
-        return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return (new File(dir, name)).isDirectory();
-            }
-        });
-    }
+   private String[] getPhotoNames() {
+      return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
+         public boolean accept(File dir, String name) {
+            return (new File(dir, name)).isDirectory();
+         }
+      });
+   }
 }

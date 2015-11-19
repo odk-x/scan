@@ -24,18 +24,18 @@ import android.view.View;
 import android.widget.TextView;
 
 public class ColorMatcher {
-    public static Matcher<View> withTextColor(final int color) {
-        Checks.checkNotNull(color);
+   public static Matcher<View> withTextColor(final int color) {
+      Checks.checkNotNull(color);
 
-        return new BoundedMatcher<View, TextView>(TextView.class) {
-            @Override
-            public boolean matchesSafely(TextView view) {
-                return color == view.getCurrentTextColor();
-            }
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("With text color: " + color);
-            }
-        };
-    }
+      return new BoundedMatcher<View, TextView>(TextView.class) {
+         @Override
+         public boolean matchesSafely(TextView view) {
+            return color == view.getCurrentTextColor();
+         }
+         @Override
+         public void describeTo(Description description) {
+            description.appendText("With text color: " + color);
+         }
+      };
+   }
 }
