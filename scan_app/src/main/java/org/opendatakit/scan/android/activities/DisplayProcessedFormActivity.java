@@ -29,7 +29,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -51,27 +50,27 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 		SAVE,
 		TRANSCRIBE;
 
-        public static RequestCode fromInt(int toConvert) {
-            switch(toConvert) {
-                case 0:
-                    return SAVE;
-                case 1:
-                    return TRANSCRIBE;
-                default:
-                    return null;
-            }
-        }
+		public static RequestCode fromInt(int toConvert) {
+			switch(toConvert) {
+				case 0:
+					return SAVE;
+				case 1:
+					return TRANSCRIBE;
+				default:
+					return null;
+			}
+		}
 
-        public static int toInt(RequestCode toConvert) {
-            switch(toConvert) {
-                case SAVE:
-                    return 0;
-                case TRANSCRIBE:
-                    return 1;
-                default:
-                    return -1;
-            }
-        }
+		public static int toInt(RequestCode toConvert) {
+			switch(toConvert) {
+				case SAVE:
+					return 0;
+				case TRANSCRIBE:
+					return 1;
+				default:
+					return -1;
+			}
+		}
 	}
 
 	private String photoName;
@@ -129,9 +128,9 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 						ArrayList<String> prevPhotoNames = extras.getStringArrayList("prevPhotoNames");
 						if(prevTemplatePaths == null || prevPhotoNames == null){
 							intent.putStringArrayListExtra("prevTemplatePaths", new ArrayList<String>(
-								    Arrays.asList(templatePath)));
+									Arrays.asList(templatePath)));
 							intent.putStringArrayListExtra("prevPhotoNames", new ArrayList<String>(
-								    Arrays.asList(photoName)));
+									Arrays.asList(photoName)));
 						} else {
 							prevTemplatePaths.add(templatePath);
 							prevPhotoNames.add(photoName);
@@ -149,51 +148,47 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 			} else {
 				LinearLayout layout = (LinearLayout) findViewById(R.id.save_transcribe);
 				layout.setVisibility(View.VISIBLE);
+
+				/* Uncomment for Tables
+				tablesIntent = makeTablesIntent();
+				*/
+				surveyIntent = makeSurveyIntent();
+
 				Button saveData = (Button) findViewById(R.id.saveBtn);
 				saveData.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
 						/* Uncomment if you want Scan to launch Tables
-						if(tablesIntent == null) {
-							tablesIntent = makeTablesIntent();
-						}
-						//tablesIntent is still null if Tables not installed.
-						if(tablesIntent != null) {
+						//TODO: tablesIntent is still null if Tables not installed.
+						if(isTablesInstalled) {
 							if(tablesIntent.getData() == null) {
 								exportToTables(RequestCode.SAVE);
 							}
 						}
 						*/
-						// Uncomment if you want Scan to launch Survey
-						if(surveyIntent == null) {
-							surveyIntent = makeSurveyIntent();
-						}
 						//TODO: surveyIntent is still null if Survey not installed.
-						if(surveyIntent != null) {
-							if(surveyIntent.getData() == null) {
+						if(isSurveyInstalled()) {
+							if (surveyIntent.getData() == null) {
 								exportToSurvey(RequestCode.SAVE);
 							}
 						}
-
 					}
 				});
+
 				Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
 				transcribeData.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						Log.i(LOG_TAG, "Using template: " + templatePath);
 
 						/* Uncomment to Launch Tables
-						if(tablesIntent == null) {
-							tablesIntent = makeTablesIntent();
-						}
 						//TODO: tablesIntent is still null if Tables not installed.
-						if(tablesIntent != null) {
+						if(isTablesInstalled) {
 							if(tablesIntent.getData() == null) {
 								exportToTables(RequestCode.TRANSCRIBE);
 							} else {
 								//The scan data has already been exported
 								//so just start Tables.
-								boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
+								boolean tablesInstalled = isTablesInstalled(tablesIntent);
 								if (tablesInstalled) {
 									startActivity(tablesIntent);
 								}
@@ -201,20 +196,14 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 						}
 						*/
 						// Launch Survey
-						if(surveyIntent == null) {
-							surveyIntent = makeSurveyIntent();
-						}
 						//TODO: surveyIntent is still null if Survey not installed.
-						if(surveyIntent != null) {
+						if(isSurveyInstalled()) {
 							if(surveyIntent.getData() == null) {
 								exportToSurvey(RequestCode.TRANSCRIBE);
 							} else {
 								//The scan data has already been exported
-								//so just start Tables.
-								boolean surveyInstalled = checkForTablesInstallation(surveyIntent);
-								if (surveyInstalled) {
-									startActivity(surveyIntent);
-								}
+								//so just start Survey.
+								startActivity(surveyIntent);
 							}
 						}
 					}
@@ -233,7 +222,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 					.setNeutralButton("Ok",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
-										int id) {
+													int id) {
 									dialog.cancel();
 									finish();
 								}
@@ -251,17 +240,21 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 	public Intent makeSurveyIntent() {
 		// Initialize the intent that will start Survey.
 		Intent intent =  getPackageManager().getLaunchIntentForPackage("org.opendatakit.survey.android");
-		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		intent.setAction(Intent.ACTION_EDIT);
-		intent.addCategory(Intent.CATEGORY_DEFAULT);
+		if (intent != null) {
+			intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		//Start indicates that the form should be launched from the first question
-		//rather than the prompt list.
-		// Not sure if this start parameter is still necessary in Survey
-		intent.putExtra("start", true);
+			intent.setAction(Intent.ACTION_EDIT);
+			intent.addCategory(Intent.CATEGORY_DEFAULT);
+
+			//Start indicates that the form should be launched from the first question
+			//rather than the prompt list.
+			// Not sure if this start parameter is still necessary in Survey
+			intent.putExtra("start", true);
+		}
+
 		return intent;
 	}
 
@@ -272,49 +265,46 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 	 */
 	public Intent makeTablesIntent() {
 		// Initialize the intent that will start Tables.
-	   // final String TABLE_DISPLAY_ACTIVITY =
-	   //     "org.opendatakit.tables.activities.TableDisplayActivity";
-	   // Intent intent = new Intent(TABLE_DISPLAY_ACTIVITY);
+		// final String TABLE_DISPLAY_ACTIVITY =
+		//     "org.opendatakit.tables.activities.TableDisplayActivity";
+		// Intent intent = new Intent(TABLE_DISPLAY_ACTIVITY);
 
-	   //Old Way
+		//Old Way
 		Intent intent = getPackageManager().getLaunchIntentForPackage("org.opendatakit.tables");
 
-		intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.setAction(Intent.ACTION_VIEW);
+		if (intent != null) {
+			intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setAction(Intent.ACTION_VIEW);
+		}
 
 		return intent;
 	}
 
 	/**
-	 * Creates an intent for launching survey.
-	 * May return null if survey is not installed.
+	 * Checks if Survey is installed
 	 * @return
 	 */
-	public boolean checkForSurveyInstallation(Intent intent) {
-		boolean installed = true;
-
-		//Use the intent to see if survey is installed.
-		//this assumes that you have action and data specified
-		PackageManager packMan = getPackageManager();
-		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
+	public Boolean isSurveyInstalled() {
+		//intent is null when Survey is not installed
+		if(surveyIntent == null) {
 			// ////////////
 			Log.i(LOG_TAG, "Survey is not installed.");
 			// ////////////
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("ODK Survey was not found on this device.")
 					.setCancelable(false)
-					// Take this out until Survey is available on the Google Play Store
-					//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
-					//	public void onClick(DialogInterface dialog,
-					//			int id) {
-					//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
-					//	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
-					//		startActivity(goToMarket);
-					//		dialog.cancel();
-					//	}
-					//})
+							// Take this out until Survey is available on the Google Play Store
+							//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
+							//	public void onClick(DialogInterface dialog,
+							//			int id) {
+							//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
+							//	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
+							//		startActivity(goToMarket);
+							//		dialog.cancel();
+							//	}
+							//})
 					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
 											int id) {
@@ -323,52 +313,45 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 					});
 			AlertDialog alert = builder.create();
 			alert.show();
-			installed = false;
 		}
 
-		return installed;
+		return surveyIntent != null;
 	}
 
 	/**
-	 * Creates an intent for launching tables.
-	 * May return null if tables is not installed.
+	 * Checks if Tables is installed
 	 * @return
 	 */
-	public boolean checkForTablesInstallation(Intent intent) {
-		boolean installed = true;
-
-		//Use the intent to see if tables is installed.
-		//this assumes that you have action and data specified
-		PackageManager packMan = getPackageManager();
-		if (packMan.queryIntentActivities(intent, 0).size() == 0) {
+	public Boolean isTablesInstalled() {
+		//intent is null when Tables is not installed
+		if (tablesIntent == null) {
 			// ////////////
 			Log.i(LOG_TAG, "Tables is not installed.");
 			// ////////////
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("ODK Tables was not found on this device.")
 					.setCancelable(false)
-					// Take this out until Tables is available on the Google Play Store
-					//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
-					//	public void onClick(DialogInterface dialog,
-					//			int id) {
-					//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
-					//	    	.setData(Uri.parse("market://details?id=org.odk.tables.android"));
-					//		startActivity(goToMarket);
-					//		dialog.cancel();
-					//	}
-					//})
+							// Take this out until Tables is available on the Google Play Store
+							//.setPositiveButton("Install it.", new DialogInterface.OnClickListener() {
+							//	public void onClick(DialogInterface dialog,
+							//			int id) {
+							//		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
+							//	    	.setData(Uri.parse("market://details?id=org.odk.tables.android"));
+							//		startActivity(goToMarket);
+							//		dialog.cancel();
+							//	}
+							//})
 					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
-								int id) {
+											int id) {
 							dialog.cancel();
 						}
 					});
 			AlertDialog alert = builder.create();
 			alert.show();
-			installed = false;
 		}
 
-		return installed;
+		return tablesIntent != null;
 	}
 
 	@Override
@@ -412,7 +395,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 	@Override
 	protected void onActivityResult(int requestCodeInt, int resultCode, Intent data) {
 		// TODO: dismissDialog(0);
-        RequestCode requestCode = RequestCode.fromInt(requestCodeInt);
+		RequestCode requestCode = RequestCode.fromInt(requestCodeInt);
 
 		// Only launch intents if the result was ok
 		if (resultCode == Activity.RESULT_OK) {
@@ -431,19 +414,17 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 			if (requestCode == RequestCode.TRANSCRIBE) {
 				//dismissDialog(1);
 
+				//No need to check for Survey or Tables,
+				//S or T is always installed if RequestCode
+				//is TRANSCRIBE or SAVE
+
 				/* Uncomment to Launch tables
 				Log.i(LOG_TAG, "Starting Tables...");
-				boolean tablesInstalled = checkForTablesInstallation(tablesIntent);
-				if (tablesInstalled) {
-					startActivity(tablesIntent);
-				}
+				startActivity(tablesIntent);
 				*/
-			   // Launch survey
+				// Launch survey
 				Log.i(LOG_TAG, "Starting Survey...");
-				boolean surveyInstalled = checkForSurveyInstallation(surveyIntent);
-				if (surveyInstalled) {
-					startActivity(surveyIntent);
-				}
+				startActivity(surveyIntent);
 			}
 		}
 
@@ -478,17 +459,17 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 		}
 	}
 
-  public void databaseAvailable() {
-    // TODO Auto-generated method stub
+	public void databaseAvailable() {
+		// TODO Auto-generated method stub
 
-  }
+	}
 
-  public void databaseUnavailable() {
-    // TODO Auto-generated method stub
+	public void databaseUnavailable() {
+		// TODO Auto-generated method stub
 
-  }
+	}
 
-  public String getAppName() {
-    return ScanUtils.getODKAppName();
-  }
+	public String getAppName() {
+		return ScanUtils.getODKAppName();
+	}
 }
