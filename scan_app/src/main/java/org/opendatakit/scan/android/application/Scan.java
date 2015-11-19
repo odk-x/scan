@@ -19,41 +19,36 @@ import org.opendatakit.scan.android.R;
 
 public class Scan extends CommonApplication {
 
-  public static final String t = "Scan";
+   public static final String t = "Scan";
 
-  private static Scan singleton = null;
+   private static Scan singleton = null;
 
-  public static Scan getInstance() {
-    return singleton;
-  }
+   public static Scan getInstance() {
+      return singleton;
+   }
 
-  @Override
-  public void onCreate() {
-    singleton = this;
+   @Override public void onCreate() {
+      singleton = this;
 
-    super.onCreate();
-  }
+      super.onCreate();
+   }
 
-  @Override
-  public int getApkDisplayNameResourceId() {
-    return R.string.app_name;
-  }
+   @Override public int getApkDisplayNameResourceId() {
+      return R.string.app_name;
+   }
 
-  @Override
-  public int getConfigZipResourceId() {
-    // unused -- modify InitializationTask to handle this tool
-    return -1;
-  }
+   @Override public int getConfigZipResourceId() {
+      // unused -- modify InitializationTask to handle this tool
+      return -1;
+   }
 
-  @Override
-  public int getSystemZipResourceId() {
-    // unused -- modify InitializationTask to handle this tool
-    return -1;
-  }
+   @Override public int getSystemZipResourceId() {
+      // unused -- modify InitializationTask to handle this tool
+      return -1;
+   }
 
-  @Override
-  public int getWebKitResourceId() {
-    return -1;
-  }
+   @Override public int getWebKitResourceId() {
+      return -1;
+   }
 
 }

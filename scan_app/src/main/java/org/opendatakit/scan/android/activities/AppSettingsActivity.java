@@ -25,49 +25,47 @@ import java.io.FilenameFilter;
 
 public class AppSettingsActivity extends BasePreferenceActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+   @Override protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
 
-		addPreferencesFromResource(R.xml.prefs);
+      addPreferencesFromResource(R.xml.prefs);
 
-		// TODO: For this it would be better to have a template manager like
-		// Collect's form manager.
-		// This will become slow and it would be nice to be able to
-		// download/delete templates.
-		// Plus if we put it on the main page it will be one less click.
-		final ListPreference templatePreference = (ListPreference) findPreference("select_templates");
+      // TODO: For this it would be better to have a template manager like
+      // Collect's form manager.
+      // This will become slow and it would be nice to be able to
+      // download/delete templates.
+      // Plus if we put it on the main page it will be one less click.
+      final ListPreference templatePreference = (ListPreference) findPreference("select_templates");
 
-		// // Get the available templates:
-		File dir = new File(ScanUtils.getTemplateDirPath());
-		String[] templateNames = dir.list(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				File templateFile = new File(dir, name);
-				if (templateFile.isDirectory()) {
-					// Make sure necessary files are present
-					if (new File(templateFile, "template.json").exists()
-							&& new File(templateFile, "form.jpg").exists()) {
-						return true;
-					}
+      // // Get the available templates:
+      File dir = new File(ScanUtils.getTemplateDirPath());
+      String[] templateNames = dir.list(new FilenameFilter() {
+         public boolean accept(File dir, String name) {
+            File templateFile = new File(dir, name);
+            if (templateFile.isDirectory()) {
+               // Make sure necessary files are present
+               if (new File(templateFile, "template.json").exists() && new File(templateFile,
+                   "form.jpg").exists()) {
+                  return true;
+               }
 
-				}
-				return false;
-			}
-		});
+            }
+            return false;
+         }
+      });
 
-		// Remove suffixes and set paths
-		String[] templatePaths = new String[templateNames.length];
-		for (int i = 0; i < templateNames.length; i++) {
-			templateNames[i] = templateNames[i];//.replace(".json", "");
-			templatePaths[i] = ScanUtils.getTemplateDirPath()
-					+ templateNames[i];
-		}
+      // Remove suffixes and set paths
+      String[] templatePaths = new String[templateNames.length];
+      for (int i = 0; i < templateNames.length; i++) {
+         templateNames[i] = templateNames[i];//.replace(".json", "");
+         templatePaths[i] = ScanUtils.getTemplateDirPath() + templateNames[i];
+      }
 
-		templatePreference.setEntries(templateNames);
-		templatePreference.setEntryValues(templatePaths);
-	}
+      templatePreference.setEntries(templateNames);
+      templatePreference.setEntryValues(templatePaths);
+   }
 
-  public String getAppName() {
-    return ScanUtils.getODKAppName();
-  }
+   public String getAppName() {
+      return ScanUtils.getODKAppName();
+   }
 }

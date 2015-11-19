@@ -33,128 +33,132 @@ import org.opendatakit.scan.android.utils.ScanUtils;
  */
 public class RunSetup implements Runnable {
 
-	private static final String LOG_TAG = "ODKScan";
+   private static final String LOG_TAG = "ODKScan";
 
-	private SharedPreferences settings;
-	private AssetManager assets;
-	private Handler handler;
-	private int appVersionCode;
+   private SharedPreferences settings;
+   private AssetManager assets;
+   private Handler handler;
+   private int appVersionCode;
 
-	public RunSetup(Handler handler, SharedPreferences settings, AssetManager assets, int appVersionCode){
-		this.handler = handler;
-		this.settings = settings;
-		this.assets = assets;
-		this.appVersionCode = appVersionCode;
-	}
-	public void run() {
+   public RunSetup(Handler handler, SharedPreferences settings, AssetManager assets,
+       int appVersionCode) {
+      this.handler = handler;
+      this.settings = settings;
+      this.assets = assets;
+      this.appVersionCode = appVersionCode;
+   }
 
-		SharedPreferences.Editor editor = settings.edit();
+   public void run() {
 
-		// Create output dir if it doesn't exist
-		new File(ScanUtils.getOutputDirPath()).mkdirs();
+      SharedPreferences.Editor editor = settings.edit();
 
-		try {
-			//Creates a .nomedia file to prevent the images from showing up in the gallery.
-			new File(ScanUtils.appFolder + ".nomedia").createNewFile();
+      // Create output dir if it doesn't exist
+      new File(ScanUtils.getOutputDirPath()).mkdirs();
 
-			File trainingExamplesDir =  new File(ScanUtils.getTrainingExampleDirPath());
-			File formTemplatesDir = new File(ScanUtils.getTemplateDirPath());
+      try {
+         //Creates a .nomedia file to prevent the images from showing up in the gallery.
+         new File(ScanUtils.appFolder + ".nomedia").createNewFile();
 
-			//TODO: When new examples/templates are added to the assets dir they should be added here as well.
-			//It would be nice to automatically delete examples/templates in the assets dir.
-			rmdir(new File(trainingExamplesDir, "bubbles"));
-			rmdir(new File(trainingExamplesDir, "squre_checkboxes"));
-			rmdir(new File(formTemplatesDir, "example"));
-			rmdir(new File(ScanUtils.getFormViewHTMLDir()));
+         File trainingExamplesDir = new File(ScanUtils.getTrainingExampleDirPath());
+         File formTemplatesDir = new File(ScanUtils.getTemplateDirPath());
 
-			if(!settings.contains("select_templates")){
-				//If there is no data for which templates to use, use the example template as default
-				editor.putString("select_templates", ScanUtils.getTemplateDirPath() + "example");
-			}
+         //TODO: When new examples/templates are added to the assets dir they should be added here as well.
+         //It would be nice to automatically delete examples/templates in the assets dir.
+         rmdir(new File(trainingExamplesDir, "bubbles"));
+         rmdir(new File(trainingExamplesDir, "squre_checkboxes"));
+         rmdir(new File(formTemplatesDir, "example"));
+         rmdir(new File(ScanUtils.getFormViewHTMLDir()));
 
-			extractAssets(new File(""), new File(ScanUtils.appFolder));
+         if (!settings.contains("select_templates")) {
+            //If there is no data for which templates to use, use the example template as default
+            editor.putString("select_templates", ScanUtils.getTemplateDirPath() + "example");
+         }
 
-			editor.putInt("version", appVersionCode);
+         extractAssets(new File(""), new File(ScanUtils.appFolder));
 
-		} catch (IOException e) {
-			// TODO: Terminate the app if this fails.
-			e.printStackTrace();
-			Log.i(LOG_TAG, "Extration Error");
-		}
-		editor.commit();
-		handler.sendEmptyMessage(0);
-	}
-	/**
-	 * Recursively copy all the assets in the specified assets directory to the specified output directory
-	 * @param assetsDir
-	 * @param outputDir
-	 * @throws IOException
-	 */
-	protected void extractAssets(File assetsDir, File outputDir) throws IOException{
+         editor.putInt("version", appVersionCode);
 
-		outputDir.mkdirs();
-		String[] assetNames = assets.list(assetsDir.toString());
-		for(int i = 0; i < assetNames.length; i++){
+      } catch (IOException e) {
+         // TODO: Terminate the app if this fails.
+         e.printStackTrace();
+         Log.i(LOG_TAG, "Extration Error");
+      }
+      editor.commit();
+      handler.sendEmptyMessage(0);
+   }
 
-			File nextAssetsDir = new File(assetsDir, assetNames[i]);
-			File nextOutputDir = new File(outputDir, assetNames[i]);
+   /**
+    * Recursively copy all the assets in the specified assets directory to the specified output directory
+    *
+    * @param assetsDir
+    * @param outputDir
+    * @throws IOException
+    */
+   protected void extractAssets(File assetsDir, File outputDir) throws IOException {
 
+      outputDir.mkdirs();
+      String[] assetNames = assets.list(assetsDir.toString());
+      for (int i = 0; i < assetNames.length; i++) {
 
-			if(assets.list(nextAssetsDir.toString()).length == 0){
-				copyAsset(nextAssetsDir, nextOutputDir);
-			}
-			else{
-				extractAssets(nextAssetsDir, nextOutputDir);
-			}
-		}
-	}
-	/**
-	 * Copy a single asset file to the specified directory.
-	 * @param assetDir
-	 * @param outputDir
-	 * @throws IOException
-	 */
-	protected void copyAsset(File assetDir, File outputDir) throws IOException {
+         File nextAssetsDir = new File(assetsDir, assetNames[i]);
+         File nextOutputDir = new File(outputDir, assetNames[i]);
 
-		Log.i(LOG_TAG, "Copying " + assetDir + " to " + outputDir.toString());
+         if (assets.list(nextAssetsDir.toString()).length == 0) {
+            copyAsset(nextAssetsDir, nextOutputDir);
+         } else {
+            extractAssets(nextAssetsDir, nextOutputDir);
+         }
+      }
+   }
 
-		InputStream fis = assets.open(assetDir.toString());
+   /**
+    * Copy a single asset file to the specified directory.
+    *
+    * @param assetDir
+    * @param outputDir
+    * @throws IOException
+    */
+   protected void copyAsset(File assetDir, File outputDir) throws IOException {
 
-		outputDir.createNewFile();
-		FileOutputStream fos = new FileOutputStream(outputDir);
+      Log.i(LOG_TAG, "Copying " + assetDir + " to " + outputDir.toString());
 
-		// Transfer bytes from in to out
-		byte[] buf = new byte[1024];
-		int len;
-		while ((len = fis.read(buf)) > 0) {
-			fos.write(buf, 0, len);
-		}
+      InputStream fis = assets.open(assetDir.toString());
 
-		fos.close();
-		fis.close();
-	}
-	/**
-	 * Recursively remove all the files in a directory, then the directory.
-	 * @param dir
-	 */
-	public void rmdir(File dir){
+      outputDir.createNewFile();
+      FileOutputStream fos = new FileOutputStream(outputDir);
 
-		if(dir.exists()){
-			String[] files = dir.list();
-			for(int i = 0; i < files.length; i++){
-				File file = new File(dir, files[i]);
-				Log.i(LOG_TAG, "Removing: " + file.toString());
-				if(file.isDirectory()){
-					rmdir(file);
-				}
-				else{
-					file.delete();
-				}
-			}
-			dir.delete();
-		}
-		else{
-			Log.i(LOG_TAG, "Cound not remove directory, it does not exist:" + dir.toString());
-		}
-	}
+      // Transfer bytes from in to out
+      byte[] buf = new byte[1024];
+      int len;
+      while ((len = fis.read(buf)) > 0) {
+         fos.write(buf, 0, len);
+      }
+
+      fos.close();
+      fis.close();
+   }
+
+   /**
+    * Recursively remove all the files in a directory, then the directory.
+    *
+    * @param dir
+    */
+   public void rmdir(File dir) {
+
+      if (dir.exists()) {
+         String[] files = dir.list();
+         for (int i = 0; i < files.length; i++) {
+            File file = new File(dir, files[i]);
+            Log.i(LOG_TAG, "Removing: " + file.toString());
+            if (file.isDirectory()) {
+               rmdir(file);
+            } else {
+               file.delete();
+            }
+         }
+         dir.delete();
+      } else {
+         Log.i(LOG_TAG, "Cound not remove directory, it does not exist:" + dir.toString());
+      }
+   }
 }

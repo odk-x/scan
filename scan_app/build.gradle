@@ -40,7 +40,8 @@ android {
         }
     }
 
-    packagingOptions { // Pick first occurrence of any files that cause conflicts, as defined in common.gradle
+    packagingOptions {
+        // Pick first occurrence of any files that cause conflicts, as defined in common.gradle
         packageList.each {
             pickFirst it
         }
@@ -53,11 +54,11 @@ android {
 }
 
 configurations.all {
-  resolutionStrategy {
-    cacheDynamicVersionsFor(0, 'seconds')
-    cacheChangingModulesFor(0, 'seconds')
-  }
-  transitive = true
+    resolutionStrategy {
+        cacheDynamicVersionsFor(0, 'seconds')
+        cacheChangingModulesFor(0, 'seconds')
+    }
+    transitive = true
 }
 
 

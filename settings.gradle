@@ -1,10 +1,10 @@
 gradle.ext.gradleConfigVersion = 14
 
-if ( !gradle.ext.has('workspacePath') ) {
-	def env = System.getProperties();
-	logger.warn("scan/settings.gradle System.getProperties().stringPropertyNames(): " + env.stringPropertyNames());
+if (!gradle.ext.has('workspacePath')) {
+    def env = System.getProperties();
+    logger.warn("scan/settings.gradle System.getProperties().stringPropertyNames(): " + env.stringPropertyNames());
     def path = System.getProperty('com.android.studio.gradle.project.path');
-    if ( path != null ) {
+    if (path != null) {
         logger.warn("scan/settings.gradle Found value for System.getProperty('com.android.studio.gradle.project.path')");
         gradle.ext.workspacePath = (new File(path)).getParentFile().getAbsolutePath();
     } else {
@@ -33,7 +33,8 @@ settingsScripts.each {
 
 include(scanProjectChild)
 
-if (libraryProjectPath.exists() && gradle.ext.useLocal) { // check if local library project is present
+if (libraryProjectPath.exists() && gradle.ext.useLocal) {
+    // check if local library project is present
     include libraryProjectName
     project(libraryProjectName).setProjectDir(libraryProjectPath) // set local location
 }
