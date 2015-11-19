@@ -39,166 +39,159 @@ import android.widget.TextView;
 
 public class MainMenuActivity extends BaseActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_menu); // Setup the UI
+   @Override protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.main_menu); // Setup the UI
 
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
+      SharedPreferences settings = PreferenceManager
+          .getDefaultSharedPreferences(getApplicationContext());
 
-		try {
-			// Create the app folder if it doesn't exist:
-			new File(ScanUtils.appFolder).mkdirs();
-			checkSDCard();
-			PackageInfo packInfo = getPackageManager().getPackageInfo(
-					getPackageName(), 0);
-			{
-				// dynamically construct the main screen version string
-				TextView mainMenuMessageLabel = (TextView) findViewById(R.id.version_display);
-				mainMenuMessageLabel.setText("version:\n"
-						+ packInfo.versionName);
-			}
-			// check version and run setup if needed
-			int storedVersionCode = settings.getInt("version", 0);
-			int appVersionCode = packInfo.versionCode;
-			if (appVersionCode == 0 || storedVersionCode < appVersionCode) {
-				final ProgressDialog pd = ProgressDialog.show(this, "Please wait...",
-						"Extracting assets", true);
+      try {
+         // Create the app folder if it doesn't exist:
+         new File(ScanUtils.appFolder).mkdirs();
+         checkSDCard();
+         PackageInfo packInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+         {
+            // dynamically construct the main screen version string
+            TextView mainMenuMessageLabel = (TextView) findViewById(R.id.version_display);
+            mainMenuMessageLabel.setText("version:\n" + packInfo.versionName);
+         }
+         // check version and run setup if needed
+         int storedVersionCode = settings.getInt("version", 0);
+         int appVersionCode = packInfo.versionCode;
+         if (appVersionCode == 0 || storedVersionCode < appVersionCode) {
+            final ProgressDialog pd = ProgressDialog
+                .show(this, "Please wait...", "Extracting assets", true);
 
-			final Handler handler = new Handler(new Handler.Callback() {
-		            public boolean handleMessage(Message message) {
-				pd.dismiss();
-						return true;
-		            }
-			});
+            final Handler handler = new Handler(new Handler.Callback() {
+               public boolean handleMessage(Message message) {
+                  pd.dismiss();
+                  return true;
+               }
+            });
 
-				Thread thread = new Thread(new RunSetup(handler, settings,
-						getAssets(), appVersionCode));
-				thread.start();
-			}
-		} catch (Exception e) {
-			// Display an error dialog if something goes wrong.
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(e.toString())
-					.setCancelable(false)
-					.setNeutralButton("Ok",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-									finish();
-								}
-							});
-			AlertDialog alert = builder.create();
-			alert.show();
-		}
+            Thread thread = new Thread(
+                new RunSetup(handler, settings, getAssets(), appVersionCode));
+            thread.start();
+         }
+      } catch (Exception e) {
+         // Display an error dialog if something goes wrong.
+         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+         builder.setMessage(e.toString()).setCancelable(false)
+             .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                       dialog.cancel();
+                       finish();
+                    }
+                 });
+         AlertDialog alert = builder.create();
+         alert.show();
+      }
 
-		hookupButtonHandlers();
-	}
+      hookupButtonHandlers();
+   }
 
-	private void hookupButtonHandlers() {
+   private void hookupButtonHandlers() {
 
-		Button scanForm = (Button) findViewById(R.id.ScanButton);
-		scanForm.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
-				startActivity(intent);
-			}
-		});
+      Button scanForm = (Button) findViewById(R.id.ScanButton);
+      scanForm.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
+            startActivity(intent);
+         }
+      });
 
-		Button viewForms = (Button) findViewById(R.id.ViewFormsButton);
-		viewForms.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(),
-						ViewScannedForms.class);
-				startActivity(intent);
-			}
-		});
+      Button viewForms = (Button) findViewById(R.id.ViewFormsButton);
+      viewForms.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), ViewScannedForms.class);
+            startActivity(intent);
+         }
+      });
 
-		Button instructions = (Button) findViewById(R.id.InstructionsButton);
-		instructions.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), InstructionsActivity.class);
-				startActivity(intent);
-			}
-		});
+      Button instructions = (Button) findViewById(R.id.InstructionsButton);
+      instructions.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), InstructionsActivity.class);
+            startActivity(intent);
+         }
+      });
 
-		Button settingsButton = (Button) findViewById(R.id.SettingsButton);
-		settingsButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplication(), AppSettingsActivity.class);
-				startActivity(intent);
-			}
-		});
-	}
+      Button settingsButton = (Button) findViewById(R.id.SettingsButton);
+      settingsButton.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), AppSettingsActivity.class);
+            startActivity(intent);
+         }
+      });
+   }
 
-	/**
-	 * Throw an exception if there is no storage or not enough space.
-	 * @throws Exception
-	 */
-	private void checkSDCard() throws Exception {
-		// http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
-		String state = Environment.getExternalStorageState();
+   /**
+    * Throw an exception if there is no storage or not enough space.
+    *
+    * @throws Exception
+    */
+   private void checkSDCard() throws Exception {
+      // http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+      String state = Environment.getExternalStorageState();
 
-		if (Environment.MEDIA_MOUNTED.equals(state)) {
-			// We can read and write the media
-			// Now Check that there is room to store more images
-			final int APROX_IMAGE_SIZE = 1000000;
-			long usableSpace = ScanUtils.getUsableSpace(ScanUtils.appFolder);
-			if (usableSpace >= 0 && usableSpace < 4 * APROX_IMAGE_SIZE) {
-				throw new Exception("It looks like there isn't enough space to store more images.");
-			}
-		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-			throw new Exception("We cannot write the media.");
-		} else {
-			throw new Exception("We can neither read nor write the media.");
-		}
-	}
+      if (Environment.MEDIA_MOUNTED.equals(state)) {
+         // We can read and write the media
+         // Now Check that there is room to store more images
+         final int APROX_IMAGE_SIZE = 1000000;
+         long usableSpace = ScanUtils.getUsableSpace(ScanUtils.appFolder);
+         if (usableSpace >= 0 && usableSpace < 4 * APROX_IMAGE_SIZE) {
+            throw new Exception("It looks like there isn't enough space to store more images.");
+         }
+      } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+         throw new Exception("We cannot write the media.");
+      } else {
+         throw new Exception("We can neither read nor write the media.");
+      }
+   }
 
    private void updateScanButtonText(SharedPreferences settings) {
       Button scanForm = (Button) findViewById(R.id.ScanButton);
-      String[] templatePaths = {settings.getString("select_templates", "")};
+      String[] templatePaths = { settings.getString("select_templates", "") };
       String templateName = "";
       if (templatePaths.length > 0) {
          String[] parts = templatePaths[0].split("/");
-         templateName = parts[parts.length-1];
+         templateName = parts[parts.length - 1];
       }
       String newText = String.format(getString(R.string.scan_new_form), templateName);
       CharSequence styledText = Html.fromHtml(newText);
 
       scanForm.setText(styledText);
-	 }
-   @Override
-   public void onResume() {
+   }
+
+   @Override public void onResume() {
       super.onResume();
       SharedPreferences settings = PreferenceManager
           .getDefaultSharedPreferences(getApplicationContext());
       updateScanButtonText(settings);
    }
 
-  @Override
-	public void onBackPressed() {
-		// This override is used in order to avoid going back to the
-		// DisplayProcessedFormActivity activity.
-		Intent setIntent = new Intent(Intent.ACTION_MAIN);
-		setIntent.addCategory(Intent.CATEGORY_HOME);
-		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(setIntent);
-	}
+   @Override public void onBackPressed() {
+      // This override is used in order to avoid going back to the
+      // DisplayProcessedFormActivity activity.
+      Intent setIntent = new Intent(Intent.ACTION_MAIN);
+      setIntent.addCategory(Intent.CATEGORY_HOME);
+      setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(setIntent);
+   }
 
-  public void databaseAvailable() {
-    // TODO Auto-generated method stub
+   public void databaseAvailable() {
+      // TODO Auto-generated method stub
 
-  }
+   }
 
-  public void databaseUnavailable() {
-    // TODO Auto-generated method stub
+   public void databaseUnavailable() {
+      // TODO Auto-generated method stub
 
-  }
+   }
 
-  public String getAppName() {
-    return ScanUtils.getODKAppName();
-  }
+   public String getAppName() {
+      return ScanUtils.getODKAppName();
+   }
 
 }

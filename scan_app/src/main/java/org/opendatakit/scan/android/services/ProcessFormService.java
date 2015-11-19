@@ -42,169 +42,165 @@ import java.util.LinkedList;
  * It creates a notification that it's processing an image and updates it when it completes.
  */
 public class ProcessFormService extends Service {
-	//Android has an IntentService class which fits the queuing requirement nicely
-	//but I'm not using it because it seems like it will be easier to deal with the
-	//notifications for enqueued jobs this way.
-	/*
+   //Android has an IntentService class which fits the queuing requirement nicely
+   //but I'm not using it because it seems like it will be easier to deal with the
+   //notifications for enqueued jobs this way.
+  /*
 	 * Ideas:
 	 * 1. Update notifications when alignment finished and allow previews of it.
 	 * 2. For multipage forms, the user could be prompted to take the next picture as soon as alignment completes.
 	 */
 
-	private static final String LOG_TAG = "ODKScan";
+   private static final String LOG_TAG = "ODKScan";
 
-	/**
-	 * This process is a singleton. Every time an activity "starts" it
-	 * a new thread is created to do the processing code and added to this queue.
-	 * This makes it so the number of active threads can be throttled
-	 * (rather than all of them trying to run in parallel)
-	 * so they don't end up thrashing or causing other issues due to resource limitations.
-	 */
-	private LinkedList<Thread> processingQueue = new LinkedList<Thread>();
-	private Thread activeThread;
-	/**
-	 * Start the next job on the queue is there
-	 * aren't too many threads running.
-	 * Stop the service if there are no threads left.
-	 */
-	public synchronized void updateProcessingQueue(){
-		Log.i(LOG_TAG, "Active thread: " + (activeThread != null));
-		if(activeThread == null) {
-			Thread nextJob = processingQueue.poll();
-			if(nextJob == null){
-				stopSelf();
-				return;
-			}
-			//nextJob.setPriority(Thread.MAX_PRIORITY);
-			nextJob.start();
-			activeThread = nextJob;
-		}
-	}
+   /**
+    * This process is a singleton. Every time an activity "starts" it
+    * a new thread is created to do the processing code and added to this queue.
+    * This makes it so the number of active threads can be throttled
+    * (rather than all of them trying to run in parallel)
+    * so they don't end up thrashing or causing other issues due to resource limitations.
+    */
+   private LinkedList<Thread> processingQueue = new LinkedList<Thread>();
+   private Thread activeThread;
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startid) {
-		try {
-			Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
-			final Bundle extras = intent.getExtras();
-			if (extras == null) {
-				throw new Exception("Missing extras in intent.");
-			}
-			//final String photoName = extras.getString("photoName");
-			final String configJSON = extras.getString("config");
-			if (configJSON == null) {
-				throw new Exception("config property is not in extras.");
-			}
+   /**
+    * Start the next job on the queue is there
+    * aren't too many threads running.
+    * Stop the service if there are no threads left.
+    */
+   public synchronized void updateProcessingQueue() {
+      Log.i(LOG_TAG, "Active thread: " + (activeThread != null));
+      if (activeThread == null) {
+         Thread nextJob = processingQueue.poll();
+         if (nextJob == null) {
+            stopSelf();
+            return;
+         }
+         //nextJob.setPriority(Thread.MAX_PRIORITY);
+         nextJob.start();
+         activeThread = nextJob;
+      }
+   }
 
-		final int notificationId = (int) (Math.random() * 9999999);
-			final NotificationManager notificationManager = (NotificationManager)
-	                getSystemService(Context.NOTIFICATION_SERVICE);
-			final Context context = getApplicationContext();
+   @Override public int onStartCommand(Intent intent, int flags, int startid) {
+      try {
+         Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
+         final Bundle extras = intent.getExtras();
+         if (extras == null) {
+            throw new Exception("Missing extras in intent.");
+         }
+         //final String photoName = extras.getString("photoName");
+         final String configJSON = extras.getString("config");
+         if (configJSON == null) {
+            throw new Exception("config property is not in extras.");
+         }
 
-	        int icon = android.R.drawable.status_bar_item_background;
-	        CharSequence tickerText = "Processing form...";
-	        long when = System.currentTimeMillis();
-	        Intent waitingIntent = new Intent(context, DisplayStatusActivity.class);
-	        waitingIntent.putExtras(extras);
-	        Notification notification = new Notification(icon, tickerText, when);
-	        notification.setLatestEventInfo(context, "ODK Scan", "Processing form...",
-	                PendingIntent.getActivity(context, 0, waitingIntent, 0));
-	        notificationManager.notify(notificationId , notification);
+         final int notificationId = (int) (Math.random() * 9999999);
+         final NotificationManager notificationManager = (NotificationManager) getSystemService(
+             Context.NOTIFICATION_SERVICE);
+         final Context context = getApplicationContext();
 
-		//A subprocess is used to run the OpenCV code.
-		//I tried doing it synchronously inside this service but it locks up the UI.
+         int icon = android.R.drawable.status_bar_item_background;
+         CharSequence tickerText = "Processing form...";
+         long when = System.currentTimeMillis();
+         Intent waitingIntent = new Intent(context, DisplayStatusActivity.class);
+         waitingIntent.putExtras(extras);
+         Notification notification = new Notification(icon, tickerText, when);
+         notification.setLatestEventInfo(context, "ODK Scan", "Processing form...",
+             PendingIntent.getActivity(context, 0, waitingIntent, 0));
+         notificationManager.notify(notificationId, notification);
 
-	        /**
-	         * This handler gets called with the result json when
-	         * the scan cpp code finishes processing an image.
-	         */
-		final Handler handler = new Handler(new Handler.Callback() {
-	            public boolean handleMessage(Message message) {
-			Bundle messageData = message.getData();
+         //A subprocess is used to run the OpenCV code.
+         //I tried doing it synchronously inside this service but it locks up the UI.
 
-			JSONObject result = new JSONObject();
-			String errorMessage = "";
+         /**
+          * This handler gets called with the result json when
+          * the scan cpp code finishes processing an image.
+          */
+         final Handler handler = new Handler(new Handler.Callback() {
+            public boolean handleMessage(Message message) {
+               Bundle messageData = message.getData();
 
-			if(messageData != null) {
-						try {
-							result = new JSONObject(messageData.getString("result"));
-							errorMessage = result.optString("errorMessage");
-						} catch (JSONException e) {
-							Log.i(LOG_TAG, "Unparsable JSON: " + messageData.getString("result"));
-						}
-			} else {
-				messageData = new Bundle();
-				Toast.makeText(context,
-						"Error: Empty data bundle given to handler.",
-						Toast.LENGTH_LONG).show();
-			}
-		        CharSequence contentTitle = "ODK Scan";
+               JSONObject result = new JSONObject();
+               String errorMessage = "";
 
-					//Assume an error for the default notification.
-		        int icon = android.R.drawable.stat_notify_error;
-		        CharSequence contentText = "Error processing form.";
-		        CharSequence tickerText = contentText;
-		        long when = System.currentTimeMillis();
-		        Intent notificationIntent = new Intent(context, DisplayStatusActivity.class);
+               if (messageData != null) {
+                  try {
+                     result = new JSONObject(messageData.getString("result"));
+                     errorMessage = result.optString("errorMessage");
+                  } catch (JSONException e) {
+                     Log.i(LOG_TAG, "Unparsable JSON: " + messageData.getString("result"));
+                  }
+               } else {
+                  messageData = new Bundle();
+                  Toast.makeText(context, "Error: Empty data bundle given to handler.",
+                      Toast.LENGTH_LONG).show();
+               }
+               CharSequence contentTitle = "ODK Scan";
 
-		        if(errorMessage.length() == 0) {
-				extras.putString("templatePath", result.optString("templatePath"));
-				contentText = "Successfully processed image!";
-				tickerText = contentText;
-				icon = android.R.drawable.stat_notify_more;
-				notificationIntent = new Intent(context, DisplayProcessedFormActivity.class);
-		        }
+               //Assume an error for the default notification.
+               int icon = android.R.drawable.stat_notify_error;
+               CharSequence contentText = "Error processing form.";
+               CharSequence tickerText = contentText;
+               long when = System.currentTimeMillis();
+               Intent notificationIntent = new Intent(context, DisplayStatusActivity.class);
 
-		        //Pass along the data from the intent that started this service.
-		        notificationIntent.putExtras(extras);
-		        //Pass along the message data to the notification activity.
-		        notificationIntent.putExtras(messageData);
-		        Notification notification = new Notification(icon, tickerText, when);
-		        //Make it so notifications are canceled on click
-		        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationId,
-		                notificationIntent, 0);
-		        notification.setLatestEventInfo(context, contentTitle, contentText,
-		                contentIntent);
+               if (errorMessage.length() == 0) {
+                  extras.putString("templatePath", result.optString("templatePath"));
+                  contentText = "Successfully processed image!";
+                  tickerText = contentText;
+                  icon = android.R.drawable.stat_notify_more;
+                  notificationIntent = new Intent(context, DisplayProcessedFormActivity.class);
+               }
 
-					notificationManager.notify(notificationId , notification);
+               //Pass along the data from the intent that started this service.
+               notificationIntent.putExtras(extras);
+               //Pass along the message data to the notification activity.
+               notificationIntent.putExtras(messageData);
+               Notification notification = new Notification(icon, tickerText, when);
+               //Make it so notifications are canceled on click
+               notification.flags |= Notification.FLAG_AUTO_CANCEL;
+               PendingIntent contentIntent = PendingIntent
+                   .getActivity(context, notificationId, notificationIntent, 0);
+               notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
-					Log.i(LOG_TAG, "Finished active thread status: " + activeThread.getState());
-					activeThread = null;
-			updateProcessingQueue();
-					return true;
-	            }
-		});
+               notificationManager.notify(notificationId, notification);
 
-		Thread pThread = new Thread(new Runnable() {
-			public void run() {
-				//The JNI object that connects to the ODKScan-core code.
-				final Processor mProcessor = new Processor();//ScanUtils.appFolder
-				Bundle outputData = new Bundle();
+               Log.i(LOG_TAG, "Finished active thread status: " + activeThread.getState());
+               activeThread = null;
+               updateProcessingQueue();
+               return true;
+            }
+         });
 
-                    Log.i(LOG_TAG, "Using data = " + configJSON);
-				String result = mProcessor.processViaJSON(configJSON);
+         Thread pThread = new Thread(new Runnable() {
+            public void run() {
+               //The JNI object that connects to the ODKScan-core code.
+               final Processor mProcessor = new Processor();//ScanUtils.appFolder
+               Bundle outputData = new Bundle();
 
-					outputData.putString("result", result);
-				Message msg = new Message();
-				msg.setData(outputData);
-				handler.sendMessage(msg);
-			}
-		});
+               Log.i(LOG_TAG, "Using data = " + configJSON);
+               String result = mProcessor.processViaJSON(configJSON);
 
-		processingQueue.offer(pThread);
-		updateProcessingQueue();
+               outputData.putString("result", result);
+               Message msg = new Message();
+               msg.setData(outputData);
+               handler.sendMessage(msg);
+            }
+         });
 
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Background processing exception!");
-			Log.e(LOG_TAG, e.toString());
-		}
-		return startid;
-	}
+         processingQueue.offer(pThread);
+         updateProcessingQueue();
 
+      } catch (Exception e) {
+         Log.e(LOG_TAG, "Background processing exception!");
+         Log.e(LOG_TAG, e.toString());
+      }
+      return startid;
+   }
 
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+   @Override public IBinder onBind(Intent arg0) {
+      // TODO Auto-generated method stub
+      return null;
+   }
 }

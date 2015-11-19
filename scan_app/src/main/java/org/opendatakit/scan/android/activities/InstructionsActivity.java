@@ -26,36 +26,33 @@ import android.os.Bundle;
  */
 public class InstructionsActivity extends BaseActivity {
 
-	// Initialize the application
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+   // Initialize the application
+   @Override protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.bubble_instructions); // Setup the UI
-	}
+      setContentView(R.layout.bubble_instructions); // Setup the UI
+   }
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
+   @Override protected void onPause() {
+      super.onPause();
+   }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+   @Override protected void onResume() {
+      super.onResume();
 
-	}
+   }
 
-  public void databaseAvailable() {
-    // TODO Auto-generated method stub
+   public void databaseAvailable() {
+      // TODO Auto-generated method stub
 
-  }
+   }
 
-  public void databaseUnavailable() {
-    // TODO Auto-generated method stub
+   public void databaseUnavailable() {
+      // TODO Auto-generated method stub
 
-  }
+   }
 
-  public String getAppName() {
-    return ScanUtils.getODKAppName();
-  }
+   public String getAppName() {
+      return ScanUtils.getODKAppName();
+   }
 }
