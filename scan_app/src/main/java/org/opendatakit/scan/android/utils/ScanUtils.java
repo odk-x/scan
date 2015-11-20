@@ -173,7 +173,7 @@ public class ScanUtils {
     */
    public static long getUsableSpace(String folder) {
       StatFs sfs = new StatFs(folder);
-      return sfs.getAvailableBlocks() * sfs.getBlockSize();
+      return (long) sfs.getAvailableBlocks() * sfs.getBlockSize();
    }
 
    public static String readFileAsString(String filePath) throws java.io.IOException {
