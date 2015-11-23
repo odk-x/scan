@@ -100,8 +100,9 @@ dependencies {
                 version: (useLatestPlayServices ? latestVersion : playServicesSnapshot), ext: 'aar')
     }
 
-    androidTestCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-v4:23.1.0'
     androidTestCompile 'com.android.support:support-v4:23.1.0'
+    androidTestCompile 'junit:junit:4.12'
     testCompile 'junit:junit:4.12'
 
     //for Espresso
