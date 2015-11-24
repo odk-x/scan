@@ -93,7 +93,8 @@ public class MainMenuActivity extends BaseActivity {
       Button scanForm = (Button) findViewById(R.id.ScanButton);
       scanForm.setOnClickListener(new View.OnClickListener() {
          public void onClick(View v) {
-            Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
+            Intent intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+            intent.putExtra("acquisitionMethod", R.integer.take_picture);
             startActivity(intent);
          }
       });
@@ -101,7 +102,8 @@ public class MainMenuActivity extends BaseActivity {
       Button processImage = (Button) findViewById(R.id.ProcessImageButton);
       processImage.setOnClickListener(new View.OnClickListener() {
          public void onClick(View v) {
-            Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
+            Intent intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+            intent.putExtra("acquisitionMethod", R.integer.pick_file);
             startActivity(intent);
          }
       });

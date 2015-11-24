@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Form processing intent codes -->
+    <integer name="take_picture">12345679</integer>
+    <integer name="pick_file">24681214</integer>
+    <integer name="pick_directory">35791315</integer>
+
+    <!-- Camera intent codes -->
+    <integer name="new_image">468101416</integer>
+
+    <!-- File picker intent codes -->
+    <integer name="existing_image">579111517</integer>
+    <integer name="image_directory">68101214</integer>
+
+</resources>

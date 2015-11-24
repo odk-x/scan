@@ -123,7 +123,8 @@ public class DisplayProcessedFormActivity extends BaseActivity {
             nextPage.setVisibility(View.VISIBLE);
             nextPage.setOnClickListener(new View.OnClickListener() {
                public void onClick(View v) {
-                  Intent intent = new Intent(getApplication(), PhotographFormActivity.class);
+                  Intent intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+                  intent.putExtra("acquisitionMethod", R.integer.take_picture);
                   String[] templatePaths = { nextPageTemplatePath.toString() };
                   intent.putExtra("templatePaths", templatePaths);
                   ArrayList<String> prevTemplatePaths = extras
@@ -444,7 +445,8 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       Intent intent;
       int itemId = item.getItemId();
       if (itemId == R.id.scanNewForm) {
-         intent = new Intent(getApplication(), PhotographFormActivity.class);
+         intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+         intent.putExtra("acquisitionMethod", R.integer.take_picture);
          startActivity(intent);
          finish();
          return true;
