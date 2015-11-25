@@ -108,6 +108,15 @@ public class MainMenuActivity extends BaseActivity {
          }
       });
 
+      Button processFolder = (Button) findViewById(R.id.ProcessFolderButton);
+      processFolder.setOnClickListener(new View.OnClickListener() {
+         public void onClick(View v) {
+            Intent intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+            intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+            startActivity(intent);
+         }
+      });
+
       Button viewForms = (Button) findViewById(R.id.ViewFormsButton);
       viewForms.setOnClickListener(new View.OnClickListener() {
          public void onClick(View v) {
@@ -162,7 +171,6 @@ public class MainMenuActivity extends BaseActivity {
           .getDefaultSharedPreferences(getApplicationContext());
 
       Button scanForm = (Button) findViewById(R.id.ScanButton);
-      Button processImage = (Button) findViewById(R.id.ProcessImageButton);
 
       String[] templatePaths = { settings.getString("select_templates", "") };
       String templateName = "";
@@ -173,10 +181,8 @@ public class MainMenuActivity extends BaseActivity {
       }
 
       String newScanText = String.format(getString(R.string.scan_new_form), templateName);
-      String newProcessText = String.format(getString(R.string.ProcessImageButton), templateName);
 
       scanForm.setText(Html.fromHtml(newScanText));
-      processImage.setText(Html.fromHtml(newProcessText));
    }
 
    @Override public void onResume() {

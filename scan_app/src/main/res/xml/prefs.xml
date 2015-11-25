@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-   	<android.preference.ListPreference
+   	<org.droidparts.preference.MultiSelectListPreference
 	    android:key="select_templates"
 	    android:title="@string/template_to_use" android:dialogTitle="@string/template_to_use"
 	    android:summary="@string/specify_form_type"
 	    android:entries="@array/select_templates_default_entries"
 	    android:entryValues="@array/select_templates_default_values" />
+    <android.preference.ListPreference
+        android:key="directory_search"
+        android:title="Directory search method" android:dialogTitle="Directory search method"
+        android:summary="%s"
+        android:entries="@array/directory_search_entries"
+        android:entryValues="@array/directory_search_values"
+        android:defaultValue="0" />
     <!--
     <CheckBoxPreference android:key="calibrate" android:title="@string/calibrate" android:shouldDisableView="true" android:enabled="false" ></CheckBoxPreference>
     <EditTextPreference android:key="userName" android:title="User Name"></EditTextPreference>
