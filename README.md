@@ -33,6 +33,8 @@ If you are using a Mac you can use [Homebrew](http://brew.sh/) to install swig.
  homebrew install swig
  ```
 
+If you are using Windows, we recommend using [Cygwin](https://www.cygwin.com/) for a terminal. In the installer you will want to include the swig, make, and gcc. 
+
 Install the Android [NDK](https://developer.android.com/tools/sdk/ndk/index.html).
 
 Set the NDK path in `local.env.mk`
