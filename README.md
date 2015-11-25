@@ -21,7 +21,7 @@ We currently have only tested this process on Linux and Mac.
 
 ### C++ components
 
-Install swig:
+Install swig. If you are using Linux it can be obtained for your package manager: 
 
 ```bash
 sudo apt-get install swig
