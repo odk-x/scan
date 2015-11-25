@@ -16,6 +16,7 @@ package org.opendatakit.scan.android.activities;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
+import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.common.android.activities.BasePreferenceActivity;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.utils.ScanUtils;
@@ -30,12 +31,20 @@ public class AppSettingsActivity extends BasePreferenceActivity {
 
       addPreferencesFromResource(R.xml.prefs);
 
+      initializeTemplatePref();
+   }
+
+   /**
+    * Specifies which template to use when processing forms
+    */
+   private void initializeTemplatePref() {
+      //
       // TODO: For this it would be better to have a template manager like
       // Collect's form manager.
       // This will become slow and it would be nice to be able to
       // download/delete templates.
       // Plus if we put it on the main page it will be one less click.
-      final ListPreference templatePreference = (ListPreference) findPreference("select_templates");
+      MultiSelectListPreference multiSelectPreference = (MultiSelectListPreference) findPreference("select_templates");
 
       // // Get the available templates:
       File dir = new File(ScanUtils.getTemplateDirPath());
@@ -61,8 +70,8 @@ public class AppSettingsActivity extends BasePreferenceActivity {
          templatePaths[i] = ScanUtils.getTemplateDirPath() + templateNames[i];
       }
 
-      templatePreference.setEntries(templateNames);
-      templatePreference.setEntryValues(templatePaths);
+      multiSelectPreference.setEntries(templateNames);
+      multiSelectPreference.setEntryValues(templatePaths);
    }
 
    public String getAppName() {
