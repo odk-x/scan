@@ -158,6 +158,12 @@ public class AppSettingsActivityTest {
          e.printStackTrace();
       }
 
+      //return to main menu
+      Espresso.pressBack();
+      Espresso.pressBack();
+
+      openTemplateChooserFromMain();
+
       //Check if "espresso test" is present
       onData(is(NEW_TEMPLATE_NAME)).check(matches(isCompletelyDisplayed()));
 
