@@ -16,6 +16,7 @@ package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 
+import android.os.*;
 import android.text.Html;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
@@ -28,10 +29,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
@@ -70,9 +67,7 @@ public class MainMenuActivity extends BaseActivity {
                }
             });
 
-            Thread thread = new Thread(
-                new RunSetup(handler, settings, getAssets(), appVersionCode));
-            thread.start();
+            AsyncTask.execute(new RunSetup(handler, settings, getAssets(), appVersionCode));
          }
       } catch (Exception e) {
          // Display an error dialog if something goes wrong.
