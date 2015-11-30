@@ -116,6 +116,11 @@ public class PhotographFormTest {
       } catch (RuntimeException e) {}
    }
 
+   /**
+    * Traverses "output" directory to find all expected entries of scanned forms
+    *
+    * @return A String[] of the entries
+    */
    private String[] getPhotoNames() {
       return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
          public boolean accept(File dir, String name) {

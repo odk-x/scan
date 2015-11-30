@@ -32,6 +32,7 @@ public class ColorMatcher {
          public boolean matchesSafely(TextView view) {
             return color == view.getCurrentTextColor();
          }
+
          @Override
          public void describeTo(Description description) {
             description.appendText("With text color: " + color);

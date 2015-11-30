@@ -15,7 +15,9 @@
 package org.opendatakit.scan;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.activities.AppSettingsActivity;
 import org.opendatakit.scan.android.activities.MainMenuActivity;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
@@ -63,10 +65,17 @@ public class AppSettingsActivityTest {
    @Rule
    public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(MainMenuActivity.class);
 
+   @Before
+   public void openTemplateChooserFromMain() {
+      //Go to AppSettings
+      onView(withId(R.id.SettingsButton)).perform(click());
+
+      //Open template chooser
+      onData(withKey(PREFERENCE_KEY)).perform(click());
+   }
+
    @Test
    public void changeTemplateNameDisplay_AppSettings() {
-      openTemplateChooserFromMain();
-
       //Select template
       onView(withText(TEMPLATE_TO_USE)).perform(click());
 
@@ -74,16 +83,13 @@ public class AppSettingsActivityTest {
       onView(withId(android.R.id.summary)).check(matches(withText(
               String.format(
                   mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
-                  TEMPLATE_TO_USE
-              )
+                  TEMPLATE_TO_USE)
           )
       ));
    }
 
    @Test
    public void changeTemplateNameDisplay_ScanButtonText() {
-      openTemplateChooserFromMain();
-
       //Choose template and go back
       onView(withText(TEMPLATE_TO_USE)).perform(click());
       Espresso.pressBack();
@@ -116,8 +122,6 @@ public class AppSettingsActivityTest {
             return false;
          }
       });
-
-      openTemplateChooserFromMain();
 
       //check if every template is displayed
       for (String template : templateNames) {
@@ -154,8 +158,6 @@ public class AppSettingsActivityTest {
          e.printStackTrace();
       }
 
-      openTemplateChooserFromMain();
-
       //Check if "espresso test" is present
       onData(is(NEW_TEMPLATE_NAME)).check(matches(isCompletelyDisplayed()));
 
@@ -176,13 +178,5 @@ public class AppSettingsActivityTest {
       try {
          onData(is(NEW_TEMPLATE_NAME)).check(doesNotExist());
       } catch (RuntimeException e) {}
-   }
-
-   private void openTemplateChooserFromMain() {
-      //Go to AppSettings
-      onView(withId(R.id.SettingsButton)).perform(click());
-
-      //Open template chooser
-      onData(withKey(PREFERENCE_KEY)).perform(click());
    }
 }
