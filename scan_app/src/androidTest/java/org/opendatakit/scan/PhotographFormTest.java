@@ -79,28 +79,18 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class PhotographFormTest {
-   /**
-    * This test is a placeholder for the tests below until the code to wait for Scan setup is
-    * completed
-    */
-   @Test public void appSettings_dummyTest() {
-      assert(true);
-   }
-   /*
-   @Rule
-   public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(MainMenuActivity.class);
+@RunWith(AndroidJUnit4.class) @LargeTest public class PhotographFormTest {
+
+   @Rule public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(
+       MainMenuActivity.class);
 
    //block external intents
-   @Before
-   public void stubAllExternalIntents() {
-      intending(not(isInternal())).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
+   @Before public void stubAllExternalIntents() {
+      intending(not(isInternal()))
+          .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
    }
 
-   @Test
-   public void scanNewForm_cancel() {
+   @Test public void scanNewForm_cancel() {
       //get list of outputs before "Scan New Form"
       String[] photoNames = getPhotoNames();
 
@@ -121,9 +111,15 @@ public class PhotographFormTest {
       //Very ugly but it works
       try {
          onData(not(anyOf(photoList))).check(doesNotExist());
-      } catch (RuntimeException e) {}
+      } catch (RuntimeException e) {
+      }
    }
 
+   /**
+    * Traverses "output" directory to find all expected entries of scanned forms
+    *
+    * @return A String[] of the entries
+    */
    private String[] getPhotoNames() {
       return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
          public boolean accept(File dir, String name) {
@@ -131,5 +127,4 @@ public class PhotographFormTest {
          }
       });
    }
-   */
 }
