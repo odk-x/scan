@@ -39,6 +39,16 @@
     <string name="error_file_creation">Could not save photo.</string>
     <string name="error_finding_file">Could not find photo.</string>
     <string name="error_finding_dir">Could not find folder.</string>
+    <string name="background_processing">Processing photos in background...</string>
+    <string name="error_empty_folder">No images found in the folder</string>
+
+    <!-- ProcessFormsService -->
+    <string name="begin_processing">Processing form...</string>
+    <string name="error_background_exception">Background processing exception!</string>
+    <string name="error_missing_intent">Missing extras in intent.</string>
+    <string name="error_missing_config">config property is not in extras.</string>
+    <string name="error_processing">Error processing form.</string>
+    <string name="finished_processing">Finished processing form.</string>
 
     <!-- DisplayProcessedFormActivity -->
     <string name="next_page">Scan Next Page</string>
