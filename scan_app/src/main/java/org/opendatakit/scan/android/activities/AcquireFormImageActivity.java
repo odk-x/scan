@@ -11,13 +11,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.app.Activity;
 
+import android.widget.Toast;
 import org.apache.commons.io.FileUtils;
 import org.droidparts.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.services.ProcessFormService;
+import org.opendatakit.scan.android.services.ProcessFormsService;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
 import java.io.File;
@@ -98,6 +99,7 @@ public class AcquireFormImageActivity extends BaseActivity {
          //Display an error dialog if something goes wrong.
          failAndReturn(e.toString());
          finish();
+         return;
       }
    }
 
@@ -122,6 +124,7 @@ public class AcquireFormImageActivity extends BaseActivity {
          } catch (Exception e) {
             failAndReturn(e.toString());
             finish();
+            return;
          }
 
          // Store the new image here
@@ -136,6 +139,7 @@ public class AcquireFormImageActivity extends BaseActivity {
          if (acquireIntent.resolveActivity(getPackageManager()) == null) {
             failAndReturn(this.getString(R.string.error_no_camera));
             finish();
+            return;
          }
 
          Log.d(LOG_TAG, "Taking picture");
@@ -157,6 +161,7 @@ public class AcquireFormImageActivity extends BaseActivity {
          if (acquireIntent.resolveActivity(getPackageManager()) == null) {
             failAndReturn(this.getString(R.string.error_no_file_picker));
             finish();
+            return;
          }
 
          Log.d(LOG_TAG, "Picking file");
@@ -176,6 +181,7 @@ public class AcquireFormImageActivity extends BaseActivity {
          if (acquireIntent.resolveActivity(getPackageManager()) == null) {
             failAndReturn(this.getString(R.string.error_no_folder_picker));
             finish();
+            return;
          }
 
          Log.d(LOG_TAG, "Picking folder");
@@ -202,6 +208,7 @@ public class AcquireFormImageActivity extends BaseActivity {
             finish();
          }
       });
+      builder.show();
    }
 
    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -212,16 +219,22 @@ public class AcquireFormImageActivity extends BaseActivity {
       if (resultCode == Activity.RESULT_FIRST_USER) {
          Log.d(LOG_TAG, "First User");
          finish();
+         return;
       } else if (resultCode == Activity.RESULT_CANCELED) {
          Log.d(LOG_TAG, "Canceled");
          finish();
+         return;
       } else if (resultCode != RESULT_OK) {
          failAndReturn(this.getString(R.string.error_acquire_bad_return));
          finish();
+         return;
       }
 
       File destFile;
       Uri uri;
+
+      // TODO: Remove this
+      //android.os.Debug.waitForDebugger();
 
       try {
          switch (requestCode) {
@@ -234,10 +247,12 @@ public class AcquireFormImageActivity extends BaseActivity {
             if (!destFile.exists()) {
                failAndReturn(this.getString(R.string.error_file_creation));
                finish();
+               return;
             }
 
             // Process the form in the background
-            Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
+            Log.d(LOG_TAG, "Photographed form: " + ScanUtils.getPhotoPath(photoName));
+            Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
             startService(processPhoto);
             break;
 
@@ -252,6 +267,7 @@ public class AcquireFormImageActivity extends BaseActivity {
             if (!sourceFile.exists() || !imageFilter.accept(sourceFile, uri.toString())) {
                failAndReturn(this.getString(R.string.error_finding_file));
                finish();
+               return;
             }
 
             prepareToProcessForm();
@@ -260,7 +276,8 @@ public class AcquireFormImageActivity extends BaseActivity {
             destFile = new File(ScanUtils.getPhotoPath(photoName));
             FileUtils.copyFile(sourceFile, destFile);
 
-            Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
+            Log.d(LOG_TAG, "Copied form: " + ScanUtils.getPhotoPath(photoName));
+            Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
             startService(processPhoto);
             break;
 
@@ -276,6 +293,7 @@ public class AcquireFormImageActivity extends BaseActivity {
             if (!dir.exists() || !dir.isDirectory()) {
                failAndReturn(this.getString(R.string.error_finding_dir));
                finish();
+               return;
             }
 
             // Find the directory search preference
@@ -284,16 +302,22 @@ public class AcquireFormImageActivity extends BaseActivity {
             String dirSearch = settings.getString("directory_search", "flat");
             boolean isRecursive = dirSearch.equals("recursive");
 
-            processImagesInFolder(dir, isRecursive);
+            if (processImagesInFolder(dir, isRecursive)) {
+               Toast.makeText(this, R.string.background_processing, Toast.LENGTH_LONG).show();
+            } else {
+               Toast.makeText(this, R.string.error_empty_folder, Toast.LENGTH_LONG).show();
+            }
             break;
 
          default:
             failAndReturn(this.getString(R.string.error_acquire_bad_return));
             finish();
+            return;
          }
       } catch (Exception e) {
          failAndReturn(e.toString());
          finish();
+         return;
       }
 
       finish();
@@ -326,10 +350,11 @@ public class AcquireFormImageActivity extends BaseActivity {
       } catch (Exception e) {
          failAndReturn(e.toString());
          finish();
+         return;
       }
 
       // Create the intent to process the acquired image.
-      processPhoto = new Intent(this, ProcessFormService.class);
+      processPhoto = new Intent(this, ProcessFormsService.class);
       processPhoto.putExtra("photoName", photoName);
       processPhoto.putExtra("config", config.toString());
 
@@ -352,10 +377,12 @@ public class AcquireFormImageActivity extends BaseActivity {
     * @param dir         The folder to read from
     * @param isRecursive Whether to recursively search sub folders
     */
-   private void processImagesInFolder(File dir, boolean isRecursive) {
+   private boolean processImagesInFolder(File dir, boolean isRecursive) {
       if (!dir.exists() || !dir.isDirectory()) {
-         return;
+         return false;
       }
+
+      boolean foundForm = false;
 
       // Process all the images in the folder
       for (File curr : dir.listFiles(imageFilter)) {
@@ -369,6 +396,8 @@ public class AcquireFormImageActivity extends BaseActivity {
             Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
             startService(processPhoto);
 
+            foundForm = true;
+
          } catch (Exception e) {
             Log.e(LOG_TAG, "Error processing image: " + curr.getPath());
             Log.e(LOG_TAG, e.toString());
@@ -378,13 +407,15 @@ public class AcquireFormImageActivity extends BaseActivity {
 
       // If we are not recursing, we are done
       if (!isRecursive) {
-         return;
+         return foundForm;
       }
 
       // Recurse through each subdirectory
       for (File currDir : dir.listFiles(subdirFilter)) {
-         processImagesInFolder(currDir, isRecursive);
+         foundForm  |= processImagesInFolder(currDir, isRecursive);
       }
+
+      return foundForm;
    }
 
    @Override protected void onDestroy() {

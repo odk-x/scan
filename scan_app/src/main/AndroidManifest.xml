@@ -72,7 +72,7 @@
         </activity>
 
         <service
-            android:name=".services.ProcessFormService"
+            android:name=".services.ProcessFormsService"
             android:label="ODK Scan Background" >
         </service>
 
