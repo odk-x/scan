@@ -695,7 +695,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
             Log.i(LOG_TAG,
                 "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
             Scan.getInstance().getDatabase()
-                .insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableId,
+                .insertRowWithId(ScanUtils.getODKAppName(), db, tableId,
                     orderedColumns, tablesValues, rowId);
          }
          setIntentToReturn(tableId, formId, rowId, RESULT_OK);
@@ -925,7 +925,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
                Log.i(LOG_TAG,
                    "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
                Scan.getInstance().getDatabase()
-                   .insertDataIntoExistingDBTableWithId(ScanUtils.getODKAppName(), db, tableId,
+                   .insertRowWithId(ScanUtils.getODKAppName(), db, tableId,
                        orderedColumns, tablesValues, rowId);
             }
          }
