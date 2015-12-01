@@ -30,6 +30,7 @@ import android.support.test.espresso.core.deps.guava.io.Files;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.support.test.espresso.IdlingPolicies;
 import android.text.Html;
 
 import java.io.File;
@@ -37,6 +38,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -60,18 +62,12 @@ import static org.hamcrest.Matchers.not;
    private static final String PREFERENCE_KEY = "select_templates";
    private static final String NEW_TEMPLATE_NAME = "espresso test";
 
-   /**
-    * This test is a placeholder for the tests below until the code to wait for Scan setup is
-    * completed
-    */
-   @Test public void appSettings_dummyTest() {
-      assert (true);
-   }
-   /*
    @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
        MainMenuActivity.class);
 
    @Before public void openTemplateChooserFromMain() {
+      extendIdleWaitTimeout();
+
       //Go to AppSettings
       onView(withId(R.id.SettingsButton)).perform(click());
 
@@ -84,9 +80,9 @@ import static org.hamcrest.Matchers.not;
       onView(withText(TEMPLATE_TO_USE)).perform(click());
 
       //Check template name is displayed in summary
-      onView(withId(android.R.id.summary)).check(matches(withText(String.format(
-                  mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
-                  TEMPLATE_TO_USE))));
+      onView(withId(android.R.id.summary)).check(matches(withText(String
+          .format(mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
+              TEMPLATE_TO_USE))));
    }
 
    @Test public void changeTemplateNameDisplay_ScanButtonText() {
@@ -181,5 +177,8 @@ import static org.hamcrest.Matchers.not;
       } catch (RuntimeException e) {
       }
    }
-   */
+
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
+   }
 }

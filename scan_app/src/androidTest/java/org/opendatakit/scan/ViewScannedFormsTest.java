@@ -16,6 +16,7 @@ package org.opendatakit.scan;
 
 import android.content.res.AssetManager;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingPolicies;
 import org.hamcrest.Matcher;
 import org.junit.*;
 
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -74,14 +76,6 @@ import static org.hamcrest.Matchers.not;
    private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
        .substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
 
-   /**
-    * This test is a placeholder for the tests below until the code to wait for Scan setup is
-    * completed
-    */
-   @Test public void viewScannedForms_dummyTest() {
-      assert (true);
-   }
-   /*
    @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
        MainMenuActivity.class);
 
@@ -98,6 +92,8 @@ import static org.hamcrest.Matchers.not;
    //Pre-condition to all tests in this class
    //there must be at least one scanned form
    @Before public void hasAtLeastOneForm() {
+      extendIdleWaitTimeout();
+
       onView(withId(R.id.ViewFormsButton)).perform(click());
       onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
    }
@@ -179,7 +175,7 @@ import static org.hamcrest.Matchers.not;
     * Traverses "output" directory to find all expected entries of scanned forms
     *
     * @return A String[] of the entries
-    *
+    */
    private String[] getPhotoNames() {
       return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
          public boolean accept(File dir, String name) {
@@ -194,7 +190,7 @@ import static org.hamcrest.Matchers.not;
     * @param assetMngr
     * @param sourceDir
     * @throws IOException
-    *
+    */
    private static void copyAssets(AssetManager assetMngr, String sourceDir) throws IOException {
       String[] fileList = assetMngr.list(sourceDir);
 
@@ -219,7 +215,7 @@ import static org.hamcrest.Matchers.not;
     * @param assetMngr
     * @param sourceDir
     * @throws IOException
-    *
+    */
    private static void deleteAssets(AssetManager assetMngr, String sourceDir) throws IOException {
       String[] fileList = assetMngr.list(sourceDir);
 
@@ -242,7 +238,7 @@ import static org.hamcrest.Matchers.not;
     * @param in
     * @param out
     * @throws IOException
-    *
+    */
    private static void copyFile(InputStream in, OutputStream out) throws IOException {
       byte[] buffer = new byte[1024];
       int read;
@@ -251,5 +247,8 @@ import static org.hamcrest.Matchers.not;
          out.write(buffer, 0, read);
       }
    }
-   */
+
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
+   }
 }
