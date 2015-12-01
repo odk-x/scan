@@ -14,6 +14,7 @@
 
 package org.opendatakit.scan;
 
+import android.support.test.espresso.IdlingPolicies;
 import org.hamcrest.Matcher;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainMenuActivity;
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.app.Instrumentation.ActivityResult;
 import static android.support.test.espresso.Espresso.onData;
@@ -86,6 +88,8 @@ import static org.hamcrest.Matchers.not;
 
    //block external intents
    @Before public void stubAllExternalIntents() {
+      extendIdleWaitTimeout();
+
       intending(not(isInternal()))
           .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
    }
@@ -126,5 +130,9 @@ import static org.hamcrest.Matchers.not;
             return (new File(dir, name)).isDirectory();
          }
       });
+   }
+
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
    }
 }

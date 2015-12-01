@@ -16,6 +16,7 @@ package org.opendatakit.scan;
 
 import android.content.res.AssetManager;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingPolicies;
 import org.hamcrest.Matcher;
 import org.junit.*;
 
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -90,6 +92,8 @@ import static org.hamcrest.Matchers.not;
    //Pre-condition to all tests in this class
    //there must be at least one scanned form
    @Before public void hasAtLeastOneForm() {
+      extendIdleWaitTimeout();
+
       onView(withId(R.id.ViewFormsButton)).perform(click());
       onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
    }
@@ -242,5 +246,9 @@ import static org.hamcrest.Matchers.not;
       while ((read = in.read(buffer)) > 0) {
          out.write(buffer, 0, read);
       }
+   }
+
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
    }
 }
