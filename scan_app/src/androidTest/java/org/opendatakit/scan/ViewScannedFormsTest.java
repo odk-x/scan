@@ -14,14 +14,16 @@
 
 package org.opendatakit.scan;
 
+import android.content.res.AssetManager;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingPolicies;
 import org.hamcrest.Matcher;
+import org.junit.*;
+
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainMenuActivity;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.app.Activity;
@@ -35,11 +37,12 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -70,20 +73,27 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class) @LargeTest public class ViewScannedFormsTest {
+   private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
+       .substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
+
    @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
        MainMenuActivity.class);
 
-   /**
-    * This test is a placeholder for the tests below until the code to pre-populate the forms is
-    * written.
-    */
-   @Test public void viewForms_dummyTest() {
-      assert(true);
+   @BeforeClass public static void setUp() throws IOException {
+      //populate dummy data
+      copyAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
    }
-/*
+
+   @AfterClass public static void cleanUp() throws IOException {
+      //delete dummy data
+      deleteAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
+   }
+
    //Pre-condition to all tests in this class
    //there must be at least one scanned form
    @Before public void hasAtLeastOneForm() {
+      extendIdleWaitTimeout();
+
       onView(withId(R.id.ViewFormsButton)).perform(click());
       onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
    }
@@ -149,23 +159,96 @@ import static org.hamcrest.Matchers.not;
          onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
          //check title
          onView(withId(android.R.id.title)).check(matches(withText(
-                     mActivityRule.getActivity().getResources()
-                         .getString(R.string.display_processed_form_activity))));
+             mActivityRule.getActivity().getResources()
+                 .getString(R.string.display_processed_form_activity))));
       } catch (junit.framework.AssertionFailedError e) {
          //click first item
          onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
          //check title
          onView(withId(android.R.id.title)).check(matches(withText(
-                     mActivityRule.getActivity().getResources()
-                         .getString(R.string.view_bubble_forms_activity))));
+             mActivityRule.getActivity().getResources()
+                 .getString(R.string.view_bubble_forms_activity))));
       }
    }
-*/
+
+   /**
+    * Traverses "output" directory to find all expected entries of scanned forms
+    *
+    * @return A String[] of the entries
+    */
    private String[] getPhotoNames() {
       return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
          public boolean accept(File dir, String name) {
             return (new File(dir, name)).isDirectory();
          }
       });
+   }
+
+   /**
+    * Copies sourceDir from assets directory to ODKScan directory
+    *
+    * @param assetMngr
+    * @param sourceDir
+    * @throws IOException
+    */
+   private static void copyAssets(AssetManager assetMngr, String sourceDir) throws IOException {
+      String[] fileList = assetMngr.list(sourceDir);
+
+      for (String s : fileList) {
+         String newDir = sourceDir + "/" + s;
+         String[] subDirFileList = assetMngr.list(newDir);
+
+         if (subDirFileList.length == 0) {
+            copyFile(assetMngr.open(newDir),
+                new FileOutputStream(new File(ScanUtils.appFolder + newDir)));
+         } else {
+            new File(ScanUtils.appFolder + newDir).mkdir();
+
+            copyAssets(assetMngr, newDir);
+         }
+      }
+   }
+
+   /**
+    * Deletes sourceDir of assets directory from ODKScan directory
+    *
+    * @param assetMngr
+    * @param sourceDir
+    * @throws IOException
+    */
+   private static void deleteAssets(AssetManager assetMngr, String sourceDir) throws IOException {
+      String[] fileList = assetMngr.list(sourceDir);
+
+      for (String s : fileList) {
+         String newDir = sourceDir + "/" + s;
+         String[] subDirFileList = assetMngr.list(newDir);
+
+         if (subDirFileList.length == 0) {
+            new File(ScanUtils.appFolder + newDir).delete();
+         } else {
+            deleteAssets(assetMngr, newDir);
+            new File(ScanUtils.appFolder + newDir).delete();
+         }
+      }
+   }
+
+   /**
+    * Copies an InputStream to an OutputStream
+    *
+    * @param in
+    * @param out
+    * @throws IOException
+    */
+   private static void copyFile(InputStream in, OutputStream out) throws IOException {
+      byte[] buffer = new byte[1024];
+      int read;
+
+      while ((read = in.read(buffer)) > 0) {
+         out.write(buffer, 0, read);
+      }
+   }
+
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
    }
 }

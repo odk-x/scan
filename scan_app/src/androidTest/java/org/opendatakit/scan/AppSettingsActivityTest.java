@@ -15,7 +15,9 @@
 package org.opendatakit.scan;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.activities.AppSettingsActivity;
 import org.opendatakit.scan.android.activities.MainMenuActivity;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
@@ -28,6 +30,7 @@ import android.support.test.espresso.core.deps.guava.io.Files;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.support.test.espresso.IdlingPolicies;
 import android.text.Html;
 
 import java.io.File;
@@ -35,6 +38,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -53,61 +57,46 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class AppSettingsActivityTest {
+@RunWith(AndroidJUnit4.class) @LargeTest public class AppSettingsActivityTest {
    private static final String TEMPLATE_TO_USE = "numbers";
    private static final String PREFERENCE_KEY = "select_templates";
    private static final String NEW_TEMPLATE_NAME = "espresso test";
 
-   /**
-    * This test is a placeholder for the tests below until the code to wait for Scan setup is
-    * completed
-    */
-   @Test public void appSettings_dummyTest() {
-      assert(true);
+   @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
+       MainMenuActivity.class);
+
+   @Before public void openTemplateChooserFromMain() {
+      extendIdleWaitTimeout();
+
+      //Go to AppSettings
+      onView(withId(R.id.SettingsButton)).perform(click());
+
+      //Open template chooser
+      onData(withKey(PREFERENCE_KEY)).perform(click());
    }
-   /*
-   @Rule
-   public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(MainMenuActivity.class);
 
-   @Test
-   public void changeTemplateNameDisplay_AppSettings() {
-      openTemplateChooserFromMain();
-
+   @Test public void changeTemplateNameDisplay_AppSettings() {
       //Select template
       onView(withText(TEMPLATE_TO_USE)).perform(click());
 
       //Check template name is displayed in summary
-      onView(withId(android.R.id.summary)).check(matches(withText(
-              String.format(
-                  mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
-                  TEMPLATE_TO_USE
-              )
-          )
-      ));
+      onView(withId(android.R.id.summary)).check(matches(withText(String
+          .format(mActivityRule.getActivity().getResources().getString(R.string.specify_form_type),
+              TEMPLATE_TO_USE))));
    }
 
-   @Test
-   public void changeTemplateNameDisplay_ScanButtonText() {
-      openTemplateChooserFromMain();
-
+   @Test public void changeTemplateNameDisplay_ScanButtonText() {
       //Choose template and go back
       onView(withText(TEMPLATE_TO_USE)).perform(click());
       Espresso.pressBack();
 
       //Check template name is displayed on ScanButton
-      onView(withId(R.id.ScanButton)).check(matches(withText(
-          Html.fromHtml(
-              String.format(
+      onView(withId(R.id.ScanButton)).check(matches(withText(Html.fromHtml(String.format(
                   mActivityRule.getActivity().getResources().getString(R.string.scan_new_form),
-                  TEMPLATE_TO_USE)
-          ).toString()
-      )));
+                  TEMPLATE_TO_USE)).toString())));
    }
 
-   @Test
-   public void templatesToUse_ChoiceDisplay() {
+   @Test public void templatesToUse_ChoiceDisplay() {
       //Retrieve list of templates
       File dir = new File(ScanUtils.getTemplateDirPath());
       String[] templateNames = dir.list(new FilenameFilter() {
@@ -115,8 +104,8 @@ public class AppSettingsActivityTest {
             File templateFile = new File(dir, name);
             if (templateFile.isDirectory()) {
                // Make sure necessary files are present
-               if (new File(templateFile, "template.json").exists()
-                   && new File(templateFile, "form.jpg").exists()) {
+               if (new File(templateFile, "template.json").exists() && new File(templateFile,
+                   "form.jpg").exists()) {
                   return true;
                }
 
@@ -124,8 +113,6 @@ public class AppSettingsActivityTest {
             return false;
          }
       });
-
-      openTemplateChooserFromMain();
 
       //check if every template is displayed
       for (String template : templateNames) {
@@ -144,11 +131,11 @@ public class AppSettingsActivityTest {
       //Very ugly but it works
       try {
          onData(not(anyOf(templatesList))).check(doesNotExist());
-      } catch (RuntimeException e) {}
+      } catch (RuntimeException e) {
+      }
    }
 
-   @Test
-   public void templatesToUse_AddAndRemoveTemplateDisplay() {
+   @Test public void templatesToUse_AddAndRemoveTemplateDisplay() {
       //Copy "example" to "espresso test" to simulate adding a template
       File dir = new File(ScanUtils.getTemplateDirPath());
       File newTemplateDir = new File(dir, NEW_TEMPLATE_NAME);
@@ -161,6 +148,10 @@ public class AppSettingsActivityTest {
       } catch (IOException e) {
          e.printStackTrace();
       }
+
+      //return to main menu
+      Espresso.pressBack();
+      Espresso.pressBack();
 
       openTemplateChooserFromMain();
 
@@ -183,15 +174,11 @@ public class AppSettingsActivityTest {
       //Very ugly but it works
       try {
          onData(is(NEW_TEMPLATE_NAME)).check(doesNotExist());
-      } catch (RuntimeException e) {}
+      } catch (RuntimeException e) {
+      }
    }
-   */
 
-   private void openTemplateChooserFromMain() {
-      //Go to AppSettings
-      onView(withId(R.id.SettingsButton)).perform(click());
-
-      //Open template chooser
-      onData(withKey(PREFERENCE_KEY)).perform(click());
+   private void extendIdleWaitTimeout() {
+      IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
    }
 }
