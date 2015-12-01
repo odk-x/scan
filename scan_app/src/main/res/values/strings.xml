@@ -20,7 +20,9 @@
     <!-- For Main Screen -->
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">The current health center is:</string>
-    <string name="scan_new_form">Scan New Form&lt;br/>&lt;i>%s&lt;/i></string>
+    <string name="template_selected">Templates: &lt;i>%s&lt;/i></string>
+    <string name="no_template">Please select a template to use before scanning.</string>
+    <string name="scan_new_form">Scan New Form</string>
     <string name="ProcessImageButton">Process Saved Image</string>
     <string name="ProcessFolderButton">Process Image Folder</string>
     <string name="ViewFormsButton">View Scanned Forms</string>

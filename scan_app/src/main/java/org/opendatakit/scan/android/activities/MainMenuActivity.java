@@ -15,9 +15,12 @@
 package org.opendatakit.scan.android.activities;
 
 import java.io.File;
+import java.util.Set;
 
+import android.graphics.Color;
 import android.os.*;
 import android.text.Html;
+import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.Tasks.RunSetup;
@@ -170,19 +173,36 @@ public class MainMenuActivity extends BaseActivity {
       SharedPreferences settings = PreferenceManager
           .getDefaultSharedPreferences(getApplicationContext());
 
-      Button scanForm = (Button) findViewById(R.id.ScanButton);
+      TextView templateText = (TextView) findViewById(R.id.TemplateText);
 
-      String[] templatePaths = { settings.getString("select_templates", "") };
-      String templateName = "";
-
-      if (templatePaths.length > 0) {
-         String[] parts = templatePaths[0].split("/");
-         templateName = parts[parts.length - 1];
+      // If no template is selected, present a warning
+      if (!settings.contains("select_templates")) {
+         templateText.setText(R.string.no_template);
+         templateText.setTextColor(Color.RED);
+         return;
       }
 
-      String newScanText = String.format(getString(R.string.scan_new_form), templateName);
+      String[] templatePaths = MultiSelectListPreference
+          .fromPersistedPreferenceValue(settings.getString("select_templates", ""));
 
-      scanForm.setText(Html.fromHtml(newScanText));
+      if (templatePaths.length == 0) {
+         templateText.setText(R.string.no_template);
+         templateText.setTextColor(Color.RED);
+         return;
+      }
+
+      String templateName = "";
+      for (String path : templatePaths) {
+         String[] parts = path.split("/");
+         templateName += parts[parts.length - 1] + ", ";
+      }
+      // Remove the trailing comma and space
+      templateName = templateName.substring(0, templateName.length() - 2);
+
+      String newScanText = String.format(getString(R.string.template_selected), templateName);
+
+      templateText.setText(Html.fromHtml(newScanText));
+      templateText.setTextColor(Color.BLACK);
    }
 
    @Override public void onResume() {

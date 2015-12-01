@@ -72,6 +72,14 @@
     </Button>
 
     <TextView
+            android:id="@+id/TemplateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/template_selected"
+            android:textSize="20sp"
+            android:layout_margin="5sp"/>
+
+    <TextView
             android:id="@+id/version_display"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
