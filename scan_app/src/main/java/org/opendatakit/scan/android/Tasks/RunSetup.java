@@ -71,6 +71,7 @@ public class RunSetup implements Runnable {
 
          if (!settings.contains("select_templates")) {
             //If there is no data for which templates to use, use the example template as default
+            // TODO: This should really prompt the user to set a template or otherwise fail
             editor.putString("select_templates", ScanUtils.getTemplateDirPath() + "example");
          }
 
