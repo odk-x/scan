@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.Tasks;
+package org.opendatakit.scan.android.tasks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,12 +68,6 @@ public class RunSetup implements Runnable {
          rmdir(new File(trainingExamplesDir, "squre_checkboxes"));
          rmdir(new File(formTemplatesDir, "example"));
          rmdir(new File(ScanUtils.getFormViewHTMLDir()));
-
-         if (!settings.contains("select_templates")) {
-            //If there is no data for which templates to use, use the example template as default
-            // TODO: This should really prompt the user to set a template or otherwise fail
-            editor.putString("select_templates", ScanUtils.getTemplateDirPath() + "example");
-         }
 
          extractAssets(new File(""), new File(ScanUtils.appFolder));
 

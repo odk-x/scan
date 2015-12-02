@@ -20,10 +20,9 @@ import java.util.Set;
 import android.graphics.Color;
 import android.os.*;
 import android.text.Html;
-import org.droidparts.preference.MultiSelectListPreference;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.Tasks.RunSetup;
+import org.opendatakit.scan.android.tasks.RunSetup;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
 import android.app.AlertDialog;
@@ -182,10 +181,8 @@ public class MainMenuActivity extends BaseActivity {
          return;
       }
 
-      String[] templatePaths = MultiSelectListPreference
-          .fromPersistedPreferenceValue(settings.getString("select_templates", ""));
-
-      if (templatePaths.length == 0) {
+      Set<String> templatePaths = settings.getStringSet("select_templates", null);
+      if (templatePaths == null || templatePaths.isEmpty()) {
          templateText.setText(R.string.no_template);
          templateText.setTextColor(Color.RED);
          return;
