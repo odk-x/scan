@@ -13,7 +13,7 @@ import android.app.Activity;
 
 import android.widget.Toast;
 import org.apache.commons.io.FileUtils;
-import org.droidparts.preference.MultiSelectListPreference;
+import android.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * AcquireFormImageActivity launches the Android camera app or a file picker app to capture a form
@@ -89,8 +90,13 @@ public class AcquireFormImageActivity extends BaseActivity {
             SharedPreferences settings = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
             Log.d(LOG_TAG, "No template path passed");
-            templatePaths = MultiSelectListPreference
-                .fromPersistedPreferenceValue(settings.getString("select_templates", ""));
+
+            Set<String> selectedTemplates = settings.getStringSet("select_templates", null);
+            if (selectedTemplates == null || selectedTemplates.isEmpty()) {
+               throw new Exception("No templates selected");
+            }
+
+            templatePaths =  selectedTemplates.toArray(new String[selectedTemplates.size()]);
             extras.putStringArray("templatePaths", templatePaths);
          }
 
@@ -233,9 +239,6 @@ public class AcquireFormImageActivity extends BaseActivity {
       File destFile;
       Uri uri;
 
-      // TODO: Remove this
-      //android.os.Debug.waitForDebugger();
-
       try {
          switch (requestCode) {
          case R.integer.new_image:
@@ -299,7 +302,8 @@ public class AcquireFormImageActivity extends BaseActivity {
             // Find the directory search preference
             SharedPreferences settings = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-            String dirSearch = settings.getString("directory_search", "flat");
+            String dirSearch = settings.getString("directory_search",
+                getString(R.string.default_directory_search));
             boolean isRecursive = dirSearch.equals("recursive");
 
             if (processImagesInFolder(dir, isRecursive)) {

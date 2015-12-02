@@ -15,12 +15,15 @@
     <string name="calibrate">Calibrate</string>
     <string name="doFormDetection">Do Form Detection</string>
     <string name="template_to_use">Template to Use</string>
-    <string name="specify_form_type">Set to scan \"%s\" form template</string>
+    <string name="specify_form_type">Set to scan \"%s\" form template(s)</string>
+    <string name="no_form_selected">Please select a form template</string>
+    <string name="directory_search_method">Directory search method</string>
+    <string name="default_directory_search">flat</string>
 
     <!-- For Main Screen -->
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">The current health center is:</string>
-    <string name="template_selected">Templates: &lt;i>%s&lt;/i></string>
+    <string name="template_selected">Templates selected: &lt;i>%s&lt;/i></string>
     <string name="no_template">Please select a template to use before scanning.</string>
     <string name="scan_new_form">Scan New Form</string>
     <string name="ProcessImageButton">Process Saved Image</string>
