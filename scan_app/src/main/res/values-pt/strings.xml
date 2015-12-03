@@ -12,9 +12,9 @@
     <!-- For Main Screen -->
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">a unidade sanitaria e:</string>
-    <string name="ViewFormsButton">ver imagens</string>
-    <string name="InstructionsButton">instruncoes</string>
-    <string name="SettingsButton">definicoes</string>
+    <string name="view_forms_button">ver imagens</string>
+    <string name="instructions_button">instruncoes</string>
+    <string name="settings_button">definicoes</string>
 
     <!-- For Preferences -->
     <string name="calibrate">Calibrate</string>

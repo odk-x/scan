@@ -29,7 +29,7 @@
                 android:id="@+id/ProcessImageButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/ProcessImageButton"
+                android:text="@string/process_image_button"
                 android:layout_weight="1">
 
         </Button>
@@ -38,7 +38,7 @@
                 android:id="@+id/ProcessFolderButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/ProcessFolderButton"
+                android:text="@string/process_folder_button"
                 android:layout_weight="1">
 
         </Button>
@@ -49,7 +49,7 @@
             style="@style/StandardButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ViewFormsButton">
+            android:text="@string/view_forms_button">
 
     </Button>
 
@@ -58,7 +58,7 @@
             style="@style/StandardButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/InstructionsButton">
+            android:text="@string/instructions_button">
 
     </Button>
 
@@ -67,7 +67,7 @@
             style="@style/StandardButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/SettingsButton">
+            android:text="@string/settings_button">
 
     </Button>
 

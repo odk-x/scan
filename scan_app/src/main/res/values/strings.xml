@@ -26,11 +26,11 @@
     <string name="template_selected">Templates selected: &lt;i>%s&lt;/i></string>
     <string name="no_template">Please select a template to use before scanning.</string>
     <string name="scan_new_form">Scan New Form</string>
-    <string name="ProcessImageButton">Process Saved Image</string>
-    <string name="ProcessFolderButton">Process Image Folder</string>
-    <string name="ViewFormsButton">View Scanned Forms</string>
-    <string name="InstructionsButton">Instructions</string>
-    <string name="SettingsButton">Settings</string>
+    <string name="process_image_button">Process Saved Image</string>
+    <string name="process_folder_button">Process Image Folder</string>
+    <string name="view_forms_button">View Scanned Forms</string>
+    <string name="instructions_button">Instructions</string>
+    <string name="settings_button">Settings</string>
 
     <!-- AcquireFormImageActivity -->
     <string name="select_image_title">Select Image to Process</string>
