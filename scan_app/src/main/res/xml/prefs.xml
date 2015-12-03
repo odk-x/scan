@@ -2,21 +2,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <org.opendatakit.scan.android.preferences.TemplatePreference
-        android:key="select_templates"
-        android:title="@string/template_to_use"
-        android:dialogTitle="@string/template_to_use"
-        android:summary="@string/specify_form_type"
-        android:entries="@array/select_templates_default_entries"
-        android:entryValues="@array/select_templates_default_values" />
+            android:key="select_templates"
+            android:title="@string/template_to_use"
+            android:dialogTitle="@string/template_to_use"
+            android:summary="@string/specify_form_type"
+            android:entries="@array/select_templates_default_entries"
+            android:entryValues="@array/select_templates_default_values"/>
 
     <android.preference.ListPreference
-        android:key="directory_search"
-        android:title="@string/directory_search_method"
-        android:dialogTitle="@string/directory_search_method"
-        android:summary="%s"
-        android:entries="@array/directory_search_entries"
-        android:entryValues="@array/directory_search_values"
-        android:defaultValue="@string/default_directory_search" />
+            android:key="directory_search"
+            android:title="@string/directory_search_method"
+            android:dialogTitle="@string/directory_search_method"
+            android:summary="%s"
+            android:entries="@array/directory_search_entries"
+            android:entryValues="@array/directory_search_values"
+            android:defaultValue="@string/default_directory_search"/>
     <!--
     <CheckBoxPreference android:key="calibrate" android:title="@string/calibrate" android:shouldDisableView="true" android:enabled="false" ></CheckBoxPreference>
     <EditTextPreference android:key="userName" android:title="User Name"></EditTextPreference>

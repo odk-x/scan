@@ -5,10 +5,10 @@
 	    android:id="@+id/exportToODK"
 	    android:title="@string/export_to_ODK" />
    	-->
-    <item 
-	    android:id="@+id/scanNewForm"
-	    android:title="@string/scan_new_form" />
-	<item 
-	    android:id="@+id/startOver"
-	    android:title="@string/main_menu" />
+    <item
+            android:id="@+id/scanNewForm"
+            android:title="@string/scan_new_form"/>
+    <item
+            android:id="@+id/startOver"
+            android:title="@string/main_menu"/>
 </menu>
