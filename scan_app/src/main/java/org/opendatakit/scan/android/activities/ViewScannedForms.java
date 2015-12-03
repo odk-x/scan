@@ -43,7 +43,8 @@ public class ViewScannedForms extends BaseListActivity {
    private ArrayAdapter<String> myAdapter;
 
    // Initialize the application
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
       File dir = new File(ScanUtils.getOutputDirPath());
@@ -55,7 +56,8 @@ public class ViewScannedForms extends BaseListActivity {
       });
 
       myAdapter = new ArrayAdapter<String>(this, R.layout.filename_list_item, photoNames) {
-         @Override public View getView(int position, View convertView, ViewGroup parent) {
+         @Override
+         public View getView(int position, View convertView, ViewGroup parent) {
 
             LinearLayout view = (convertView != null) ?
                 (LinearLayout) convertView :
@@ -83,7 +85,7 @@ public class ViewScannedForms extends BaseListActivity {
 
             //ND restructuring to try and put view scanned forms back in
         /*try {
-					String templatePath = ScanUtils.getTemplatePath(photoName);
+          String templatePath = ScanUtils.getTemplatePath(photoName);
 					Log.i("SCAN", "templatePath " + templatePath);
 
 					String templateName = new File(templatePath).getName();
@@ -135,7 +137,8 @@ public class ViewScannedForms extends BaseListActivity {
 
    }
 
-   @Override public void onResume() {
+   @Override
+   public void onResume() {
       super.onResume();
       myAdapter.notifyDataSetChanged();
    }

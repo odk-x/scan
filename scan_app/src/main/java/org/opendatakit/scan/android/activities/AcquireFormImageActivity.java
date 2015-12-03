@@ -41,7 +41,8 @@ public class AcquireFormImageActivity extends BaseActivity {
 
    // Filter for image files
    private static final FilenameFilter imageFilter = new FilenameFilter() {
-      @Override public boolean accept(File dir, String filename) {
+      @Override
+      public boolean accept(File dir, String filename) {
          for (String extension : imageExtensions) {
             if (filename.endsWith("." + extension)) {
                return true;
@@ -53,7 +54,8 @@ public class AcquireFormImageActivity extends BaseActivity {
 
    // Filter for directories
    private static final FilenameFilter subdirFilter = new FilenameFilter() {
-      @Override public boolean accept(File dir, String filename) {
+      @Override
+      public boolean accept(File dir, String filename) {
          return new File(dir, filename).isDirectory();
       }
    };
@@ -62,7 +64,8 @@ public class AcquireFormImageActivity extends BaseActivity {
    String[] templatePaths;
    Intent processPhoto;
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
       // Default to taking pictures to acquire form images
@@ -96,7 +99,7 @@ public class AcquireFormImageActivity extends BaseActivity {
                throw new Exception("No templates selected");
             }
 
-            templatePaths =  selectedTemplates.toArray(new String[selectedTemplates.size()]);
+            templatePaths = selectedTemplates.toArray(new String[selectedTemplates.size()]);
             extras.putStringArray("templatePaths", templatePaths);
          }
 
@@ -217,7 +220,8 @@ public class AcquireFormImageActivity extends BaseActivity {
       builder.show();
    }
 
-   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+   @Override
+   public void onActivityResult(int requestCode, int resultCode, Intent data) {
       super.onActivityResult(requestCode, resultCode, data);
 
       Log.d(LOG_TAG, "AcquireFormImage onActivityResult " + requestCode);
@@ -302,8 +306,8 @@ public class AcquireFormImageActivity extends BaseActivity {
             // Find the directory search preference
             SharedPreferences settings = PreferenceManager
                 .getDefaultSharedPreferences(getApplicationContext());
-            String dirSearch = settings.getString("directory_search",
-                getString(R.string.default_directory_search));
+            String dirSearch = settings
+                .getString("directory_search", getString(R.string.default_directory_search));
             boolean isRecursive = dirSearch.equals("recursive");
 
             if (processImagesInFolder(dir, isRecursive)) {
@@ -416,13 +420,14 @@ public class AcquireFormImageActivity extends BaseActivity {
 
       // Recurse through each subdirectory
       for (File currDir : dir.listFiles(subdirFilter)) {
-         foundForm  |= processImagesInFolder(currDir, isRecursive);
+         foundForm |= processImagesInFolder(currDir, isRecursive);
       }
 
       return foundForm;
    }
 
-   @Override protected void onDestroy() {
+   @Override
+   protected void onDestroy() {
       //Try to remove the forms directory if the photo couldn't be captured:
       //Note: this won't delete the folder if it has any files in it.
       File capturedImage = new File(ScanUtils.getPhotoPath(photoName));

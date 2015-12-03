@@ -38,7 +38,8 @@ import android.widget.TextView;
 
 public class MainMenuActivity extends BaseActivity {
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main_menu); // Setup the UI
 
@@ -202,12 +203,14 @@ public class MainMenuActivity extends BaseActivity {
       templateText.setTextColor(Color.BLACK);
    }
 
-   @Override public void onResume() {
+   @Override
+   public void onResume() {
       super.onResume();
       updateTemplateText();
    }
 
-   @Override public void onBackPressed() {
+   @Override
+   public void onBackPressed() {
       // This override is used in order to avoid going back to the
       // DisplayProcessedFormActivity activity.
       Intent setIntent = new Intent(Intent.ACTION_MAIN);

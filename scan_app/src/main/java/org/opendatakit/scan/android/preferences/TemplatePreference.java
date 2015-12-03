@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Set;
 
-public class TemplatePreference extends MultiSelectListPreference{
+public class TemplatePreference extends MultiSelectListPreference {
 
    // TODO: For this it would be better to have a template manager like
    // Collect's form manager.
@@ -66,14 +66,15 @@ public class TemplatePreference extends MultiSelectListPreference{
    /**
     * Displays the selected templates
     */
-   @Override public CharSequence getSummary() {
+   @Override
+   public CharSequence getSummary() {
       Set<String> selectedTemplates = getValues();
 
       // Concat the list of template names that are selected
       String templateNameString = "";
-      for (String path: selectedTemplates) {
+      for (String path : selectedTemplates) {
          String[] parts = path.toString().split("/");
-         templateNameString +=  parts[parts.length - 1] + ", ";
+         templateNameString += parts[parts.length - 1] + ", ";
       }
 
       // Fill in the selected template names, or prompt the user for one if none are found
@@ -81,13 +82,15 @@ public class TemplatePreference extends MultiSelectListPreference{
       if (!selectedTemplates.isEmpty()) {
          // Remove the trailing comma and space
          templateNameString = templateNameString.substring(0, templateNameString.length() - 2);
-         summary = String.format(getContext().getString(R.string.specify_form_type), templateNameString);
+         summary = String
+             .format(getContext().getString(R.string.specify_form_type), templateNameString);
       }
 
       return summary;
    }
 
-   @Override protected void onDialogClosed(boolean positiveResult) {
+   @Override
+   protected void onDialogClosed(boolean positiveResult) {
       super.onDialogClosed(positiveResult);
       setSummary(getSummary());
    }

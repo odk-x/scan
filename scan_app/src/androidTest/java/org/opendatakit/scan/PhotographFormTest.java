@@ -81,26 +81,32 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class) @LargeTest public class PhotographFormTest {
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class PhotographFormTest {
 
-   @Rule public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(
+   @Rule
+   public IntentsTestRule<MainMenuActivity> mActivityRule = new IntentsTestRule<>(
        MainMenuActivity.class);
 
    // TODO: Fix these tests
-   @Test public void dummyTest() {
-      assert(true);
+   @Test
+   public void dummyTest() {
+      assert (true);
    }
-   /*
 
+   /*
    //block external intents
-   @Before public void stubAllExternalIntents() {
+   @Before
+   public void stubAllExternalIntents() {
       extendIdleWaitTimeout();
 
       intending(not(isInternal()))
           .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
    }
 
-   @Test public void scanNewForm_cancel() {
+   @Test
+   public void scanNewForm_cancel() {
       //get list of outputs before "Scan New Form"
       String[] photoNames = getPhotoNames();
 
@@ -109,7 +115,7 @@ import static org.hamcrest.Matchers.not;
       onView(withId(R.id.ScanButton)).perform(click());
 
       // TODO: Fix this test
-      assert(true);
+      assert (true);
       /*
       intended(hasAction(MediaStore.ACTION_IMAGE_CAPTURE));
 

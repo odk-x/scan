@@ -57,20 +57,25 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class) @LargeTest public class AppSettingsActivityTest {
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class AppSettingsActivityTest {
    private static final String TEMPLATE_TO_USE = "numbers";
    private static final String PREFERENCE_KEY = "select_templates";
    private static final String NEW_TEMPLATE_NAME = "espresso test";
 
-   @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
+   @Rule
+   public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
        MainMenuActivity.class);
 
    // TODO: Fix these tests
-   @Test public void dummyTest() {
-      assert(true);
+   @Test
+   public void dummyTest() {
+      assert (true);
    }
    /*
-   @Before public void openTemplateChooserFromMain() {
+   @Before
+   public void openTemplateChooserFromMain() {
       extendIdleWaitTimeout();
 
       //Go to AppSettings
@@ -80,12 +85,13 @@ import static org.hamcrest.Matchers.not;
       onView(withText(R.string.template_to_use)).perform(click());
    }
 
-   @Test public void changeTemplateNameDisplay_AppSettings() {
+   @Test
+   public void changeTemplateNameDisplay_AppSettings() {
       //Select template
       onView(withText(TEMPLATE_TO_USE)).perform(click());
 
       // TODO: Fix this test
-      assert(true);
+      assert (true);
       //Check template name is displayed in summary
       /*
       onView(withId(android.R.id.summary)).check(matches(withText(String
@@ -94,14 +100,15 @@ import static org.hamcrest.Matchers.not;
               *
    }
 
-   @Test public void changeTemplateNameDisplay_TemplateText() {
+   @Test
+   public void changeTemplateNameDisplay_TemplateText() {
       //Choose template and go back
       onView(withText(TEMPLATE_TO_USE)).perform(click());
       Espresso.pressBack();
       Espresso.pressBack();
 
       // TODO: Fix this test
-      assert(true);
+      assert (true);
       //Check template name is displayed in the template text view
       /*
       onView(withId(R.id.TemplateText)).check(matches(withText(Html.fromHtml(String.format(
@@ -110,7 +117,8 @@ import static org.hamcrest.Matchers.not;
                   *
    }
 
-   @Test public void templatesToUse_ChoiceDisplay() {
+   @Test
+   public void templatesToUse_ChoiceDisplay() {
       //Retrieve list of templates
       File dir = new File(ScanUtils.getTemplateDirPath());
       String[] templateNames = dir.list(new FilenameFilter() {
@@ -149,7 +157,8 @@ import static org.hamcrest.Matchers.not;
       }
    }
 
-   @Test public void templatesToUse_AddAndRemoveTemplateDisplay() {
+   @Test
+   public void templatesToUse_AddAndRemoveTemplateDisplay() {
       //Copy "example" to "espresso test" to simulate adding a template
       File dir = new File(ScanUtils.getTemplateDirPath());
       File newTemplateDir = new File(dir, NEW_TEMPLATE_NAME);

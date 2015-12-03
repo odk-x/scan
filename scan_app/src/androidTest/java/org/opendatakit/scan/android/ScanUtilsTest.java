@@ -19,7 +19,7 @@ import android.test.AndroidTestCase;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
 public class ScanUtilsTest extends AndroidTestCase {
-   private static final String APP_NAME = "scan";
+   private static final String APP_NAME = "tables";
 
    public void testValuesMatch() {
       String appName = ScanUtils.getODKAppName();

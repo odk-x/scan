@@ -72,38 +72,47 @@ import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@RunWith(AndroidJUnit4.class) @LargeTest public class ViewScannedFormsTest {
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class ViewScannedFormsTest {
    private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
        .substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
 
    // TODO: Fix these tests
-   @Test public void dummyTest() {
-      assert(true);
+   @Test
+   public void dummyTest() {
+      assert (true);
    }
+
    /*
-   @Rule public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
+   @Rule
+   public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
        MainMenuActivity.class);
 
-   @BeforeClass public static void setUp() throws IOException {
+   @BeforeClass
+   public static void setUp() throws IOException {
       //populate dummy data
       copyAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
    }
 
-   @AfterClass public static void cleanUp() throws IOException {
+   @AfterClass
+   public static void cleanUp() throws IOException {
       //delete dummy data
       deleteAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
    }
 
    //Pre-condition to all tests in this class
    //there must be at least one scanned form
-   @Before public void hasAtLeastOneForm() {
+   @Before
+   public void hasAtLeastOneForm() {
       extendIdleWaitTimeout();
 
       onView(withId(R.id.ViewFormsButton)).perform(click());
       onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
    }
 
-   @Test public void viewForms_displayEntries() {
+   @Test
+   public void viewForms_displayEntries() {
       String[] photoNames = getPhotoNames();
 
       //Check if each output is displayed
@@ -127,7 +136,8 @@ import static org.hamcrest.Matchers.not;
       }
    }
 
-   @Test public void viewForms_displayEntriesMetadata() {
+   @Test
+   public void viewForms_displayEntriesMetadata() {
       String[] photoNames = getPhotoNames();
 
       //Check if metadata of each output is displayed correctly
@@ -152,7 +162,8 @@ import static org.hamcrest.Matchers.not;
       }
    }
 
-   @Test public void viewForms_DisplayProcessedForm() {
+   @Test
+   public void viewForms_DisplayProcessedForm() {
       //if first item is green, activity should land on Display Processed Form
       //if otherwise, should stay on the same activity
       try {

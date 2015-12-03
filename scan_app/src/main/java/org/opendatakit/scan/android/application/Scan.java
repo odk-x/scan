@@ -27,27 +27,32 @@ public class Scan extends CommonApplication {
       return singleton;
    }
 
-   @Override public void onCreate() {
+   @Override
+   public void onCreate() {
       singleton = this;
 
       super.onCreate();
    }
 
-   @Override public int getApkDisplayNameResourceId() {
+   @Override
+   public int getApkDisplayNameResourceId() {
       return R.string.app_name;
    }
 
-   @Override public int getConfigZipResourceId() {
+   @Override
+   public int getConfigZipResourceId() {
       // unused -- modify InitializationTask to handle this tool
       return -1;
    }
 
-   @Override public int getSystemZipResourceId() {
+   @Override
+   public int getSystemZipResourceId() {
       // unused -- modify InitializationTask to handle this tool
       return -1;
    }
 
-   @Override public int getWebKitResourceId() {
+   @Override
+   public int getWebKitResourceId() {
       return -1;
    }
 

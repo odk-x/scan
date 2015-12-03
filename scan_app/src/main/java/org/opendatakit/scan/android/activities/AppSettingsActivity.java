@@ -22,13 +22,13 @@ import org.opendatakit.scan.android.utils.ScanUtils;
 
 public class AppSettingsActivity extends BasePreferenceActivity {
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
-      if (getFragmentManager().findFragmentById(android.R.id.content)==null) {
+      if (getFragmentManager().findFragmentById(android.R.id.content) == null) {
          getFragmentManager().beginTransaction()
-             .add(android.R.id.content,
-                 new ScanPreferencesFragment()).commit();
+             .add(android.R.id.content, new ScanPreferencesFragment()).commit();
       }
    }
 

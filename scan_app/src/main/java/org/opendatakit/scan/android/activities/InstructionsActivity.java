@@ -27,17 +27,20 @@ import android.os.Bundle;
 public class InstructionsActivity extends BaseActivity {
 
    // Initialize the application
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
       setContentView(R.layout.bubble_instructions); // Setup the UI
    }
 
-   @Override protected void onPause() {
+   @Override
+   protected void onPause() {
       super.onPause();
    }
 
-   @Override protected void onResume() {
+   @Override
+   protected void onResume() {
       super.onResume();
 
    }

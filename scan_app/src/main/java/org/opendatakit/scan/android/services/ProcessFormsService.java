@@ -43,7 +43,8 @@ public class ProcessFormsService extends IntentService {
       super("ProcessFormsService");
    }
 
-   @Override public void onHandleIntent(Intent intent) {
+   @Override
+   public void onHandleIntent(Intent intent) {
 
       final Context context = getApplicationContext();
       final int notificationId = (int) (Math.random() * 9999999);
@@ -71,8 +72,7 @@ public class ProcessFormsService extends IntentService {
           .setSmallIcon(android.R.drawable.status_bar_item_background)
           .setContentText(this.getString(R.string.begin_processing))
           .setContentIntent(PendingIntent.getActivity(context, 0, waitingIntent, 0))
-          .setWhen(System.currentTimeMillis())
-          .build();
+          .setWhen(System.currentTimeMillis()).build();
       notificationManager.notify(notificationId, beginNotification);
 
       // Send the config to the cpp, start processing and block until completion
@@ -101,10 +101,9 @@ public class ProcessFormsService extends IntentService {
          resultNotification = new Notification.Builder(context)
              .setContentTitle(NOTIFICATION_APP_TITLE)
              .setSmallIcon(android.R.drawable.stat_notify_more)
-             .setContentText(this.getString(R.string.finished_processing))
-             .setContentIntent(PendingIntent.getActivity(context, notificationId, finishedIntent, 0))
-             .setWhen(System.currentTimeMillis())
-             .build();
+             .setContentText(this.getString(R.string.finished_processing)).setContentIntent(
+                 PendingIntent.getActivity(context, notificationId, finishedIntent, 0))
+             .setWhen(System.currentTimeMillis()).build();
 
       } else {
          // Construct a notification that we had an error processing the form
@@ -117,12 +116,11 @@ public class ProcessFormsService extends IntentService {
              .setSmallIcon(android.R.drawable.stat_notify_error)
              .setContentText(this.getString(R.string.error_processing))
              .setContentIntent(PendingIntent.getActivity(context, notificationId, errorIntent, 0))
-             .setWhen(System.currentTimeMillis())
-             .build();
+             .setWhen(System.currentTimeMillis()).build();
       }
 
       resultNotification.flags |= Notification.FLAG_AUTO_CANCEL;
-      notificationManager.notify(notificationId,resultNotification);
+      notificationManager.notify(notificationId, resultNotification);
 
    }
 

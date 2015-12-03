@@ -14,14 +14,13 @@
 
 package org.opendatakit.scan.android.fragments;
 
-
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import org.opendatakit.scan.android.R;
 
-
 public class ScanPreferencesFragment extends PreferenceFragment {
-   @Override public void onCreate(Bundle savedInstanceState) {
+   @Override
+   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
       addPreferencesFromResource(R.xml.prefs);

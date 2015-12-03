@@ -85,7 +85,8 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 
    private Intent tablesIntent;
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       try {
          setContentView(R.layout.processed_form);
@@ -163,7 +164,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
             saveData.setOnClickListener(new View.OnClickListener() {
                public void onClick(View v) {
                   Log.i(LOG_TAG, "Using template: " + templatePath);
-						/* Uncomment if you want Scan to launch Tables
+            /* Uncomment if you want Scan to launch Tables
 						//TODO: tablesIntent is still null if Tables not installed.
 						if(isTablesInstalled) {
 							if(tablesIntent.getData() == null) {
@@ -223,11 +224,11 @@ public class DisplayProcessedFormActivity extends BaseActivity {
          AlertDialog.Builder builder = new AlertDialog.Builder(this);
          builder.setMessage(e.toString()).setCancelable(false)
              .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                       dialog.cancel();
-                       finish();
-                    }
-                 });
+                public void onClick(DialogInterface dialog, int id) {
+                   dialog.cancel();
+                   finish();
+                }
+             });
          AlertDialog alert = builder.create();
          alert.show();
       }
@@ -356,7 +357,8 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       return tablesIntent != null;
    }
 
-   @Override protected Dialog onCreateDialog(int id, Bundle args) {
+   @Override
+   protected Dialog onCreateDialog(int id, Bundle args) {
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
       builder.setTitle("Exporting...");
       builder.setCancelable(false);
@@ -395,7 +397,8 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       startActivityForResult(createInstanceIntent, RequestCode.toInt(requestCode));
    }
 
-   @Override protected void onActivityResult(int requestCodeInt, int resultCode, Intent data) {
+   @Override
+   protected void onActivityResult(int requestCodeInt, int resultCode, Intent data) {
       // TODO: dismissDialog(0);
       RequestCode requestCode = RequestCode.fromInt(requestCodeInt);
 
@@ -433,14 +436,16 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       super.onActivityResult(requestCodeInt, resultCode, data);
    }
 
-   @Override public boolean onCreateOptionsMenu(Menu menu) {
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
       //if(morePagesToScan) return false;
       MenuInflater inflater = getMenuInflater();
       inflater.inflate(R.menu.mscan_menu, menu);
       return true;
    }
 
-   @Override public boolean onOptionsItemSelected(MenuItem item) {
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
       // Handle item selection
       Intent intent;
       int itemId = item.getItemId();

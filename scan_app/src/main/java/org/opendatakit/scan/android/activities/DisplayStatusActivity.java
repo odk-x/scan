@@ -40,13 +40,15 @@ public class DisplayStatusActivity extends BaseActivity {
 
    private static final String LOG_TAG = "ODKScan";
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       // TODO Auto-generated method stub
       super.onCreate(savedInstanceState);
       displayStatus(getIntent());
    }
 
-   @Override protected void onNewIntent(Intent intent) {
+   @Override
+   protected void onNewIntent(Intent intent) {
       // TODO Auto-generated method stub
       super.onNewIntent(intent);
       displayStatus(intent);
@@ -90,11 +92,11 @@ public class DisplayStatusActivity extends BaseActivity {
          AlertDialog.Builder builder = new AlertDialog.Builder(this);
          builder.setMessage(e.toString()).setCancelable(false)
              .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                       dialog.cancel();
-                       finish();
-                    }
-                 });
+                public void onClick(DialogInterface dialog, int id) {
+                   dialog.cancel();
+                   finish();
+                }
+             });
          AlertDialog alert = builder.create();
          alert.show();
       }

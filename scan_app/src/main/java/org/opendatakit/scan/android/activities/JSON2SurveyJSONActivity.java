@@ -90,7 +90,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
    WebView myWebView;
 
-   @Override protected void onCreate(Bundle savedInstanceState) {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
       Bundle extras = getIntent().getExtras();
@@ -163,7 +164,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       // wait for databaseAvailable to do any further processing
    }
 
-   @Override public void onPostResume() {
+   @Override
+   public void onPostResume() {
 
       super.onPostResume();
       Scan.getInstance().establishDatabaseConnectionListener(this);
@@ -695,8 +697,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
             Log.i(LOG_TAG,
                 "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
             Scan.getInstance().getDatabase()
-                .insertRowWithId(ScanUtils.getODKAppName(), db, tableId,
-                    orderedColumns, tablesValues, rowId);
+                .insertRowWithId(ScanUtils.getODKAppName(), db, tableId, orderedColumns,
+                    tablesValues, rowId);
          }
          setIntentToReturn(tableId, formId, rowId, RESULT_OK);
       } catch (Exception e) {
@@ -925,8 +927,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
                Log.i(LOG_TAG,
                    "Writing db values for row:" + rowId + " values:" + dbValuesToWrite.toString());
                Scan.getInstance().getDatabase()
-                   .insertRowWithId(ScanUtils.getODKAppName(), db, tableId,
-                       orderedColumns, tablesValues, rowId);
+                   .insertRowWithId(ScanUtils.getODKAppName(), db, tableId, orderedColumns,
+                       tablesValues, rowId);
             }
          }
          setIntentToReturn(tableId, subformId, rowId, RESULT_OK);
