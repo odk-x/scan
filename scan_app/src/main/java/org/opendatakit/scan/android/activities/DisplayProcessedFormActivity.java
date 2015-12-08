@@ -407,7 +407,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
         saveData.setEnabled(false);
         saveData.setText("saved");
         /* Uncomment to launch tables
-				tablesIntent.putExtras(data);
+        tablesIntent.putExtras(data);
 				tablesIntent.setData(data.getData()); */
         // Launch survey
         surveyIntent.putExtras(data);

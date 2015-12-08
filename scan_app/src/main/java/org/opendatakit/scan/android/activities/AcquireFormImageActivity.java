@@ -23,6 +23,7 @@ import org.opendatakit.scan.android.utils.ScanUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -373,11 +374,24 @@ public class AcquireFormImageActivity extends BaseActivity {
     // Process all the images in the folder
     for (File curr : dir.listFiles(ScanUtils.imageFilter)) {
       try {
+        String pre_aligned_name = curr.getName();
+        if (!pre_aligned_name.contains("_photo.jpg")) {
+          Log.d(LOG_TAG, "Skipping image: " + pre_aligned_name);
+          continue;
+        }
+
         prepareToProcessForm();
+
+        Log.d(LOG_TAG, "Found pre-aligned image: " + pre_aligned_name);
+        String clientID = pre_aligned_name.substring(0, pre_aligned_name.indexOf("_photo"));
 
         // Copy the new file into the Scan file system
         File destFile = new File(ScanUtils.getPhotoPath(photoName));
         FileUtils.copyFile(curr, destFile);
+        PrintWriter clientIDFile = new PrintWriter(
+            ScanUtils.getOutputPath(photoName) + "/clientID.txt");
+        clientIDFile.print(clientID);
+        clientIDFile.close();
 
         Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
         startService(processPhoto);
