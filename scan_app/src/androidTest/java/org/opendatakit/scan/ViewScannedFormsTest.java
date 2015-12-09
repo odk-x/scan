@@ -75,8 +75,8 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ViewScannedFormsTest {
-  private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
-      .substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
+  //private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
+  //.substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
 
   // TODO: Fix these tests
   @Test

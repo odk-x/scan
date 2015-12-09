@@ -15,18 +15,27 @@
 package org.opendatakit.scan.android.activities;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
+import android.app.*;
 import android.graphics.Color;
+import android.opengl.Visibility;
 import android.os.*;
 import android.text.Html;
+import android.util.Log;
 import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.common.android.activities.IAppAwareActivity;
+import org.opendatakit.common.android.activities.IInitResumeActivity;
+import org.opendatakit.common.android.activities.ODKActivity;
+import org.opendatakit.common.android.utilities.ODKFileUtils;
+import org.opendatakit.common.android.utilities.WebLogger;
+import org.opendatakit.common.android.views.ICallbackFragment;
 import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.tasks.RunSetup;
+import org.opendatakit.scan.android.application.Scan;
+import org.opendatakit.scan.android.fragments.InitializationFragment;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,20 +45,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainMenuActivity extends BaseActivity {
+public class MainMenuActivity extends BaseActivity implements IInitResumeActivity {
+  private static final String LOG_TAG = "ODKScan";
+  private Fragment mInitFragment;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     setContentView(R.layout.main_menu); // Setup the UI
 
     SharedPreferences settings = PreferenceManager
         .getDefaultSharedPreferences(getApplicationContext());
 
     try {
-      // Create the app folder if it doesn't exist:
-      new File(ScanUtils.appFolder).mkdirs();
-      checkSDCard();
       PackageInfo packInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
       {
         // dynamically construct the main screen version string
@@ -60,18 +69,9 @@ public class MainMenuActivity extends BaseActivity {
       int storedVersionCode = settings.getInt("version", 0);
       int appVersionCode = packInfo.versionCode;
       if (appVersionCode == 0 || storedVersionCode < appVersionCode) {
-        final ProgressDialog pd = ProgressDialog
-            .show(this, "Please wait...", "Extracting assets", true);
-
-        final Handler handler = new Handler(new Handler.Callback() {
-          public boolean handleMessage(Message message) {
-            updateTemplateText();
-            pd.dismiss();
-            return true;
-          }
-        });
-
-        AsyncTask.execute(new RunSetup(handler, settings, getAssets(), appVersionCode));
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("version", appVersionCode);
+        editor.commit();
       }
     } catch (Exception e) {
       // Display an error dialog if something goes wrong.
@@ -145,30 +145,6 @@ public class MainMenuActivity extends BaseActivity {
     });
   }
 
-  /**
-   * Throw an exception if there is no storage or not enough space.
-   *
-   * @throws Exception
-   */
-  private void checkSDCard() throws Exception {
-    // http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
-    String state = Environment.getExternalStorageState();
-
-    if (Environment.MEDIA_MOUNTED.equals(state)) {
-      // We can read and write the media
-      // Now Check that there is room to store more images
-      final int APROX_IMAGE_SIZE = 1000000;
-      long usableSpace = ScanUtils.getUsableSpace(ScanUtils.appFolder);
-      if (usableSpace >= 0 && usableSpace < 4 * APROX_IMAGE_SIZE) {
-        throw new Exception("It looks like there isn't enough space to store more images.");
-      }
-    } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-      throw new Exception("We cannot write the media.");
-    } else {
-      throw new Exception("We can neither read nor write the media.");
-    }
-  }
-
   private void updateTemplateText() {
     SharedPreferences settings = PreferenceManager
         .getDefaultSharedPreferences(getApplicationContext());
@@ -219,16 +195,56 @@ public class MainMenuActivity extends BaseActivity {
     startActivity(setIntent);
   }
 
+  private void initializeFileSystem() {
+    /* TODO: Check if we need to initialize
+    if (!Scan.getInstance().shouldRunInitializationTask(getAppName())) {
+      return;
+    }
+    */
+
+    // Ensuring ODK directories exist
+    ODKFileUtils.verifyExternalStorageAvailability();
+
+    FragmentManager fragmentManager = getFragmentManager();
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+    mInitFragment = new InitializationFragment();
+    fragmentTransaction.add(R.id.fragment_container, mInitFragment).commit();
+
+    ODKFileUtils.assertDirectoryStructure(ScanUtils.getODKAppName());
+
+    /* TODO: Prevent initializaiton rerun
+    Scan.getInstance().clearRunInitializationTask(getAppName());
+    */
+
+  }
+
+  @Override
   public void databaseAvailable() {
-    // TODO Auto-generated method stub
-
+    initializeFileSystem();
   }
 
+  @Override
   public void databaseUnavailable() {
-    // TODO Auto-generated method stub
-
+    initializeFileSystem();
   }
 
+  @Override
+  public void onPostResume() {
+    super.onPostResume();
+    Scan.getInstance().establishDatabaseConnectionListener(this);
+  }
+
+  @Override
+  public void initializationCompleted() {
+    FragmentManager fragmentManager = getFragmentManager();
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    fragmentTransaction.remove(mInitFragment).commit();
+
+    findViewById(R.id.fragment_container).setVisibility(View.GONE);
+  }
+
+  @Override
   public String getAppName() {
     return ScanUtils.getODKAppName();
   }

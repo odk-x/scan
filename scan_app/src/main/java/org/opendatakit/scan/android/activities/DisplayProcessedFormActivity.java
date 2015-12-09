@@ -186,7 +186,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
             Log.i(LOG_TAG, "Using template: " + templatePath);
 
 						/* Uncomment to Launch Tables
-						//TODO: tablesIntent is still null if Tables not installed.
+            //TODO: tablesIntent is still null if Tables not installed.
 						if(isTablesInstalled) {
 							if(tablesIntent.getData() == null) {
 								exportToTables(RequestCode.TRANSCRIBE);
@@ -406,7 +406,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
         Button saveData = (Button) findViewById(R.id.saveBtn);
         saveData.setEnabled(false);
         saveData.setText("saved");
-				/* Uncomment to launch tables
+        /* Uncomment to launch tables
 				tablesIntent.putExtras(data);
 				tablesIntent.setData(data.getData()); */
         // Launch survey

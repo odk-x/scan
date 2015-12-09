@@ -439,7 +439,7 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
   vector<double> features;
 
   // TODO: Don't hard code this
-  string weight_file_path = "/storage/emulated/0/ODKScan/training_models/numbers/mlp_all_classes.txt";
+  string weight_file_path = "/storage/emulated/0/opendatakit/tables/system/scan/training_models/numbers/mlp_all_classes.txt";
 
   ifstream infile(weight_file_path.c_str());
   int num_hidden_units;

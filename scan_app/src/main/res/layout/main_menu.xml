@@ -13,6 +13,11 @@
             android:contentDescription="ODKScan title"
             android:src="@drawable/odk_scan_logo"/>
 
+    <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     <Button
             android:id="@+id/ScanButton"
             style="@style/StandardButton"

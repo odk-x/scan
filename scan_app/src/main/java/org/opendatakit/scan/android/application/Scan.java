@@ -41,14 +41,12 @@ public class Scan extends CommonApplication {
 
   @Override
   public int getConfigZipResourceId() {
-    // unused -- modify InitializationTask to handle this tool
-    return -1;
+    return R.raw.configzip;
   }
 
   @Override
   public int getSystemZipResourceId() {
-    // unused -- modify InitializationTask to handle this tool
-    return -1;
+    return R.raw.systemzip;
   }
 
   @Override
