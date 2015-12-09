@@ -352,6 +352,7 @@ public class AcquireFormImageActivity extends BaseActivity {
     JSONObject config = new JSONObject();
     try {
       config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
+      config.put("trainingModelDirectory", ScanUtils.getTrainedModelDir());
       config.put("inputImage", inputPath);
       config.put("outputDirectory", outputPath);
       config.put("templatePaths", new JSONArray(Arrays.asList(templatePaths)));

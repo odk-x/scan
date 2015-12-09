@@ -432,14 +432,11 @@ void NumberClassifier::print_results(void) {
     std::cout << "Total: " << total_correct << "/" << c_numbers << std::endl;
 }
 
-Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location, int classifier_height, int classifier_width) {
+Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location, const string weight_file_path, int classifier_height, int classifier_width) {
 
 	Json::Value output;
 	cv::Mat query_pixels;
   vector<double> features;
-
-  // TODO: Don't hard code this
-  string weight_file_path = "/storage/emulated/0/opendatakit/tables/system/scan/training_models/numbers/mlp_all_classes.txt";
 
   ifstream infile(weight_file_path.c_str());
   int num_hidden_units;

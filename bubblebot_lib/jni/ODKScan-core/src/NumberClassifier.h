@@ -111,7 +111,7 @@ public:
             }
         };
     
-    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location, int classifier_height, int classifier_width);
+    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location, const string weight_file_path, int classifier_height, int classifier_width);
     void print_results(void);
     void print_rois(void);
 };

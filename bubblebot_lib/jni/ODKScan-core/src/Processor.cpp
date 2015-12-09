@@ -346,7 +346,7 @@ class Processor::ProcessorImpl
 {
 public:
 	string trainingDataPath;
-	bool trainedNumberClassifier;
+  string trainingModelPath;
 	Mat formImage;
 	Aligner aligner;
 private:
@@ -365,24 +365,6 @@ private:
 	#ifdef TIME_IT
 		clock_t init;
 	#endif
-
-
-//Creates a number classifier
-// TODO: Rename this, since it no longer trains anything
-void trainNumberClassifier(const Json::Value& classifier)
-{
-	//Currently classifier directory does nothing. Need to remove it.
-	std::string classifyDirectory("/storage/emulated/0/ODKScan/output/test/");
-
-	std::string trainingPath = trainingDataPath + "numbers/";
-	//Hardcoding some values for now based on the size of the box in the training set
-	//Want to change this later.
-	numberClassifier = NumberClassifier(classifyDirectory, trainingPath, 40, 60, 15, 15);
-	trainedNumberClassifier = true;
-
-	LOGI("Trained number classifier...");
-
-}
 
 //Creates a classifier based on the given JSON classifier specification.
 //Classifiers are cached in memory via the "classifiers" map. 
@@ -404,8 +386,14 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 	if( it == classifiers.end() ) {
 		//PCA_classifier classifier = classifiers[key];
 		classifiers[key] = Ptr<PCA_classifier>(new PCA_classifier);
-		
-		string dataPath = trainingDataPath + training_data_uri;
+
+    // TODO: Generalize this instead of hard coding numbers as the exception
+    string dataPath = "";
+    if (training_data_uri.compare("numbers") == 0) {
+      dataPath = trainingModelPath + training_data_uri + "/mlp_all_classes.txt";
+    } else {
+      dataPath = trainingDataPath + training_data_uri;
+    }
 		string cachedDataPath = dataPath + "/cached_classifier_data_" + ss.str() + ".yml";
 
 		classifiers[key]->set_classifier_params(classifier);
@@ -427,7 +415,7 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 				CV_Error( -1, "Could not find classifier data: " + dataPath);
 			}
 			CrawlFileTree(dataPath, filepaths);//TODO: Check if this dir exists and show a log message if not.
-			
+
 			/*
 			#ifdef DEBUG_PROCESSOR
 				cout << dataPath << endl;
@@ -556,9 +544,6 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		if (classifierJson.get("training_data_uri", 0) == "numbers")
 		{
 			LOGI("Classifying numbers");
-			if (!trainedNumberClassifier) {
-				trainNumberClassifier (classifierJson);
-			}
 
 			//HARDCODING SIZE OF NUMBERS FOR NOW!!!!
 			int classifier_height = 28;
@@ -566,6 +551,9 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			//Uncomment these lines to use the classifier size specified in the template.json
 			//int classifier_height = classifierJson.get("classifier_height", 28).asInt();
 			//int classifier_width = classifierJson.get("classifier_width", 20).asInt();
+
+      //HARDCODING NAME OF CLASSIFIER MODEL FOR NOW!!!!
+      string dataPath = trainingModelPath + "numbers/mlp_all_classes.txt";
 
 			vector<Point> locations;
 			for (size_t i = 0; i < items.size(); i++) {
@@ -577,7 +565,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			//Classify items
 			for (size_t i = 0; i < items.size(); i++) {
 				Json::Value itemJsonOut = items[i];
-				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i], classifier_height, classifier_width);
+				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i], dataPath, classifier_height, classifier_width);
 
 				//std::stringstream ss;
 				//ss << classifiedNumber;
@@ -999,12 +987,13 @@ int detectForm(){
 /* This stuff hooks the Processor class up to the implementation class: */
 Processor::Processor() : processorImpl(new ProcessorImpl()){
 	processorImpl->trainingDataPath = "training_examples/";
-	processorImpl->trainedNumberClassifier = false;
+  processorImpl->trainingModelPath = "training_models/";
 	LOGI("Processor successfully constructed.");
 }
 
 Processor::Processor(const char* appRootDir) : processorImpl(new ProcessorImpl()){
 	processorImpl->trainingDataPath = addSlashIfNeeded(appRootDir) + "training_examples/";
+  processorImpl->trainingModelPath = addSlashIfNeeded(appRootDir) + "training_models/";
 	LOGI("Processor successfully constructed.");
 }
 
@@ -1088,6 +1077,7 @@ It expects a JSON string like this:
 	"templatePaths" : [],
 	"calibrationFilePath" : "",
 	"trainingDataDirectory" : "training_examples/",
+  "trainingModelDirectory" : "training_models/",
 	"detectOrientation" : false
 }
 You only need to specify the inputImage, outputDirectory and templatePath(s).
@@ -1194,6 +1184,7 @@ const string Processor::processViaJSON(const char* jsonString) {
 
 		if(config.get("processForm", true).asBool()){
 			processorImpl->trainingDataPath = config.get("trainingDataDirectory", "training_examples/").asString();
+      processorImpl->trainingModelPath = config.get("trainingModelDirectory", "training_models/").asString();
 			string normalizedOutDir = addSlashIfNeeded(outputDirectory);
 			string jsonOutputPath = config.get("jsonOutputPath",
 					normalizedOutDir + "output.json").asString();

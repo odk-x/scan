@@ -30,6 +30,7 @@ passed in that aren't yet supported.
 	"templatePaths" : [],
 	"calibrationFilePath" : "",
 	"trainingDataDirectory" : "training_examples/"
+  "trainingModelDirectory" : "training_models/"
 }
 ```
 

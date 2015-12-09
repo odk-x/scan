@@ -174,13 +174,8 @@ public class ScanUtils {
   }
 
   // TODO: Remove trailing slash
-  public static String getTrainedModelDir(String classifier) {
-    return getSystemPath() + File.separator + trainingModelDirName + File.separator + classifier
-        + File.separator;
-  }
-
-  public static String getNumberClassifierModel() {
-    return getTrainedModelDir("numbers") + numberModule;
+  public static String getTrainedModelDir() {
+    return getSystemPath() + File.separator + trainingModelDirName + File.separator;
   }
 
   public static void displayImageInWebView(WebView myWebView, String imagePath) {
