@@ -36,92 +36,90 @@ import org.opendatakit.scan.android.activities.DisplayStatusActivity;
  */
 public class ProcessFormsService extends IntentService {
 
-   private static final String LOG_TAG = "ODKScan";
-   private static final String NOTIFICATION_APP_TITLE = "ODK Scan";
+  private static final String LOG_TAG = "ODKScan";
+  private static final String NOTIFICATION_APP_TITLE = "ODK Scan";
 
-   public ProcessFormsService() {
-      super("ProcessFormsService");
-   }
+  public ProcessFormsService() {
+    super("ProcessFormsService");
+  }
 
-   @Override
-   public void onHandleIntent(Intent intent) {
+  @Override
+  public void onHandleIntent(Intent intent) {
 
-      final Context context = getApplicationContext();
-      final int notificationId = (int) (Math.random() * 9999999);
-      final NotificationManager notificationManager = (NotificationManager) getSystemService(
-          Context.NOTIFICATION_SERVICE);
+    final Context context = getApplicationContext();
+    final int notificationId = (int) (Math.random() * 9999999);
+    final NotificationManager notificationManager = (NotificationManager) getSystemService(
+        Context.NOTIFICATION_SERVICE);
 
-      // Retrieve input parameters
-      final Bundle extras = intent.getExtras();
-      if (extras == null) {
-         Log.e(LOG_TAG, this.getString(R.string.error_background_exception));
-         Log.e(LOG_TAG, this.getString(R.string.error_missing_intent));
-      }
-      final String configJSON = extras.getString("config");
-      if (configJSON == null) {
-         Log.e(LOG_TAG, this.getString(R.string.error_background_exception));
-         Log.e(LOG_TAG, this.getString(R.string.error_missing_config));
-      }
+    // Retrieve input parameters
+    final Bundle extras = intent.getExtras();
+    if (extras == null) {
+      Log.e(LOG_TAG, this.getString(R.string.error_background_exception));
+      Log.e(LOG_TAG, this.getString(R.string.error_missing_intent));
+    }
+    final String configJSON = extras.getString("config");
+    if (configJSON == null) {
+      Log.e(LOG_TAG, this.getString(R.string.error_background_exception));
+      Log.e(LOG_TAG, this.getString(R.string.error_missing_config));
+    }
 
-      // Send a notification that we have begun processing the form
-      Intent waitingIntent = new Intent(context, DisplayStatusActivity.class);
-      waitingIntent.putExtras(extras);
+    // Send a notification that we have begun processing the form
+    Intent waitingIntent = new Intent(context, DisplayStatusActivity.class);
+    waitingIntent.putExtras(extras);
 
-      Notification beginNotification = new Notification.Builder(context)
-          .setContentTitle(NOTIFICATION_APP_TITLE)
-          .setSmallIcon(android.R.drawable.status_bar_item_background)
-          .setContentText(this.getString(R.string.begin_processing))
-          .setContentIntent(PendingIntent.getActivity(context, 0, waitingIntent, 0))
+    Notification beginNotification = new Notification.Builder(context)
+        .setContentTitle(NOTIFICATION_APP_TITLE)
+        .setSmallIcon(android.R.drawable.status_bar_item_background)
+        .setContentText(this.getString(R.string.begin_processing))
+        .setContentIntent(PendingIntent.getActivity(context, 0, waitingIntent, 0))
+        .setWhen(System.currentTimeMillis()).build();
+    notificationManager.notify(notificationId, beginNotification);
+
+    // Send the config to the cpp, start processing and block until completion
+    Log.i(LOG_TAG, "Using data = " + configJSON);
+    final Processor mProcessor = new Processor();//ScanUtils.appFolder
+    String jsonString = mProcessor.processViaJSON(configJSON);
+
+    // Check for errors in parsing
+    JSONObject resultJSON = null;
+    String errorMessage = "";
+    try {
+      resultJSON = new JSONObject(jsonString);
+      errorMessage = resultJSON.optString("errorMessage");
+    } catch (JSONException e) {
+      Log.i(LOG_TAG, "Unparsable JSON: " + jsonString);
+    }
+
+    Notification resultNotification;
+    if (errorMessage.length() == 0 && resultJSON != null) {
+      // Construct a notification that we have finished processing the form
+      Intent finishedIntent = new Intent(context, DisplayProcessedFormActivity.class);
+      extras.putString("result", jsonString);
+      extras.putString("templatePath", resultJSON.optString("templatePath"));
+      finishedIntent.putExtras(extras);
+
+      resultNotification = new Notification.Builder(context).setContentTitle(NOTIFICATION_APP_TITLE)
+          .setSmallIcon(android.R.drawable.stat_notify_more)
+          .setContentText(this.getString(R.string.finished_processing))
+          .setContentIntent(PendingIntent.getActivity(context, notificationId, finishedIntent, 0))
           .setWhen(System.currentTimeMillis()).build();
-      notificationManager.notify(notificationId, beginNotification);
 
-      // Send the config to the cpp, start processing and block until completion
-      Log.i(LOG_TAG, "Using data = " + configJSON);
-      final Processor mProcessor = new Processor();//ScanUtils.appFolder
-      String jsonString = mProcessor.processViaJSON(configJSON);
+    } else {
+      // Construct a notification that we had an error processing the form
+      Intent errorIntent = new Intent(context, DisplayStatusActivity.class);
+      extras.putString("result", jsonString);
+      errorIntent.putExtras(extras);
 
-      // Check for errors in parsing
-      JSONObject resultJSON = null;
-      String errorMessage = "";
-      try {
-         resultJSON = new JSONObject(jsonString);
-         errorMessage = resultJSON.optString("errorMessage");
-      } catch (JSONException e) {
-         Log.i(LOG_TAG, "Unparsable JSON: " + jsonString);
-      }
+      resultNotification = new Notification.Builder(context).setContentTitle(NOTIFICATION_APP_TITLE)
+          .setSmallIcon(android.R.drawable.stat_notify_error)
+          .setContentText(this.getString(R.string.error_processing))
+          .setContentIntent(PendingIntent.getActivity(context, notificationId, errorIntent, 0))
+          .setWhen(System.currentTimeMillis()).build();
+    }
 
-      Notification resultNotification;
-      if (errorMessage.length() == 0 && resultJSON != null) {
-         // Construct a notification that we have finished processing the form
-         Intent finishedIntent = new Intent(context, DisplayProcessedFormActivity.class);
-         extras.putString("result", jsonString);
-         extras.putString("templatePath", resultJSON.optString("templatePath"));
-         finishedIntent.putExtras(extras);
+    resultNotification.flags |= Notification.FLAG_AUTO_CANCEL;
+    notificationManager.notify(notificationId, resultNotification);
 
-         resultNotification = new Notification.Builder(context)
-             .setContentTitle(NOTIFICATION_APP_TITLE)
-             .setSmallIcon(android.R.drawable.stat_notify_more)
-             .setContentText(this.getString(R.string.finished_processing)).setContentIntent(
-                 PendingIntent.getActivity(context, notificationId, finishedIntent, 0))
-             .setWhen(System.currentTimeMillis()).build();
-
-      } else {
-         // Construct a notification that we had an error processing the form
-         Intent errorIntent = new Intent(context, DisplayStatusActivity.class);
-         extras.putString("result", jsonString);
-         errorIntent.putExtras(extras);
-
-         resultNotification = new Notification.Builder(context)
-             .setContentTitle(NOTIFICATION_APP_TITLE)
-             .setSmallIcon(android.R.drawable.stat_notify_error)
-             .setContentText(this.getString(R.string.error_processing))
-             .setContentIntent(PendingIntent.getActivity(context, notificationId, errorIntent, 0))
-             .setWhen(System.currentTimeMillis()).build();
-      }
-
-      resultNotification.flags |= Notification.FLAG_AUTO_CANCEL;
-      notificationManager.notify(notificationId, resultNotification);
-
-   }
+  }
 
 }

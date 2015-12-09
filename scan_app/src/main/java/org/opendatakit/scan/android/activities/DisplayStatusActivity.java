@@ -38,81 +38,81 @@ import android.widget.TextView;
  */
 public class DisplayStatusActivity extends BaseActivity {
 
-   private static final String LOG_TAG = "ODKScan";
+  private static final String LOG_TAG = "ODKScan";
 
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-      // TODO Auto-generated method stub
-      super.onCreate(savedInstanceState);
-      displayStatus(getIntent());
-   }
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    // TODO Auto-generated method stub
+    super.onCreate(savedInstanceState);
+    displayStatus(getIntent());
+  }
 
-   @Override
-   protected void onNewIntent(Intent intent) {
-      // TODO Auto-generated method stub
-      super.onNewIntent(intent);
-      displayStatus(intent);
-   }
+  @Override
+  protected void onNewIntent(Intent intent) {
+    // TODO Auto-generated method stub
+    super.onNewIntent(intent);
+    displayStatus(intent);
+  }
 
-   protected void displayStatus(Intent intent) {
-      try {
-         setContentView(R.layout.status);
+  protected void displayStatus(Intent intent) {
+    try {
+      setContentView(R.layout.status);
 
-         Bundle extras = intent.getExtras();
-         if (extras == null) {
-            throw new Exception("Missing extras in the bundle.");
-         }
-
-         String photoName = extras.getString("photoName");
-         Log.i(LOG_TAG, ScanUtils.getPhotoPath(photoName));
-         ScanUtils.displayImageInWebView((WebView) findViewById(R.id.webview),
-             ScanUtils.getPhotoPath(photoName));
-
-         if (extras.containsKey("result")) {
-            JSONObject result = new JSONObject();
-            try {
-               result = new JSONObject(extras.getString("result"));
-            } catch (JSONException e) {
-               result.put("errorMessage", "Unparsable JSON: " + extras.getString("result"));
-            }
-
-            String errorMessage = result.optString("errorMessage");
-
-            if (errorMessage != null) {
-               ((TextView) findViewById(R.id.statusMessage)).setText(errorMessage);
-            }
-
-         } else {
-            ((TextView) findViewById(R.id.statusMessage)).setText(
-                "Once this image is processed a notification will appear in your notification tray.");
-         }
-
-      } catch (Exception e) {
-         // Display an error dialog if something goes wrong.
-         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-         builder.setMessage(e.toString()).setCancelable(false)
-             .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                   dialog.cancel();
-                   finish();
-                }
-             });
-         AlertDialog alert = builder.create();
-         alert.show();
+      Bundle extras = intent.getExtras();
+      if (extras == null) {
+        throw new Exception("Missing extras in the bundle.");
       }
-   }
 
-   public void databaseAvailable() {
-      // TODO Auto-generated method stub
+      String photoName = extras.getString("photoName");
+      Log.i(LOG_TAG, ScanUtils.getPhotoPath(photoName));
+      ScanUtils.displayImageInWebView((WebView) findViewById(R.id.webview),
+          ScanUtils.getPhotoPath(photoName));
 
-   }
+      if (extras.containsKey("result")) {
+        JSONObject result = new JSONObject();
+        try {
+          result = new JSONObject(extras.getString("result"));
+        } catch (JSONException e) {
+          result.put("errorMessage", "Unparsable JSON: " + extras.getString("result"));
+        }
 
-   public void databaseUnavailable() {
-      // TODO Auto-generated method stub
+        String errorMessage = result.optString("errorMessage");
 
-   }
+        if (errorMessage != null) {
+          ((TextView) findViewById(R.id.statusMessage)).setText(errorMessage);
+        }
 
-   public String getAppName() {
-      return ScanUtils.getODKAppName();
-   }
+      } else {
+        ((TextView) findViewById(R.id.statusMessage)).setText(
+            "Once this image is processed a notification will appear in your notification tray.");
+      }
+
+    } catch (Exception e) {
+      // Display an error dialog if something goes wrong.
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      builder.setMessage(e.toString()).setCancelable(false)
+          .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+              dialog.cancel();
+              finish();
+            }
+          });
+      AlertDialog alert = builder.create();
+      alert.show();
+    }
+  }
+
+  public void databaseAvailable() {
+    // TODO Auto-generated method stub
+
+  }
+
+  public void databaseUnavailable() {
+    // TODO Auto-generated method stub
+
+  }
+
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

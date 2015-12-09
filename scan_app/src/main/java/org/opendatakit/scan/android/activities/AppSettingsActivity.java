@@ -22,17 +22,17 @@ import org.opendatakit.scan.android.utils.ScanUtils;
 
 public class AppSettingsActivity extends BasePreferenceActivity {
 
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-      if (getFragmentManager().findFragmentById(android.R.id.content) == null) {
-         getFragmentManager().beginTransaction()
-             .add(android.R.id.content, new ScanPreferencesFragment()).commit();
-      }
-   }
+    if (getFragmentManager().findFragmentById(android.R.id.content) == null) {
+      getFragmentManager().beginTransaction()
+          .add(android.R.id.content, new ScanPreferencesFragment()).commit();
+    }
+  }
 
-   public String getAppName() {
-      return ScanUtils.getODKAppName();
-   }
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }

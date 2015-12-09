@@ -39,51 +39,49 @@ import android.widget.TextView;
  **/
 public class ViewScannedForms extends BaseListActivity {
 
-   private String[] photoNames;
-   private ArrayAdapter<String> myAdapter;
+  private String[] photoNames;
+  private ArrayAdapter<String> myAdapter;
 
-   // Initialize the application
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
+  // Initialize the application
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-      File dir = new File(ScanUtils.getOutputDirPath());
+    File dir = new File(ScanUtils.getOutputDirPath());
 
-      photoNames = dir.list(new FilenameFilter() {
-         public boolean accept(File dir, String name) {
-            return (new File(dir, name)).isDirectory();
-         }
-      });
+    photoNames = dir.list(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        return (new File(dir, name)).isDirectory();
+      }
+    });
 
-      myAdapter = new ArrayAdapter<String>(this, R.layout.filename_list_item, photoNames) {
-         @Override
-         public View getView(int position, View convertView, ViewGroup parent) {
+    myAdapter = new ArrayAdapter<String>(this, R.layout.filename_list_item, photoNames) {
+      @Override
+      public View getView(int position, View convertView, ViewGroup parent) {
 
-            LinearLayout view = (convertView != null) ?
-                (LinearLayout) convertView :
-                createView(parent);
+        LinearLayout view = (convertView != null) ? (LinearLayout) convertView : createView(parent);
 
-            String photoName = photoNames[position];
+        String photoName = photoNames[position];
 
-            TextView photoStatus = (TextView) view.findViewById(R.id.photoStatus);
-            if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
-               photoStatus.setTextColor(Color.parseColor("#00FF00"));
-            } else if (new File(ScanUtils.getAlignedPhotoPath(photoName)).exists()) {
-               photoStatus.setTextColor(Color.parseColor("#FFFF00"));
-            } else {
-               photoStatus.setTextColor(Color.parseColor("#FF0000"));
-            }
+        TextView photoStatus = (TextView) view.findViewById(R.id.photoStatus);
+        if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
+          photoStatus.setTextColor(Color.parseColor("#00FF00"));
+        } else if (new File(ScanUtils.getAlignedPhotoPath(photoName)).exists()) {
+          photoStatus.setTextColor(Color.parseColor("#FFFF00"));
+        } else {
+          photoStatus.setTextColor(Color.parseColor("#FF0000"));
+        }
 
-            TextView nameView = (TextView) view.findViewById(R.id.templateName);
+        TextView nameView = (TextView) view.findViewById(R.id.templateName);
 
-            String[] parts = photoName.split("_");
-            String templateName = parts[0];
+        String[] parts = photoName.split("_");
+        String templateName = parts[0];
 
-            if (templateName != null && templateName.length() != 0) {
-               nameView.setText(templateName);
-            }
+        if (templateName != null && templateName.length() != 0) {
+          nameView.setText(templateName);
+        }
 
-            //ND restructuring to try and put view scanned forms back in
+        //ND restructuring to try and put view scanned forms back in
         /*try {
           String templatePath = ScanUtils.getTemplatePath(photoName);
 					Log.i("SCAN", "templatePath " + templatePath);
@@ -99,51 +97,51 @@ public class ViewScannedForms extends BaseListActivity {
 					Log.i("SCAN", "BOO ");
 				}*/
 
-            TextView type = (TextView) view.findViewById(R.id.createdTime);
-            type.setText(
-                new Date(new File(ScanUtils.getPhotoPath(photoName)).lastModified()).toString());
+        TextView type = (TextView) view.findViewById(R.id.createdTime);
+        type.setText(
+            new Date(new File(ScanUtils.getPhotoPath(photoName)).lastModified()).toString());
 
-            return view;
-         }
+        return view;
+      }
 
-         private LinearLayout createView(ViewGroup parent) {
-            LinearLayout item = (LinearLayout) getLayoutInflater()
-                .inflate(R.layout.filename_list_item, parent, false);
-            return item;
-         }
-      };
+      private LinearLayout createView(ViewGroup parent) {
+        LinearLayout item = (LinearLayout) getLayoutInflater()
+            .inflate(R.layout.filename_list_item, parent, false);
+        return item;
+      }
+    };
 
-      setListAdapter(myAdapter);
+    setListAdapter(myAdapter);
 
-      ListView lv = getListView();
+    ListView lv = getListView();
 
-      lv.setOnItemClickListener(new OnItemClickListener() {
-         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    lv.setOnItemClickListener(new OnItemClickListener() {
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            String photoName = photoNames[position];
-            String[] parts = photoName.split("_");
-            String templateName = parts[0];
+        String photoName = photoNames[position];
+        String[] parts = photoName.split("_");
+        String templateName = parts[0];
 
-            if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
-               Intent intent = new Intent(getApplication(), DisplayProcessedFormActivity.class);
-               intent.putExtra("photoName", photoName);
-               intent.putExtra("templatePath", ScanUtils.getTemplateDirPath() + templateName);
-               startActivity(intent);
-            } else {
-               // TODO: Throw an error
-            }
-         }
-      });
+        if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
+          Intent intent = new Intent(getApplication(), DisplayProcessedFormActivity.class);
+          intent.putExtra("photoName", photoName);
+          intent.putExtra("templatePath", ScanUtils.getTemplateDirPath() + templateName);
+          startActivity(intent);
+        } else {
+          // TODO: Throw an error
+        }
+      }
+    });
 
-   }
+  }
 
-   @Override
-   public void onResume() {
-      super.onResume();
-      myAdapter.notifyDataSetChanged();
-   }
+  @Override
+  public void onResume() {
+    super.onResume();
+    myAdapter.notifyDataSetChanged();
+  }
 
-   public String getAppName() {
-      return ScanUtils.getODKAppName();
-   }
+  public String getAppName() {
+    return ScanUtils.getODKAppName();
+  }
 }
