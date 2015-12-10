@@ -24,6 +24,10 @@ import android.opengl.Visibility;
 import android.os.*;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.common.android.activities.IAppAwareActivity;
 import org.opendatakit.common.android.activities.IInitResumeActivity;
@@ -242,6 +246,21 @@ public class MainMenuActivity extends BaseActivity implements IInitResumeActivit
     fragmentTransaction.remove(mInitFragment).commit();
 
     findViewById(R.id.fragment_container).setVisibility(View.GONE);
+  }
+
+  private void changeOptionsMenu(Menu menu) {
+    MenuInflater menuInflater = this.getMenuInflater();
+
+    menuInflater.inflate(R.menu.scan_manager, menu);
+
+    ActionBar actionBar = getActionBar();
+    actionBar.show();
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    changeOptionsMenu(menu);
+    return super.onCreateOptionsMenu(menu);
   }
 
   @Override
