@@ -15,12 +15,9 @@
  */
 package org.opendatakit.scan.android.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.opendatakit.common.android.utilities.ODKFileUtils;
@@ -255,4 +252,30 @@ public class ScanUtils {
       out.close();
     }
   }
+
+  public static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT = new SimpleDateFormat(
+      "yyyy-MM-dd_kk-mm-ss_SSS");
+
+  public static final String[] imageExtensions = { "jpg" };
+
+  // Filter for image files
+  public static final FilenameFilter imageFilter = new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String filename) {
+      for (String extension : imageExtensions) {
+        if (filename.endsWith("." + extension)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  };
+
+  // Filter for directories
+  public static final FilenameFilter subdirFilter = new FilenameFilter() {
+    @Override
+    public boolean accept(File dir, String filename) {
+      return new File(dir, filename).isDirectory();
+    }
+  };
 }

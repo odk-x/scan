@@ -35,30 +35,6 @@ import java.util.Set;
  **/
 public class AcquireFormImageActivity extends BaseActivity {
   private static final String LOG_TAG = "ODKScan";
-  private static final DateFormat COLLECT_INSTANCE_NAME_DATE_FORMAT = new SimpleDateFormat(
-      "yyyy-MM-dd_kk-mm-ss_SSS");
-  private static final String[] imageExtensions = { "jpg" };
-
-  // Filter for image files
-  private static final FilenameFilter imageFilter = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String filename) {
-      for (String extension : imageExtensions) {
-        if (filename.endsWith("." + extension)) {
-          return true;
-        }
-      }
-      return false;
-    }
-  };
-
-  // Filter for directories
-  private static final FilenameFilter subdirFilter = new FilenameFilter() {
-    @Override
-    public boolean accept(File dir, String filename) {
-      return new File(dir, filename).isDirectory();
-    }
-  };
 
   String photoName;
   String[] templatePaths;
@@ -271,7 +247,7 @@ public class AcquireFormImageActivity extends BaseActivity {
         uri = data.getData();
         Log.d(LOG_TAG, "File Uri Selected: " + uri.toString());
         File sourceFile = new File(uri.getPath());
-        if (!sourceFile.exists() || !imageFilter.accept(sourceFile, uri.toString())) {
+        if (!sourceFile.exists() || !ScanUtils.imageFilter.accept(sourceFile, uri.toString())) {
           failAndReturn(this.getString(R.string.error_finding_file));
           finish();
           return;
@@ -339,9 +315,10 @@ public class AcquireFormImageActivity extends BaseActivity {
     if (templatePaths.length > 0) {
       String[] parts = templatePaths[0].split("/");
       String templateName = parts[parts.length - 1];
-      photoName = templateName + "_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+      photoName = templateName + "_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new
+          Date());
     } else {
-      photoName = "taken_" + COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+      photoName = "taken_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
     }
 
     String inputPath = ScanUtils.getPhotoPath(photoName);
@@ -394,7 +371,7 @@ public class AcquireFormImageActivity extends BaseActivity {
     boolean foundForm = false;
 
     // Process all the images in the folder
-    for (File curr : dir.listFiles(imageFilter)) {
+    for (File curr : dir.listFiles(ScanUtils.imageFilter)) {
       try {
         prepareToProcessForm();
 
@@ -420,7 +397,7 @@ public class AcquireFormImageActivity extends BaseActivity {
     }
 
     // Recurse through each subdirectory
-    for (File currDir : dir.listFiles(subdirFilter)) {
+    for (File currDir : dir.listFiles(ScanUtils.subdirFilter)) {
       foundForm |= processImagesInFolder(currDir, isRecursive);
     }
 
