@@ -14,38 +14,17 @@
 
 package org.opendatakit.scan;
 
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.AppSettingsActivity;
-import org.opendatakit.scan.android.activities.MainMenuActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.android.activities.MainActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.core.deps.guava.io.Files;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.support.test.espresso.IdlingPolicies;
-import android.text.Html;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static android.support.test.espresso.Espresso.onData;
-import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
@@ -65,8 +44,8 @@ public class AppSettingsActivityTest {
   private static final String NEW_TEMPLATE_NAME = "espresso test";
 
   @Rule
-  public ActivityTestRule<MainMenuActivity> mActivityRule = new ActivityTestRule<>(
-      MainMenuActivity.class);
+  public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
+      MainActivity.class);
 
   // TODO: Fix these tests
   @Test

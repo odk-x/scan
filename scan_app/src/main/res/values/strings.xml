@@ -24,7 +24,8 @@
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">The current health center is:</string>
     <string name="template_selected">Templates selected: &lt;i>%s&lt;/i></string>
-    <string name="no_template">Please select a template to use before scanning.</string>
+    <string name="no_template">Please select a template to use from the settings menu before
+        scanning.</string>
     <string name="scan_new_form">Scan New Form</string>
     <string name="process_image_button">Process Saved Image</string>
     <string name="process_folder_button">Process Image Folder</string>
@@ -105,4 +106,8 @@
         computer vision algorithm. You may retake the picture from here as well.
     </string>
     <string name="title_activity_process_image">ProcessImageActivity</string>
+    <string name="title_activity_abs_base">AbsBaseActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

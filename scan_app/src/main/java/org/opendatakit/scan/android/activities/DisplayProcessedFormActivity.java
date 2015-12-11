@@ -454,7 +454,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       finish();
       return true;
     } else if (itemId == R.id.startOver) {
-      intent = new Intent(getApplication(), MainMenuActivity.class);
+      intent = new Intent(getApplication(), MainActivity.class);
       startActivity(intent);
       finish();
       return true;

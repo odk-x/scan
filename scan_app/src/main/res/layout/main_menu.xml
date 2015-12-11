@@ -13,11 +13,6 @@
             android:contentDescription="ODKScan title"
             android:src="@drawable/odk_scan_logo"/>
 
-    <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     <Button
             android:id="@+id/ScanButton"
             style="@style/StandardButton"
@@ -65,15 +60,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/instructions_button">
-
-    </Button>
-
-    <Button
-            android:id="@+id/SettingsButton"
-            style="@style/StandardButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_button">
 
     </Button>
 
