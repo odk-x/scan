@@ -13,6 +13,14 @@
             android:contentDescription="ODKScan title"
             android:src="@drawable/odk_scan_logo"/>
 
+    <TextView
+            android:id="@+id/TemplateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/template_selected"
+            android:textSize="20sp"
+            android:layout_margin="5sp"/>
+
     <Button
             android:id="@+id/ScanButton"
             style="@style/StandardButton"
@@ -53,14 +61,6 @@
             android:text="@string/view_forms_button">
 
     </Button>
-
-    <TextView
-            android:id="@+id/TemplateText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/template_selected"
-            android:textSize="20sp"
-            android:layout_margin="5sp"/>
 
     <TextView
             android:id="@+id/version_display"
