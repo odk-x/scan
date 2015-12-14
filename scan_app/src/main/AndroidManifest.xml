@@ -61,10 +61,6 @@
                 android:label="@string/view_bubble_forms_activity">
         </activity>
         <activity
-                android:name=".activities.InstructionsActivity"
-                android:label="@string/bubble_instructions_activity">
-        </activity>
-        <activity
                 android:name=".activities.DisplayProcessedFormActivity"
                 android:label="@string/display_processed_form_activity"
                 android:screenOrientation="portrait">

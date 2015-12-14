@@ -30,8 +30,9 @@
     <string name="process_image">Process Saved Image</string>
     <string name="process_folder">Process Image Folder</string>
     <string name="view_forms_button">View Scanned Forms</string>
-    <string name="instructions_button">Instructions</string>
-    <string name="settings_button">Settings</string>
+    <string name="instructions">Instructions</string>
+    <string name="settings">Settings</string>
+    <string name="info">Info</string>
 
     <!-- For Initialization -->
     <string name="initializing">Initializing &#8230;</string>

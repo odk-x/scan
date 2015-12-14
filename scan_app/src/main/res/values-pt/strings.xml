@@ -13,8 +13,8 @@
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">a unidade sanitaria e:</string>
     <string name="view_forms_button">ver imagens</string>
-    <string name="instructions_button">instruncoes</string>
-    <string name="settings_button">definicoes</string>
+    <string name="instructions">instruncoes</string>
+    <string name="settings">definicoes</string>
 
     <!-- For Preferences -->
     <string name="calibrate">Calibrate</string>
@@ -25,7 +25,7 @@
     <string name="display_data">Display Data</string>
     <string name="main_menu">Main Menu</string>
 
-    <!-- InstructionsActivity -->
+    <!-- InstructionsFragment -->
     <string name="Instructions1">The BubbleBot appplication is designed to convert paper bubble forms into a digital format using computer vision.  </string>
     <string name="Instructions2">To scan a form, click the "Scan New Form" button on the main page.  This will open up a camera.  A rectangle will
 							be overlaid on top of the viewfinder.  In order to capture your paper form correctly, orient the phone so that your

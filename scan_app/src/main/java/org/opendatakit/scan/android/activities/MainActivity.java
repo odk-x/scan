@@ -44,6 +44,7 @@ import android.widget.Toast;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.application.Scan;
 import org.opendatakit.scan.android.fragments.InitializationFragment;
+import org.opendatakit.scan.android.fragments.InstructionsFragment;
 import org.opendatakit.scan.android.fragments.MainMenuFragment;
 import org.opendatakit.scan.android.fragments.ScanPreferencesFragment;
 import org.opendatakit.scan.android.utils.ScanUtils;
@@ -58,7 +59,8 @@ public class MainActivity extends BaseActivity
     INITIALIZATION_SCREEN,
     MAIN_MENU_SCREEN,
     ABOUT_SCREEN,
-    SETTINGS_SCREEN
+    SETTINGS_SCREEN,
+    INSTRUCTIONS_SCREEN
   }
 
   ;
@@ -206,6 +208,12 @@ public class MainActivity extends BaseActivity
         newFragment = new ScanPreferencesFragment();
       }
       break;
+    case INSTRUCTIONS_SCREEN:
+      newFragment = mgr.findFragmentByTag(newScreenType.name());
+      if (newFragment == null) {
+        newFragment = new InstructionsFragment();
+      }
+      break;
     default:
       throw new IllegalStateException("Unexpected default case");
     }
@@ -297,6 +305,9 @@ public class MainActivity extends BaseActivity
     switch (item.getItemId()) {
     case R.id.menu_scan_about:
       swapScreens(ScreenType.ABOUT_SCREEN);
+      return true;
+    case R.id.menu_scan_instructions:
+      swapScreens(ScreenType.INSTRUCTIONS_SCREEN);
       return true;
     case R.id.menu_scan_preferences:
       swapScreens(ScreenType.SETTINGS_SCREEN);

@@ -3,11 +3,14 @@
     <item
             android:id="@+id/menu_scan_preferences"
             android:icon="@android:drawable/ic_menu_preferences"
-            android:title="@string/settings_button"
+            android:title="@string/settings"
             android:showAsAction="always" />
     <item
+            android:id="@+id/menu_scan_instructions"
+            android:title="@string/instructions"
+            android:showAsAction="never" />
+    <item
             android:id="@+id/menu_scan_about"
-            android:icon="@android:drawable/ic_menu_info_details"
             android:title="@string/about"
             android:showAsAction="never" />
 </menu>

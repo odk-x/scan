@@ -19,14 +19,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.AcquireFormImageActivity;
-import org.opendatakit.scan.android.activities.InstructionsActivity;
 import org.opendatakit.scan.android.activities.ViewScannedForms;
 
 import java.util.Set;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MainMenuFragment extends Fragment {
   private static final String LOG_TAG = "ODKScan MainMenuFragment";
 
@@ -114,13 +110,6 @@ public class MainMenuFragment extends Fragment {
       }
     });
 
-    Button instructions = (Button) view.findViewById(R.id.InstructionsButton);
-    instructions.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Intent intent = new Intent(scanApp, InstructionsActivity.class);
-        startActivity(intent);
-      }
-    });
   }
 
   private void updateTemplateText() {
