@@ -438,7 +438,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     //if(morePagesToScan) return false;
     MenuInflater inflater = getMenuInflater();
-    inflater.inflate(R.menu.mscan_menu, menu);
+    inflater.inflate(R.menu.display_processed_form_menu, menu);
     return true;
   }
 
@@ -450,6 +450,18 @@ public class DisplayProcessedFormActivity extends BaseActivity {
     if (itemId == R.id.scanNewForm) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.take_picture);
+      startActivity(intent);
+      finish();
+      return true;
+    } else if (itemId == R.id.processImage) {
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_file);
+      startActivity(intent);
+      finish();
+      return true;
+    } else if (itemId == R.id.processFolder) {
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_directory);
       startActivity(intent);
       finish();
       return true;

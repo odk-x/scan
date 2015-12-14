@@ -30,7 +30,7 @@
                 android:id="@+id/ProcessImageButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/process_image_button"
+                android:text="@string/process_image"
                 android:layout_weight="1">
 
         </Button>
@@ -39,7 +39,7 @@
                 android:id="@+id/ProcessFolderButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/process_folder_button"
+                android:text="@string/process_folder"
                 android:layout_weight="1">
 
         </Button>
