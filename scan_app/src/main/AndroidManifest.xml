@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.opendatakit.scan.android"
-          android:sharedUserId="org.opendatakit"
-          android:sharedUserLabel="@string/app_userLabel" >
+          package="org.opendatakit.scan.android">
 
     <uses-feature
             android:glEsVersion="0x00020000"
