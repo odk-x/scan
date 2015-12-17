@@ -57,14 +57,26 @@
     <string name="error_finding_dir">Could not find folder.</string>
     <string name="background_processing">Processing photos in background...</string>
     <string name="error_empty_folder">No images found in the folder</string>
+    <string name="processing_in_background">Processing photo(s) in background...</string>
+    <string name="captured_form">Captured form: %s</string>
 
     <!-- ProcessFormsService -->
     <string name="begin_processing">Processing form...</string>
     <string name="error_background_exception">Background processing exception!</string>
     <string name="error_missing_intent">Missing extras in intent.</string>
     <string name="error_missing_config">config property is not in extras.</string>
+    <string name="error_missing_template_paths">template paths property is not in extras.</string>
+    <string name="error_missing_photo_name">photo name property is not in extras.</string>
+    <string name="error_missing_op_code">operation code property is not in extras.</string>
+    <string name="error_missing_uri">uri property is not in extras.</string>
     <string name="error_processing">Error processing form.</string>
     <string name="finished_processing">Finished processing form.</string>
+    <string name="acquired_from_camera">Acquired image from camera.</string>
+    <string name="acquired_from_file_picker">Acquired image from file picker.</string>
+    <string name="acquired_from_folder_picker">Acquired image from folder.</string>
+    <string name="error_failed_create_config">Failed to create JSON config.</string>
+    <string name="error_uri_not_found">No file URI was found.</string>
+    <string name="error_photo_name_not_found">No photo name was found.</string>
 
     <!-- DisplayProcessedFormActivity -->
     <string name="next_page">Scan Next Page</string>

@@ -44,7 +44,7 @@ import android.widget.LinearLayout;
  */
 public class DisplayProcessedFormActivity extends BaseActivity {
 
-  private static final String LOG_TAG = "ODKScan";
+  private static final String LOG_TAG = "ODKScan DisplayForm";
 
   public enum RequestCode {
     SAVE,

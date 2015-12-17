@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.application.Scan;
 import org.opendatakit.scan.android.services.ProcessFormsService;
 import org.opendatakit.scan.android.utils.ScanUtils;
 
@@ -34,11 +35,10 @@ import java.util.Set;
  * image. It also creates a directory for data about the form to be stored.
  **/
 public class AcquireFormImageActivity extends BaseActivity {
-  private static final String LOG_TAG = "ODKScan";
+  private static final String LOG_TAG = "ODKScan AcquireForm";
 
   String photoName;
   String[] templatePaths;
-  Intent processPhoto;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,7 @@ public class AcquireFormImageActivity extends BaseActivity {
     photoName = null;
     templatePaths = null;
 
+    // Retrieve input parameters
     try {
       Bundle extras = getIntent().getExtras();
       if (extras == null) {
@@ -58,10 +59,6 @@ public class AcquireFormImageActivity extends BaseActivity {
       if (extras.containsKey("acquisitionMethod")) {
         acquisitionCode = extras.getInt("acquisitionMethod");
         Log.d(LOG_TAG, "Acquisition code: " + acquisitionCode);
-      }
-      if (extras.containsKey("photoName")) {
-        photoName = extras.getString("photoName");
-        Log.d(LOG_TAG, "Photo name: " + photoName);
       }
       if (extras.containsKey("templatePaths")) {
         templatePaths = extras.getStringArray("templatePaths");
@@ -77,6 +74,10 @@ public class AcquireFormImageActivity extends BaseActivity {
 
         templatePaths = selectedTemplates.toArray(new String[selectedTemplates.size()]);
         extras.putStringArray("templatePaths", templatePaths);
+      }
+      if (extras.containsKey("photoName")) {
+        photoName = extras.getString("photoName");
+        Log.d(LOG_TAG, "Photo name: " + photoName);
       }
 
       launchAcquireIntent(acquisitionCode);
@@ -97,15 +98,18 @@ public class AcquireFormImageActivity extends BaseActivity {
     Intent acquireIntent;
     File root;
     Uri uri;
+
     switch (acquisitionCode) {
     default:
       // Default to capturing a new image from the camera, but log this as an error
       Log.e(LOG_TAG, "Error: Invalid Acquisition Code. Defaulting to camera capture.");
     case R.integer.take_picture:
+      photoName = ScanUtils.setPhotoName(templatePaths);
+
       // In the camera case, prepare the directory before launching so that there is a place
       // to save the picture
       try {
-        prepareToProcessForm();
+        ScanUtils.prepareOutputDir(photoName);
       } catch (Exception e) {
         failAndReturn(e.toString());
         finish();
@@ -216,192 +220,38 @@ public class AcquireFormImageActivity extends BaseActivity {
       return;
     }
 
-    File destFile;
-    Uri uri;
+    finishActivity(resultCode);
 
-    try {
-      switch (requestCode) {
-      case R.integer.new_image:
-        Log.d(LOG_TAG, "Returned from Camera");
-        finishActivity(resultCode);
+    // Grap the URI, if it exists
+    Uri uri = data.getData();
 
-        // Verify that the new picture exists
-        destFile = new File(ScanUtils.getPhotoPath(photoName));
-        if (!destFile.exists()) {
-          failAndReturn(this.getString(R.string.error_file_creation));
-          finish();
-          return;
-        }
+    // Find the directory search preference
+    SharedPreferences settings = PreferenceManager
+        .getDefaultSharedPreferences(getApplicationContext());
+    String dirSearch = settings
+        .getString("directory_search", getString(R.string.default_directory_search));
+    boolean isRecursive = dirSearch.equals("recursive");
 
-        // Process the form in the background
-        Log.d(LOG_TAG, "Photographed form: " + ScanUtils.getPhotoPath(photoName));
-        Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
-        startService(processPhoto);
-        break;
-
-      case R.integer.existing_image:
-        Log.d(LOG_TAG, "Returned from file picker");
-        finishActivity(resultCode);
-
-        // Verify that the new file exists and is an image
-        uri = data.getData();
-        Log.d(LOG_TAG, "File Uri Selected: " + uri.toString());
-        File sourceFile = new File(uri.getPath());
-        if (!sourceFile.exists() || !ScanUtils.imageFilter.accept(sourceFile, uri.toString())) {
-          failAndReturn(this.getString(R.string.error_finding_file));
-          finish();
-          return;
-        }
-
-        prepareToProcessForm();
-
-        // Copy the new file into the Scan file system
-        destFile = new File(ScanUtils.getPhotoPath(photoName));
-        FileUtils.copyFile(sourceFile, destFile);
-
-        Log.d(LOG_TAG, "Copied form: " + ScanUtils.getPhotoPath(photoName));
-        Toast.makeText(this, "Processing photo in background...", Toast.LENGTH_LONG).show();
-        startService(processPhoto);
-        break;
-
-      case R.integer.image_directory:
-        Log.d(LOG_TAG, "Returned from folder picker");
-        finishActivity(resultCode);
-
-        uri = data.getData();
-        Log.d(LOG_TAG, "Directory Uri Selected: " + uri.toString());
-
-        // Validate the directory
-        File dir = new File(uri.getPath());
-        if (!dir.exists() || !dir.isDirectory()) {
-          failAndReturn(this.getString(R.string.error_finding_dir));
-          finish();
-          return;
-        }
-
-        // Find the directory search preference
-        SharedPreferences settings = PreferenceManager
-            .getDefaultSharedPreferences(getApplicationContext());
-        String dirSearch = settings
-            .getString("directory_search", getString(R.string.default_directory_search));
-        boolean isRecursive = dirSearch.equals("recursive");
-
-        if (processImagesInFolder(dir, isRecursive)) {
-          Toast.makeText(this, R.string.background_processing, Toast.LENGTH_LONG).show();
-        } else {
-          Toast.makeText(this, R.string.error_empty_folder, Toast.LENGTH_LONG).show();
-        }
-        break;
-
-      default:
-        failAndReturn(this.getString(R.string.error_acquire_bad_return));
-        finish();
-        return;
-      }
-    } catch (Exception e) {
-      failAndReturn(e.toString());
-      finish();
-      return;
+    // Build the background process intent
+    Intent processPhoto = new Intent(this, ProcessFormsService.class);
+    processPhoto.putExtra("templatePaths", templatePaths);
+    processPhoto.putExtra("opCode", requestCode);
+    if (uri != null) {
+      processPhoto.putExtra("uri", uri.toString());
     }
+    processPhoto.putExtra("isRecursive", isRecursive);
+    if (requestCode == R.integer.new_image) {
+      processPhoto.putExtra("photoName", photoName);
+    }
+
+    // Process the form in the background
+    Log.d(LOG_TAG,
+        String.format(this.getString(R.string.captured_form), ScanUtils.getPhotoPath(photoName)));
+    Toast.makeText(this, R.string.processing_in_background, Toast.LENGTH_LONG).show();
+
+    startService(processPhoto);
 
     finish();
-  }
-
-  /**
-   * Create the file structure for storing the scan data
-   */
-  private void prepareToProcessForm() throws Exception {
-
-    if (templatePaths.length > 0) {
-      String[] parts = templatePaths[0].split("/");
-      String templateName = parts[parts.length - 1];
-      photoName = templateName + "_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new
-          Date());
-    } else {
-      photoName = "taken_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
-    }
-
-    String inputPath = ScanUtils.getPhotoPath(photoName);
-    String outputPath = ScanUtils.getOutputPath(photoName);
-
-    //This is the configuration JSON passed into ODKScan-core
-    //see: scan/bubblebot_lib/jni/ODKScan-core/processViaJSON.md
-    JSONObject config = new JSONObject();
-    try {
-      config.put("trainingDataDirectory", ScanUtils.getTrainingExampleDirPath());
-      config.put("trainingModelDirectory", ScanUtils.getTrainedModelDir());
-      config.put("inputImage", inputPath);
-      config.put("outputDirectory", outputPath);
-      config.put("templatePaths", new JSONArray(Arrays.asList(templatePaths)));
-    } catch (Exception e) {
-      failAndReturn(e.toString());
-      finish();
-      return;
-    }
-
-    // Create the intent to process the acquired image.
-    processPhoto = new Intent(this, ProcessFormsService.class);
-    processPhoto.putExtra("photoName", photoName);
-    processPhoto.putExtra("config", config.toString());
-
-    //Try to create an output folder
-    boolean createSuccess = new File(outputPath).mkdirs();
-    if (!createSuccess) {
-      throw (new Exception("Could not create output folder [" + outputPath + "].\n"
-          + "There may be a problem with the device's storage."));
-    }
-    //Create an output directory for the segments
-    boolean segDirSuccess = new File(outputPath, "segments").mkdirs();
-    if (!segDirSuccess) {
-      throw (new Exception("Could not create output folder for segments."));
-    }
-  }
-
-  /**
-   * Recursively process all images in a folder and then search subfolders
-   *
-   * @param dir         The folder to read from
-   * @param isRecursive Whether to recursively search sub folders
-   */
-  private boolean processImagesInFolder(File dir, boolean isRecursive) {
-    if (!dir.exists() || !dir.isDirectory()) {
-      return false;
-    }
-
-    boolean foundForm = false;
-
-    // Process all the images in the folder
-    for (File curr : dir.listFiles(ScanUtils.imageFilter)) {
-      try {
-        prepareToProcessForm();
-
-        // Copy the new file into the Scan file system
-        File destFile = new File(ScanUtils.getPhotoPath(photoName));
-        FileUtils.copyFile(curr, destFile);
-
-        Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
-        startService(processPhoto);
-
-        foundForm = true;
-
-      } catch (Exception e) {
-        Log.e(LOG_TAG, "Error processing image: " + curr.getPath());
-        Log.e(LOG_TAG, e.toString());
-        continue;
-      }
-    }
-
-    // If we are not recursing, we are done
-    if (!isRecursive) {
-      return foundForm;
-    }
-
-    // Recurse through each subdirectory
-    for (File currDir : dir.listFiles(ScanUtils.subdirFilter)) {
-      foundForm |= processImagesInFolder(currDir, isRecursive);
-    }
-
-    return foundForm;
   }
 
   @Override

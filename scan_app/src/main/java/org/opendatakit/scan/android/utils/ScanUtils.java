@@ -278,4 +278,36 @@ public class ScanUtils {
       return new File(dir, filename).isDirectory();
     }
   };
+
+  public static void prepareOutputDir(String photoName) throws Exception {
+    String outputPath = ScanUtils.getOutputPath(photoName);
+
+    //Try to create an output folder
+    if (!(new File(outputPath).mkdirs())) {
+      throw (new Exception("Could not create output folder [" + outputPath + "].\n"
+          + "There may be a problem with the device's storage."));
+    }
+    //Create an output directory for the segments
+    if(!(new File(outputPath, "segments").mkdirs())) {
+      throw (new Exception("Could not create output folder for segments."));
+    }
+  }
+
+  /**
+   * Initialize the name of the acquired image
+   */
+  public static String setPhotoName(String[] templatePaths) {
+    String photoName;
+
+    if (templatePaths.length > 0) {
+      String[] parts = templatePaths[0].split("/");
+      String templateName = parts[parts.length - 1];
+      photoName =
+          templateName + "_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+    } else {
+      photoName = "taken_" + ScanUtils.COLLECT_INSTANCE_NAME_DATE_FORMAT.format(new Date());
+    }
+
+    return photoName;
+  }
 }
