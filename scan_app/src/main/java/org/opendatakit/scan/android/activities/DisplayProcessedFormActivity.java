@@ -44,7 +44,7 @@ import android.widget.LinearLayout;
  */
 public class DisplayProcessedFormActivity extends BaseActivity {
 
-  private static final String LOG_TAG = "ODKScan";
+  private static final String LOG_TAG = "ODKScan DisplayForm";
 
   public enum RequestCode {
     SAVE,
@@ -438,7 +438,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     //if(morePagesToScan) return false;
     MenuInflater inflater = getMenuInflater();
-    inflater.inflate(R.menu.mscan_menu, menu);
+    inflater.inflate(R.menu.display_processed_form_menu, menu);
     return true;
   }
 
@@ -453,8 +453,20 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       startActivity(intent);
       finish();
       return true;
+    } else if (itemId == R.id.processImage) {
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_file);
+      startActivity(intent);
+      finish();
+      return true;
+    } else if (itemId == R.id.processFolder) {
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+      startActivity(intent);
+      finish();
+      return true;
     } else if (itemId == R.id.startOver) {
-      intent = new Intent(getApplication(), MainMenuActivity.class);
+      intent = new Intent(getApplication(), MainActivity.class);
       startActivity(intent);
       finish();
       return true;

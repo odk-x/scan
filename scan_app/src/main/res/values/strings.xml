@@ -24,13 +24,15 @@
     <string name="Health_Center">Health Center</string>
     <string name="the_current_health_center_is">The current health center is:</string>
     <string name="template_selected">Templates selected: &lt;i>%s&lt;/i></string>
-    <string name="no_template">Please select a template to use before scanning.</string>
+    <string name="no_template">Please select a template to use from the settings menu before
+        scanning.</string>
     <string name="scan_new_form">Scan New Form</string>
-    <string name="process_image_button">Process Saved Image</string>
-    <string name="process_folder_button">Process Alignment Training Data</string>
+    <string name="process_image">Process Saved Image</string>
+    <string name="process_folder">Process Training Data</string>
     <string name="view_forms_button">View Scanned Forms</string>
-    <string name="instructions_button">Instructions</string>
-    <string name="settings_button">Settings</string>
+    <string name="instructions">Instructions</string>
+    <string name="settings">Settings</string>
+    <string name="info">Info</string>
 
     <!-- For Initialization -->
     <string name="initializing">Initializing &#8230;</string>
@@ -55,14 +57,26 @@
     <string name="error_finding_dir">Could not find folder.</string>
     <string name="background_processing">Processing photos in background...</string>
     <string name="error_empty_folder">No images found in the folder</string>
+    <string name="processing_in_background">Processing photo(s) in background...</string>
+    <string name="captured_form">Captured form: %s</string>
 
     <!-- ProcessFormsService -->
     <string name="begin_processing">Processing form...</string>
     <string name="error_background_exception">Background processing exception!</string>
     <string name="error_missing_intent">Missing extras in intent.</string>
     <string name="error_missing_config">config property is not in extras.</string>
+    <string name="error_missing_template_paths">template paths property is not in extras.</string>
+    <string name="error_missing_photo_name">photo name property is not in extras.</string>
+    <string name="error_missing_op_code">operation code property is not in extras.</string>
+    <string name="error_missing_uri">uri property is not in extras.</string>
     <string name="error_processing">Error processing form.</string>
     <string name="finished_processing">Finished processing form.</string>
+    <string name="acquired_from_camera">Acquired image from camera.</string>
+    <string name="acquired_from_file_picker">Acquired image from file picker.</string>
+    <string name="acquired_from_folder_picker">Acquired image from folder.</string>
+    <string name="error_failed_create_config">Failed to create JSON config.</string>
+    <string name="error_uri_not_found">No file URI was found.</string>
+    <string name="error_photo_name_not_found">No photo name was found.</string>
 
     <!-- DisplayProcessedFormActivity -->
     <string name="next_page">Scan Next Page</string>
@@ -105,4 +119,8 @@
         computer vision algorithm. You may retake the picture from here as well.
     </string>
     <string name="title_activity_process_image">ProcessImageActivity</string>
+    <string name="title_activity_abs_base">AbsBaseActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

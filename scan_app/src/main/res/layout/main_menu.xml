@@ -13,10 +13,13 @@
             android:contentDescription="ODKScan title"
             android:src="@drawable/odk_scan_logo"/>
 
-    <FrameLayout
-            android:id="@+id/fragment_container"
+    <TextView
+            android:id="@+id/TemplateText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:text="@string/template_selected"
+            android:textSize="20sp"
+            android:layout_margin="5sp"/>
 
     <Button
             android:id="@+id/ScanButton"
@@ -35,7 +38,7 @@
                 android:id="@+id/ProcessImageButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/process_image_button"
+                android:text="@string/process_image"
                 android:layout_weight="1">
 
         </Button>
@@ -44,7 +47,7 @@
                 android:id="@+id/ProcessFolderButton"
                 style="@style/StandardButton"
                 android:layout_width="0dp"
-                android:text="@string/process_folder_button"
+                android:text="@string/process_folder"
                 android:layout_weight="1">
 
         </Button>
@@ -58,32 +61,6 @@
             android:text="@string/view_forms_button">
 
     </Button>
-
-    <Button
-            android:id="@+id/InstructionsButton"
-            style="@style/StandardButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/instructions_button">
-
-    </Button>
-
-    <Button
-            android:id="@+id/SettingsButton"
-            style="@style/StandardButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_button">
-
-    </Button>
-
-    <TextView
-            android:id="@+id/TemplateText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/template_selected"
-            android:textSize="20sp"
-            android:layout_margin="5sp"/>
 
     <TextView
             android:id="@+id/version_display"

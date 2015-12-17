@@ -15,6 +15,8 @@
 package org.opendatakit.scan.android.application;
 
 import org.opendatakit.common.android.application.CommonApplication;
+import org.opendatakit.common.android.logic.CommonToolProperties;
+import org.opendatakit.common.android.logic.PropertiesSingleton;
 import org.opendatakit.scan.android.R;
 
 public class Scan extends CommonApplication {
@@ -29,6 +31,11 @@ public class Scan extends CommonApplication {
 
   @Override
   public void onCreate() {
+    if (singleton == null) {
+      PropertiesSingleton props = CommonToolProperties
+          .get(this.getBaseContext(), this.getToolName());
+      props.setStartCoreServices(this.getBaseContext());
+    }
     singleton = this;
 
     super.onCreate();

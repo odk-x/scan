@@ -55,7 +55,7 @@ import android.webkit.WebView;
 public class JSON2SurveyJSONActivity extends BaseActivity {
 
   private static final String TAG = "JSON2SurveyJSONActivity";
-  private static final String LOG_TAG = "ODKScan";
+  private static final String LOG_TAG = "ODKScan JSON";
 
   private static final String scanOutputDir = "scan_output_directory";
 

@@ -23,15 +23,24 @@
 
     <uses-permission android:name="org.opendatakit.database.RUN_DATABASE"/>
 
+    <supports-screens
+            android:anyDensity="true"
+            android:largeScreens="true"
+            android:normalScreens="true"
+            android:resizeable="true"
+            android:smallScreens="true"
+            android:xlargeScreens="true"/>
+
     <application
             android:name=".application.Scan"
+            android:allowBackup="false"
             android:icon="@drawable/icon"
-            android:label="ODK Scan"
+            android:label="@string/app_name"
             android:largeHeap="true"
-            android:theme="@android:style/Theme.Light">
+            android:theme="@style/Opendatakit">
         <activity
-                android:name=".activities.MainMenuActivity"
-                android:label="ODK Scan"
+                android:name=".activities.MainActivity"
+                android:label="@string/app_name"
                 android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -50,10 +59,6 @@
                 android:label="@string/view_bubble_forms_activity">
         </activity>
         <activity
-                android:name=".activities.InstructionsActivity"
-                android:label="@string/bubble_instructions_activity">
-        </activity>
-        <activity
                 android:name=".activities.DisplayProcessedFormActivity"
                 android:label="@string/display_processed_form_activity"
                 android:screenOrientation="portrait">
@@ -65,10 +70,6 @@
                 android:name=".activities.DisplayStatusActivity"
                 android:label="status"
                 android:screenOrientation="portrait">
-        </activity>
-        <activity
-                android:name=".activities.AppSettingsActivity"
-                android:label="Settings">
         </activity>
 
         <service
