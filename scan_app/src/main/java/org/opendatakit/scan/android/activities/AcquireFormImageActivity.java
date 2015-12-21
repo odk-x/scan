@@ -223,7 +223,10 @@ public class AcquireFormImageActivity extends BaseActivity {
     finishActivity(resultCode);
 
     // Grap the URI, if it exists
-    Uri uri = data.getData();
+    Uri uri = null;
+    if (data != null) {
+      uri = data.getData();
+    }
 
     // Find the directory search preference
     SharedPreferences settings = PreferenceManager
