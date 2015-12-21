@@ -204,6 +204,8 @@ public class AcquireFormImageActivity extends BaseActivity {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
+    finishActivity(resultCode);
+
     Log.d(LOG_TAG, "AcquireFormImage onActivityResult " + requestCode);
 
     if (resultCode == Activity.RESULT_FIRST_USER) {
@@ -219,8 +221,6 @@ public class AcquireFormImageActivity extends BaseActivity {
       finish();
       return;
     }
-
-    finishActivity(resultCode);
 
     // Grap the URI, if it exists
     Uri uri = null;
