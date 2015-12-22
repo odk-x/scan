@@ -204,6 +204,8 @@ public class AcquireFormImageActivity extends BaseActivity {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
+    finishActivity(resultCode);
+
     Log.d(LOG_TAG, "AcquireFormImage onActivityResult " + requestCode);
 
     if (resultCode == Activity.RESULT_FIRST_USER) {
@@ -220,10 +222,11 @@ public class AcquireFormImageActivity extends BaseActivity {
       return;
     }
 
-    finishActivity(resultCode);
-
     // Grap the URI, if it exists
-    Uri uri = data.getData();
+    Uri uri = null;
+    if (data != null) {
+      uri = data.getData();
+    }
 
     // Find the directory search preference
     SharedPreferences settings = PreferenceManager

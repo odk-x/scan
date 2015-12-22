@@ -94,29 +94,23 @@
     <string name="Instructions1">The BubbleBot appplication is designed to convert paper bubbleforms
         into a digital format using computer vision.
     </string>
-    <string name="Instructions2">To scan a form, click the "Scan New Form" button on the main page.
-        This will open up a camera. A rectangle will
-        be overlaid on top of the viewfinder. In order to capture your paper form correctly, orient
-        the phone so that your
-        paper form fits inside the rectangle. When the phone is oriented correctly, the rectangle
-        will turn green. To take
-        a picture, click on the camera button.
+    <string name="Instructions2">To scan a form, click the \"Scan New Form\" button on the main
+        page. This will open up a camera. A rectangle will be overlaid on top of the viewfinder.
+        In order to capture your paper form correctly, orient the phone so that your paper form
+        fits inside the rectangle. When the phone is oriented correctly, the rectangle will turn
+        green. To take a picture, click on the camera button.
     </string>
     <string name="Instructions3">After taking a picture, the image will be processed. This process
-        may take a few minutes. Once processing is
-        complete, you will be able to view a copy of the image indicating which bubbles were
-        identified by the computer
-        vision algorithm. Recognized bubbles will be circled in red. If the processing is not
-        acceptable, click on the
-        "Take New Picture" button to retake. If the processing is acceptable, press "Accept". The
-        data will be stored
-        in digital format.
+        may take a few minutes. Once processing is complete, you will be able to view a copy of
+        the image indicating which bubbles were identified by the computer vision algorithm.
+        Recognized bubbles will be circled in red. If the processing is not acceptable, click on the
+        \"Take New Picture\" button to retake. If the processing is acceptable, press \"Accept\".
+        The data will be stored in digital format.
     </string>
-    <string name="Instructions4">To view forms that have already been scanned, click the "View
-        Scanned Forms" page on the main screen. You will
-        be able to view both the textual data collected and the image displaying which bubbles were
-        recognized by the
-        computer vision algorithm. You may retake the picture from here as well.
+    <string name="Instructions4">To view forms that have already been scanned, click the \"View
+        Scanned Forms\" page on the main screen. You will be able to view both the textual data
+        collected and the image displaying which bubbles were recognized by the computer vision
+        algorithm. You may retake the picture from here as well.
     </string>
     <string name="title_activity_process_image">ProcessImageActivity</string>
     <string name="title_activity_abs_base">AbsBaseActivity</string>
