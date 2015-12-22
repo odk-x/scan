@@ -111,20 +111,7 @@ public class InitializationFragment extends Fragment
         .i(t, "initializeAppName called ");
     Scan.getInstance().initializeAppName(((IAppAwareActivity) getActivity()).getAppName(), this);
 
-    // Create output dir if it doesn't exist
-    new File(ScanUtils.getOutputDirPath()).mkdirs();
 
-    try {
-      //Creates a .nomedia file to prevent the images from showing up in the gallery.
-      new File(ScanUtils.getSystemPath() + ".nomedia").createNewFile();
-      new File(ScanUtils.getConfigPath() + ".nomedia").createNewFile();
-      new File(ScanUtils.getOutputDirPath() + ".nomedia").createNewFile();
-
-    } catch (IOException e) {
-      e.printStackTrace();
-      WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-          .i(t, "Error creating nomedia");
-    }
   }
 
   @Override
@@ -186,12 +173,32 @@ public class InitializationFragment extends Fragment
 
   @Override
   public void initializationComplete(boolean overallSuccess, ArrayList<String> result) {
+
+    /* Add runtime initialization */
+
+    // Create output dir if it doesn't exist
+    new File(ScanUtils.getOutputDirPath()).mkdirs();
+
+    try {
+      //Creates a .nomedia file to prevent the images from showing up in the gallery.
+      new File(ScanUtils.getSystemPath() + File.separator + ".nomedia").createNewFile();
+      new File(ScanUtils.getConfigPath() + File.separator + ".nomedia").createNewFile();
+      new File(ScanUtils.getOutputDirPath() + File.separator + ".nomedia").createNewFile();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+      WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
+          .i(t, "Error creating nomedia");
+    }
+
     try {
       dismissProgressDialog();
     } catch (IllegalArgumentException e) {
       WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
           .i(t, "Attempting to close a dialog that was not previously opened");
     }
+
+    /* Finish initialization */
 
     Scan.getInstance().clearInitializationTask();
 
