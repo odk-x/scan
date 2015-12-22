@@ -24,6 +24,7 @@ import org.opendatakit.scan.android.utils.ScanUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -180,11 +181,31 @@ public class InitializationFragment extends Fragment
     new File(ScanUtils.getOutputDirPath()).mkdirs();
 
     try {
+      //android.os.Debug.waitForDebugger();
+
       //Creates a .nomedia file to prevent the images from showing up in the gallery.
+      /*
       new File(ScanUtils.getSystemPath() + File.separator + ".nomedia").createNewFile();
       new File(ScanUtils.getConfigPath() + File.separator + ".nomedia").createNewFile();
       new File(ScanUtils.getOutputDirPath() + File.separator + ".nomedia").createNewFile();
+      */
 
+      // TODO: Only adding dummy data while sync doesn't support empty files. Remove dummy data
+      // when that is fixed
+      PrintWriter systemPW = new PrintWriter(ScanUtils.getSystemPath() + File.separator + ""
+          + ".nomedia");
+      PrintWriter configPW = new PrintWriter(ScanUtils.getConfigPath() + File.separator + ""
+          + ".nomedia");
+      PrintWriter outputPW = new PrintWriter(ScanUtils.getOutputDirPath() + File.separator + ""
+          + ".nomedia");
+
+      systemPW.print("Dummy data");
+      configPW.print("Dummy data");
+      outputPW.print("Dummy data");
+
+      systemPW.close();
+      configPW.close();
+      outputPW.close();
     } catch (IOException e) {
       e.printStackTrace();
       WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
