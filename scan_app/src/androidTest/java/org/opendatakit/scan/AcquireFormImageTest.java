@@ -14,46 +14,50 @@
 
 package org.opendatakit.scan;
 
+import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainActivity;
+import org.opendatakit.scan.android.utils.ScanUtils;
+
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.provider.MediaStore;
+import android.support.test.espresso.IdlingPolicies;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.test.suitebuilder.annotation.LargeTest;
+import org.hamcrest.Matcher;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Before;
 
-import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import static android.support.test.espresso.Espresso.onData;
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
+import static android.support.test.espresso.intent.Intents.intending;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class PhotographFormTest {
+public class AcquireFormImageTest {
 
   @Rule
   public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(
       MainActivity.class);
 
-  // TODO: Fix these tests
-  @Test
-  public void dummyTest() {
-    assert (true);
-  }
-
-  /*
   //block external intents
   @Before
   public void stubAllExternalIntents() {
@@ -72,10 +76,8 @@ public class PhotographFormTest {
     //Cancel is handled by intent stubbing ( stubAllExternalIntents() )
     onView(withId(R.id.ScanButton)).perform(click());
 
-    // TODO: Fix this test
-    assert (true);
-    /*
-    intended(hasAction(MediaStore.ACTION_IMAGE_CAPTURE));
+    //Open "View Scanned Forms"
+    onView(withId(R.id.ViewFormsButton)).perform(click());
 
     //List of expected entries
     List<Matcher<? super String>> photoList = new ArrayList<>();
@@ -91,14 +93,38 @@ public class PhotographFormTest {
       onData(not(anyOf(photoList))).check(doesNotExist());
     } catch (RuntimeException e) {
     }
-    *
+  }
+
+  @Test
+  public void scanNewForm_launchCamera() {
+    //Click "Scan New Form" and cancel
+    //Cancel is handled by intent stubbing ( stubAllExternalIntents() )
+    onView(withId(R.id.ScanButton)).perform(click());
+
+    intended(hasAction(MediaStore.ACTION_IMAGE_CAPTURE));
+  }
+
+  @Test
+  public void processSavedImage_launchChooser() {
+    //Click "Process Saved Image"
+    onView(withId(R.id.ProcessImageButton)).perform(click());
+
+    intended(hasAction("org.openintents.action.PICK_FILE"));
+  }
+
+  @Test
+  public void processImageFolder_launchChooser() {
+    //Click "Process Image Folder"
+    onView(withId(R.id.ProcessFolderButton)).perform(click());
+
+    intended(hasAction("org.openintents.action.PICK_DIRECTORY"));
   }
 
   /**
    * Traverses "output" directory to find all expected entries of scanned forms
    *
    * @return A String[] of the entries
-   *
+   */
   private String[] getPhotoNames() {
     return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
       public boolean accept(File dir, String name) {
@@ -110,5 +136,4 @@ public class PhotographFormTest {
   private void extendIdleWaitTimeout() {
     IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
   }
-  */
 }
