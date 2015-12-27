@@ -5,9 +5,15 @@ import android.support.test.espresso.IdlingPolicies;
 import java.util.concurrent.TimeUnit;
 
 public class EspressoUtils {
-   private static int TIMEOUT = 10;
+  private static final int TIMEOUT = 10;
 
-   public static void adjustEspressoIdleWaitTimeout() {
-     IdlingPolicies.setMasterPolicyTimeout(TIMEOUT, TimeUnit.MINUTES);
-   }
+  /**
+   * Adjusts Espresso idle wait time to avoid timeout
+   * <p>
+   * Timeout is adjusted to {@value #TIMEOUT} minutes.
+   * </p>
+   */
+  public static void adjustIdleWaitTimeout() {
+    IdlingPolicies.setMasterPolicyTimeout(TIMEOUT, TimeUnit.MINUTES);
+  }
 }
