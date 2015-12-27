@@ -14,10 +14,12 @@
 
 package org.opendatakit.scan;
 
+import android.graphics.Color;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainActivity;
 import org.opendatakit.scan.android.utils.ScanUtils;
 import org.opendatakit.scan.utils.EspressoUtils;
+import org.opendatakit.scan.utils.ODKMatcher;
 import org.opendatakit.scan.utils.StringUtils;
 
 import android.support.test.espresso.Espresso;
@@ -53,35 +55,27 @@ import static org.hamcrest.Matchers.*;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class SettingsTest {
-  private static final String[] TEMPLATES_TO_USE = new String[] {
-      "numbers",
-      "example"
-   };
-  private static final String[] SEARCH_METHODS = new String[] {
-      "Flat",
-      "Recursive"
-  };
-
+  private static final String[] TEMPLATES_TO_USE = new String[] { "numbers", "example" };
+  private static final String[] SEARCH_METHODS = new String[] { "Flat", "Recursive" };
   private static final String SELECT_TEMPLATE_KEY = "select_templates";
   private static final String NEW_TEMPLATE_NAME = "espresso test";
   private static final String SEARCH_METHOD_KEY = "directory_search";
 
   @Rule
-  public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
-      MainActivity.class);
+  public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
 
   @Before
   public void openTemplateChooserFromMain() {
-    EspressoUtils.adjustEspressoIdleWaitTimeout();
+    EspressoUtils.adjustIdleWaitTimeout();
 
     //Go to Settings
-     onView(withId(R.id.menu_scan_preferences)).perform(click());
+    onView(withId(R.id.menu_scan_preferences)).perform(click());
   }
 
   @Test
   public void changeTemplateNameDisplay_OneTemplate_Settings() {
     //Select template
-    selectTemplates(TEMPLATES_TO_USE[0]);
+    toggleTemplates(TEMPLATES_TO_USE[0]);
 
     //Check summary text
     onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary)).check(matches(
@@ -90,17 +84,17 @@ public class SettingsTest {
                 TEMPLATES_TO_USE[0]))));
 
     //Remove selection
-     selectTemplates(TEMPLATES_TO_USE[0]);
+    toggleTemplates(TEMPLATES_TO_USE[0]);
 
     //Check summary text
-    onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary)).check(
-        matches(withText(R.string.no_form_selected)));
+    onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary))
+        .check(matches(withText(R.string.no_form_selected)));
   }
 
   @Test
   public void changeTemplateNameDisplay_MultiTemplate_Settings() {
     //Select templates
-     selectTemplates(TEMPLATES_TO_USE);
+    toggleTemplates(TEMPLATES_TO_USE);
 
     //Check summary text
     onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary)).check(matches(
@@ -111,17 +105,17 @@ public class SettingsTest {
                 TEMPLATES_TO_USE[1] + ", " + TEMPLATES_TO_USE[0])))));
 
     //Remove selection
-     selectTemplates(TEMPLATES_TO_USE);
+    toggleTemplates(TEMPLATES_TO_USE);
 
     //Check summary text
-    onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary)).check(matches
-        (withText(R.string.no_form_selected)));
+    onData(withKey(SELECT_TEMPLATE_KEY)).onChildView(withId(android.R.id.summary))
+        .check(matches(withText(R.string.no_form_selected)));
   }
 
   @Test
   public void changeTemplateNameDisplay_OneTemplate_MainMenu() {
     //Choose template and go to main menu
-    selectTemplates(TEMPLATES_TO_USE[0]);
+    toggleTemplates(TEMPLATES_TO_USE[0]);
     Espresso.pressBack();
 
     //Check template name is displayed on MainMenu
@@ -131,37 +125,36 @@ public class SettingsTest {
 
     //Remove selection and go back
     onView(withId(R.id.menu_scan_preferences)).perform(click());
-    selectTemplates(TEMPLATES_TO_USE[0]);
+    toggleTemplates(TEMPLATES_TO_USE[0]);
     Espresso.pressBack();
 
     //Check template name display on MainMenu
     onView(withId(R.id.TemplateText)).check(matches(withText(R.string.no_template)));
+    onView(withId(R.id.TemplateText)).check(matches(ODKMatcher.withTextColor(Color.RED)));
   }
 
   @Test
   public void changeTemplateNameDisplay_MultiTemplate_MainMenu() {
     //Choose template and go to main menu
-     selectTemplates(TEMPLATES_TO_USE);
+    toggleTemplates(TEMPLATES_TO_USE);
     Espresso.pressBack();
 
     //Check template name is displayed on MainMenu
-    onView(withId(R.id.TemplateText)).check(matches(
-        anyOf(
-            withText(Html.fromHtml(String
-                .format(StringUtils.getString(this.mActivityRule, R.string.template_selected),
-                    TEMPLATES_TO_USE[0] + ", " + TEMPLATES_TO_USE[1])).toString()),
-            withText(Html.fromHtml(String
-                .format(StringUtils.getString(this.mActivityRule, R.string.template_selected),
-                    TEMPLATES_TO_USE[1] + ", " + TEMPLATES_TO_USE[0])).toString()))));
+    onView(withId(R.id.TemplateText)).check(matches(anyOf(withText(Html.fromHtml(String
+        .format(StringUtils.getString(this.mActivityRule, R.string.template_selected),
+            TEMPLATES_TO_USE[0] + ", " + TEMPLATES_TO_USE[1])).toString()), withText(Html.fromHtml(
+            String.format(StringUtils.getString(this.mActivityRule, R.string.template_selected),
+                TEMPLATES_TO_USE[1] + ", " + TEMPLATES_TO_USE[0])).toString()))));
 
     //Remove selection and go back
     onView(withId(R.id.menu_scan_preferences)).perform(click());
-    selectTemplates(TEMPLATES_TO_USE);
+    toggleTemplates(TEMPLATES_TO_USE);
     Espresso.pressBack();
 
     //Check template name display on MainMenu
     onView(withId(R.id.TemplateText)).check(matches(withText(R.string.no_template)));
-   }
+    onView(withId(R.id.TemplateText)).check(matches(ODKMatcher.withTextColor(Color.RED)));
+  }
 
   @Test
   public void templatesToUse_ChoiceDisplay() {
@@ -226,7 +219,7 @@ public class SettingsTest {
 
     //Open template chooser
     onView(withId(R.id.menu_scan_preferences)).perform(click());
-     onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
+    onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
 
     //Check if "espresso test" is present
     onData(is(NEW_TEMPLATE_NAME)).check(matches(isCompletelyDisplayed()));
@@ -239,7 +232,7 @@ public class SettingsTest {
     //Re-enter Settings
     Espresso.pressBack();
     Espresso.pressBack();
-     onView(withId(R.id.menu_scan_preferences)).perform(click());
+    onView(withId(R.id.menu_scan_preferences)).perform(click());
     onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
 
     //Check if "espresso test" doesn't exist
@@ -254,28 +247,24 @@ public class SettingsTest {
 
   @Test
   public void searchMethodNameDisplay() {
-    //Open search method chooser
-    onData(withKey(SEARCH_METHOD_KEY)).perform(click());
+    for (String method : SEARCH_METHODS) {
+      //Open search method chooser
+      onData(withKey(SEARCH_METHOD_KEY)).perform(click());
 
-    //Choose method 2
-    onData(is(SEARCH_METHODS[1])).perform(click());
+      //choose method
+      onData(is(method)).perform(click());
 
-    //Check summary text
-    onData(withKey(SEARCH_METHOD_KEY)).onChildView(withId(android.R.id.summary)).check(matches
-        (withText(SEARCH_METHODS[1])));
-
-    //Open search method chooser
-    onData(withKey(SEARCH_METHOD_KEY)).perform(click());
-
-    //Choose method 1
-     onData(is(SEARCH_METHODS[0])).perform(click());
-
-    //Check summary text
-    onData(withKey(SEARCH_METHOD_KEY)).onChildView(withId(android.R.id.summary))
-        .check(matches(withText(SEARCH_METHODS[0])));
+      //check summary text
+      onData(withKey(SEARCH_METHOD_KEY)).onChildView(withId(android.R.id.summary))
+          .check(matches(withText(method)));
+    }
   }
 
-  private void selectTemplates(String... names) {
+  /**
+   * Toggle the specified templates
+   * @param names
+   */
+  private void toggleTemplates(String... names) {
     //Open template chooser
     onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
 
