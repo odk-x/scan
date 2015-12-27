@@ -14,6 +14,8 @@
 
 package org.opendatakit.scan;
 
+import android.support.test.espresso.Espresso;
+import org.junit.*;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainActivity;
 import org.opendatakit.scan.android.utils.ScanUtils;
@@ -27,10 +29,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 import org.hamcrest.Matcher;
 
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.Before;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -45,6 +44,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.doesNotExis
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
+import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
@@ -53,16 +53,29 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AcquireFormImageTest {
+  private static final String SELECT_TEMPLATE_KEY = "select_templates";
+  private static final String TEMPLATE = "example";
 
   @Rule
-  public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(
-      MainActivity.class);
+  public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(MainActivity.class);
 
-  //block external intents
+  @Before
+  @After
+  public void toggleTemplate() {
+    //Select a template before each test, and deselect the template after each test
+    //Has to be done this way because these lines cannot be placed under Before/AfterClass
+    onView(withId(R.id.menu_scan_preferences)).perform(click());
+    onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
+    onData(is(TEMPLATE)).perform(click());
+    onView(withId(android.R.id.button1)).perform(click());
+    Espresso.pressBack();
+  }
+
   @Before
   public void stubAllExternalIntents() {
     extendIdleWaitTimeout();
 
+    //block external intents
     intending(not(isInternal()))
         .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
   }
@@ -93,6 +106,8 @@ public class AcquireFormImageTest {
       onData(not(anyOf(photoList))).check(doesNotExist());
     } catch (RuntimeException e) {
     }
+
+    Espresso.pressBack();
   }
 
   @Test
