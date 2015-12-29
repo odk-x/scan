@@ -37,17 +37,22 @@ import java.util.Set;
 public class AcquireFormImageActivity extends BaseActivity {
   private static final String LOG_TAG = "ODKScan AcquireForm";
 
-  String photoName;
-  String[] templatePaths;
+  private String photoName;
+  private String[] templatePaths;
+  private int acquisitionCode;
+
+  private boolean afterResult = false;
+  private boolean hasLaunched = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     // Default to taking pictures to acquire form images
-    int acquisitionCode = R.integer.take_picture;
+    acquisitionCode = R.integer.take_picture;
     photoName = null;
     templatePaths = null;
+    afterResult = false;
 
     // Retrieve input parameters
     try {
@@ -80,13 +85,27 @@ public class AcquireFormImageActivity extends BaseActivity {
         Log.d(LOG_TAG, "Photo name: " + photoName);
       }
 
-      launchAcquireIntent(acquisitionCode);
+      afterResult = false;
+      hasLaunched = false;
     } catch (Exception e) {
       //Display an error dialog if something goes wrong.
       failAndReturn(e.toString());
       finish();
       return;
     }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    if (afterResult || hasLaunched) {
+      finish();
+      return;
+    }
+
+    launchAcquireIntent(acquisitionCode);
+
   }
 
   /**
@@ -132,6 +151,7 @@ public class AcquireFormImageActivity extends BaseActivity {
       }
 
       Log.d(LOG_TAG, "Taking picture");
+      hasLaunched = true;
       startActivityForResult(acquireIntent, R.integer.new_image);
       break;
 
@@ -154,6 +174,7 @@ public class AcquireFormImageActivity extends BaseActivity {
       }
 
       Log.d(LOG_TAG, "Picking file");
+      hasLaunched = true;
       startActivityForResult(acquireIntent, R.integer.existing_image);
       break;
 
@@ -174,6 +195,7 @@ public class AcquireFormImageActivity extends BaseActivity {
       }
 
       Log.d(LOG_TAG, "Picking folder");
+      hasLaunched = true;
       startActivityForResult(acquireIntent, R.integer.image_directory);
       break;
     }
@@ -210,14 +232,17 @@ public class AcquireFormImageActivity extends BaseActivity {
 
     if (resultCode == Activity.RESULT_FIRST_USER) {
       Log.d(LOG_TAG, "First User");
+      setResult(resultCode);
       finish();
       return;
     } else if (resultCode == Activity.RESULT_CANCELED) {
       Log.d(LOG_TAG, "Canceled");
+      setResult(resultCode);
       finish();
       return;
     } else if (resultCode != RESULT_OK) {
       failAndReturn(this.getString(R.string.error_acquire_bad_return));
+      setResult(resultCode);
       finish();
       return;
     }
@@ -255,6 +280,13 @@ public class AcquireFormImageActivity extends BaseActivity {
     startService(processPhoto);
 
     finish();
+  }
+
+  @Override
+  public void finish() {
+    hasLaunched = false;
+    afterResult = true;
+    super.finish();
   }
 
   @Override
