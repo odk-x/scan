@@ -225,6 +225,7 @@ public class AcquireFormImageActivity extends BaseActivity {
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    afterResult = true;
 
     finishActivity(resultCode);
 
@@ -285,12 +286,20 @@ public class AcquireFormImageActivity extends BaseActivity {
   @Override
   public void finish() {
     hasLaunched = false;
-    afterResult = true;
+    afterResult = false;
     super.finish();
   }
 
   @Override
   protected void onDestroy() {
+    // Default to taking pictures to acquire form images
+    acquisitionCode = R.integer.take_picture;
+    templatePaths = null;
+
+    if (photoName == null) {
+      super.onDestroy();
+    }
+
     //Try to remove the forms directory if the photo couldn't be captured:
     //Note: this won't delete the folder if it has any files in it.
     File capturedImage = new File(ScanUtils.getPhotoPath(photoName));
@@ -298,6 +307,7 @@ public class AcquireFormImageActivity extends BaseActivity {
       new File(ScanUtils.getOutputPath(photoName) + "/segments").delete();
       new File(ScanUtils.getOutputPath(photoName)).delete();
     }
+    photoName = null;
     super.onDestroy();
   }
 

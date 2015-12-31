@@ -55,6 +55,7 @@ public class ProcessFormsService extends IntentService {
 
   @Override
   public void onHandleIntent(Intent intent) {
+    Log.i(LOG_TAG, "Handling Intent to process form");
 
     // Retrieve input parameters
     final Bundle extras = intent.getExtras();
@@ -95,7 +96,7 @@ public class ProcessFormsService extends IntentService {
     try {
       switch (requestCode) {
       case R.integer.new_image:
-        Log.d(LOG_TAG, this.getString(R.string.acquired_from_camera));
+        Log.i(LOG_TAG, this.getString(R.string.acquired_from_camera));
 
         if (photoName == null) {
           Log.e(LOG_TAG, this.getString(R.string.error_photo_name_not_found));
