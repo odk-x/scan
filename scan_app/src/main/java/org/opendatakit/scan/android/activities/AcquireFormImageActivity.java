@@ -37,22 +37,36 @@ import java.util.Set;
 public class AcquireFormImageActivity extends BaseActivity {
   private static final String LOG_TAG = "ODKScan AcquireForm";
 
+  private static final String PHOTO_NAME = "photoName";
   private String photoName;
+
+  private static final String TEMPLATE_PATHS = "templatePaths";
   private String[] templatePaths;
+
+  private static final String ACQUISITION_CODE = "acquisitionCode";
   private int acquisitionCode;
 
+  private static final String AFTER_RESULT = "afterResult";
   private boolean afterResult = false;
+
+  private static final String HAS_LAUNCHED = "hasLaunched";
   private boolean hasLaunched = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Default to taking pictures to acquire form images
-    acquisitionCode = R.integer.take_picture;
-    photoName = null;
-    templatePaths = null;
-    afterResult = false;
+    if (savedInstanceState == null) {
+      // Default to taking pictures to acquire form images
+      acquisitionCode = R.integer.take_picture;
+      photoName = null;
+      templatePaths = null;
+      afterResult = false;
+    } else {
+      photoName = savedInstanceState.getString(PHOTO_NAME);
+      templatePaths = savedInstanceState.getStringArray(TEMPLATE_PATHS);
+      acquisitionCode = savedInstanceState.getInt(ACQUISITION_CODE);
+    }
 
     // Retrieve input parameters
     try {
@@ -93,6 +107,29 @@ public class AcquireFormImageActivity extends BaseActivity {
       finish();
       return;
     }
+  }
+
+  @Override
+  protected  void onSaveInstanceState(Bundle savedInstanceState) {
+    savedInstanceState.putString(PHOTO_NAME, photoName);
+    savedInstanceState.putStringArray(TEMPLATE_PATHS, templatePaths);
+    savedInstanceState.putInt(ACQUISITION_CODE, acquisitionCode);
+    savedInstanceState.putBoolean(AFTER_RESULT, afterResult);
+    savedInstanceState.putBoolean(HAS_LAUNCHED, hasLaunched);
+
+    super.onSaveInstanceState(savedInstanceState);
+  }
+
+  @Override
+  protected  void onRestoreInstanceState(Bundle savedInstanceState) {
+
+    photoName = savedInstanceState.getString(PHOTO_NAME);
+    templatePaths = savedInstanceState.getStringArray(TEMPLATE_PATHS);
+    acquisitionCode = savedInstanceState.getInt(ACQUISITION_CODE);
+    afterResult = savedInstanceState.getBoolean(AFTER_RESULT);
+    hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
+
+    super.onRestoreInstanceState(savedInstanceState);
   }
 
   @Override
@@ -141,7 +178,7 @@ public class AcquireFormImageActivity extends BaseActivity {
       // Create the intent
       acquireIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
       acquireIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-      acquireIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+      acquireIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
       // Check that there exists an app that can handle this intent
       if (acquireIntent.resolveActivity(getPackageManager()) == null) {
@@ -227,23 +264,21 @@ public class AcquireFormImageActivity extends BaseActivity {
     super.onActivityResult(requestCode, resultCode, data);
     afterResult = true;
 
-    finishActivity(resultCode);
+    setResult(resultCode);
+    finishActivity(requestCode);
 
     Log.d(LOG_TAG, "AcquireFormImage onActivityResult " + requestCode);
 
     if (resultCode == Activity.RESULT_FIRST_USER) {
       Log.d(LOG_TAG, "First User");
-      setResult(resultCode);
       finish();
       return;
     } else if (resultCode == Activity.RESULT_CANCELED) {
       Log.d(LOG_TAG, "Canceled");
-      setResult(resultCode);
       finish();
       return;
     } else if (resultCode != RESULT_OK) {
       failAndReturn(this.getString(R.string.error_acquire_bad_return));
-      setResult(resultCode);
       finish();
       return;
     }
