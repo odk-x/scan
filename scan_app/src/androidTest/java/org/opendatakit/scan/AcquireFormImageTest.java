@@ -104,10 +104,10 @@ public class AcquireFormImageTest {
     //Very ugly but it works
     try {
       onData(not(anyOf(photoList))).check(doesNotExist());
-    } catch (RuntimeException e) {
+    } catch (RuntimeException ignored) {
+    } finally {
+      Espresso.pressBack();
     }
-
-    Espresso.pressBack();
   }
 
   @Test
