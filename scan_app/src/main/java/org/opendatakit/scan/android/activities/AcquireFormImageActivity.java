@@ -320,19 +320,9 @@ public class AcquireFormImageActivity extends BaseActivity {
 
   @Override
   public void finish() {
-    hasLaunched = false;
-    afterResult = false;
-    super.finish();
-  }
-
-  @Override
-  protected void onDestroy() {
-    // Default to taking pictures to acquire form images
-    acquisitionCode = R.integer.take_picture;
-    templatePaths = null;
-
     if (photoName == null) {
-      super.onDestroy();
+      super.finish();
+      return;
     }
 
     //Try to remove the forms directory if the photo couldn't be captured:
@@ -342,8 +332,13 @@ public class AcquireFormImageActivity extends BaseActivity {
       new File(ScanUtils.getOutputPath(photoName) + "/segments").delete();
       new File(ScanUtils.getOutputPath(photoName)).delete();
     }
+
     photoName = null;
-    super.onDestroy();
+    acquisitionCode = R.integer.take_picture;
+    templatePaths = null;
+    hasLaunched = false;
+    afterResult = false;
+    super.finish();
   }
 
   public void databaseAvailable() {
