@@ -30,12 +30,13 @@ import android.test.suitebuilder.annotation.LargeTest;
 import org.hamcrest.Matcher;
 
 import org.junit.runner.RunWith;
+import org.opendatakit.scan.utils.EspressoUtils;
+import org.opendatakit.scan.utils.ODKMatcher;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -46,38 +47,30 @@ import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
 import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AcquireFormImageTest {
-  private static final String SELECT_TEMPLATE_KEY = "select_templates";
-  private static final String TEMPLATE = "example";
+  private static final String TEMPLATE_NAME = "example";
 
   @Rule
   public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(MainActivity.class);
 
   @Before
-  @After
-  public void toggleTemplate() {
-    //Select a template before each test, and deselect the template after each test
-    //Has to be done this way because these lines cannot be placed under Before/AfterClass
-    onView(withId(R.id.menu_scan_preferences)).perform(click());
-    onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
-    onData(is(TEMPLATE)).perform(click());
-    onView(withId(android.R.id.button1)).perform(click());
-    Espresso.pressBack();
-  }
-
-  @Before
-  public void stubAllExternalIntents() {
-    extendIdleWaitTimeout();
+  public void setup() {
+    EspressoUtils.adjustIdleWaitTimeout();
+    EspressoUtils.templateSetup(TEMPLATE_NAME, true);
 
     //block external intents
     intending(not(isInternal()))
         .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
+  }
+
+  @After
+  public void cleanup() {
+    EspressoUtils.templateSetup(TEMPLATE_NAME, false);
   }
 
   @Test
@@ -146,9 +139,5 @@ public class AcquireFormImageTest {
         return (new File(dir, name)).isDirectory();
       }
     });
-  }
-
-  private void extendIdleWaitTimeout() {
-    IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
   }
 }
