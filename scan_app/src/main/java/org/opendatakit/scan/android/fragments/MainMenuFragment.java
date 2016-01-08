@@ -83,28 +83,6 @@ public class MainMenuFragment extends Fragment {
       }
     });
 
-    Button processImage = (Button) view.findViewById(R.id.ProcessImageButton);
-    processImage.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
-        intent.putExtra("acquisitionMethod", R.integer.pick_file);
-        intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-      }
-    });
-
-    Button processFolder = (Button) view.findViewById(R.id.ProcessFolderButton);
-    processFolder.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
-        intent.putExtra("acquisitionMethod", R.integer.pick_directory);
-        intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-      }
-    });
-
     Button viewForms = (Button) view.findViewById(R.id.ViewFormsButton);
     viewForms.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {

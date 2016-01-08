@@ -29,30 +29,6 @@
 
     </Button>
 
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-        <Button
-                android:id="@+id/ProcessImageButton"
-                style="@style/StandardButton"
-                android:layout_width="0dp"
-                android:text="@string/process_image"
-                android:layout_weight="1">
-
-        </Button>
-
-        <Button
-                android:id="@+id/ProcessFolderButton"
-                style="@style/StandardButton"
-                android:layout_width="0dp"
-                android:text="@string/process_folder"
-                android:layout_weight="1">
-
-        </Button>
-    </LinearLayout>
-
     <Button
             android:id="@+id/ViewFormsButton"
             style="@style/StandardButton"
