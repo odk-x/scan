@@ -582,6 +582,13 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
     StringBuilder dbValuesToWrite = new StringBuilder();
     String uuidStr = UUID.randomUUID().toString();
+
+    // scanOutputDir is not a uriFragment it is an app-relative path.
+    String uniqueScanImageFolder = ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1));
+    // but we want to make this app-relative
+    String appRelativeUniqueScanImageFolder =
+        ODKFileUtils.asUriFragment(getAppName(), new File(uniqueScanImageFolder));
+
     try {
       if (tableId == null) {
         throw new Exception("tableId cannot be blank!!");
@@ -610,7 +617,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       orderedColumns = createSurveyTables(db, tableId, fields);
 
       String selection = scanOutputDir + "=?";
-      String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
+      String[] selectionArgs = { appRelativeUniqueScanImageFolder };
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
@@ -679,14 +686,15 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         String rawOutputFileName_uriFragment = rawOutputFileName + "_uriFragment";
         String rawOutputFileName_contentType = rawOutputFileName + "_contentType";
 
-        tablesValues.put(rawOutputFileName_uriFragment, fullFileName);
+        String tempPath = ODKFileUtils.asRowpathUri(getAppName(), tableId, rowId, outputFile);
+
+        tablesValues.put(rawOutputFileName_uriFragment, tempPath);
         tablesValues.put(rawOutputFileName_contentType, "application/json");
       }
 
       if (tablesValues.size() > 0) {
         // Add scan metadata here for the photo taken
-        tablesValues
-            .put(scanOutputDir, ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)));
+        tablesValues.put(scanOutputDir, appRelativeUniqueScanImageFolder);
 
         if (writeOutCustomCss) {
           writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());

@@ -17,6 +17,7 @@ package org.opendatakit.scan.android.activities;
 
 import java.io.File;
 
+import android.app.*;
 import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.common.android.activities.IInitResumeActivity;
 import org.opendatakit.common.android.fragment.AboutMenuFragment;
@@ -26,12 +27,7 @@ import org.opendatakit.common.android.utilities.DependencyChecker;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.common.android.utilities.WebLogger;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentManager.BackStackEntry;
-import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -300,8 +296,10 @@ public class MainActivity extends BaseActivity
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    Intent intent;
     String appName = getAppName();
     WebLogger.getLogger(appName).d(TAG, "[onOptionsItemSelected] selecting an item");
+
     switch (item.getItemId()) {
     case R.id.menu_scan_about:
       swapScreens(ScreenType.ABOUT_SCREEN);
@@ -311,6 +309,20 @@ public class MainActivity extends BaseActivity
       return true;
     case R.id.menu_scan_preferences:
       swapScreens(ScreenType.SETTINGS_SCREEN);
+      return true;
+    case R.id.processImage:
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_file);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+      startActivity(intent);
+      return true;
+    case R.id.processFolder:
+      intent = new Intent(getApplication(), AcquireFormImageActivity.class);
+      intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+      startActivity(intent);
       return true;
     default:
       return super.onOptionsItemSelected(item);
