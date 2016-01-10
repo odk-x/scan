@@ -2,6 +2,7 @@ package org.opendatakit.scan.utils;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingPolicies;
+import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.view.View;
 import android.widget.CheckedTextView;
@@ -16,6 +17,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
+import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.is;
 
@@ -49,6 +52,8 @@ public class EspressoUtils {
   }
 
   public static void templateSetup(String template, boolean turnOn) {
+    goToMainMenu();
+
     //Open Preferences
     onView(withId(R.id.menu_scan_preferences)).perform(click());
     onData(withKey(TEMPLATE_PREF_KEY)).perform(click());
@@ -79,5 +84,21 @@ public class EspressoUtils {
 
     //Exit preferences
     Espresso.pressBack();
+  }
+
+  public static void checkOnMainMenu() {
+    onView(withContentDescription("ODKScan title")).check(matches(isCompletelyDisplayed()));
+  }
+
+  /**
+   * Recursively press the "back" button until reaching the Main Menu
+   */
+  public static void goToMainMenu() {
+    try {
+      checkOnMainMenu();
+    } catch (NoMatchingViewException e) {
+      Espresso.pressBack();
+      goToMainMenu();
+    }
   }
 }

@@ -15,6 +15,7 @@
 package org.opendatakit.scan;
 
 import android.support.test.espresso.Espresso;
+import org.hamcrest.core.StringEndsWith;
 import org.junit.*;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainActivity;
@@ -40,14 +41,15 @@ import java.util.List;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
 import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
@@ -85,22 +87,8 @@ public class AcquireFormImageTest {
     //Open "View Scanned Forms"
     onView(withId(R.id.ViewFormsButton)).perform(click());
 
-    //List of expected entries
-    List<Matcher<? super String>> photoList = new ArrayList<>();
-    for (String s : photoNames) {
-      photoList.add(is(s));
-    }
-
-    //Check if there are extra entries
-    //If no extra entries exist, no exception will be thrown
-    //If extra entries exist, test fails
-    //Very ugly but it works
-    try {
-      onData(not(anyOf(photoList))).check(doesNotExist());
-    } catch (RuntimeException ignored) {
-    } finally {
-      Espresso.pressBack();
-    }
+    //Check that there's no extraneous entry
+    onView(withId(android.R.id.list)).check(matches(ODKMatcher.withSize(photoNames.length)));
   }
 
   @Test
@@ -115,7 +103,8 @@ public class AcquireFormImageTest {
   @Test
   public void processSavedImage_launchChooser() {
     //Click "Process Saved Image"
-    onView(withId(R.id.ProcessImageButton)).perform(click());
+    onView(withClassName(endsWith("OverflowMenuButton"))).perform(click());
+    onView(withText(R.string.process_image)).perform(click());
 
     intended(hasAction("org.openintents.action.PICK_FILE"));
   }
@@ -123,7 +112,8 @@ public class AcquireFormImageTest {
   @Test
   public void processImageFolder_launchChooser() {
     //Click "Process Image Folder"
-    onView(withId(R.id.ProcessFolderButton)).perform(click());
+    onView(withClassName(endsWith("OverflowMenuButton"))).perform(click());
+    onView(withText(R.string.process_folder)).perform(click());
 
     intended(hasAction("org.openintents.action.PICK_DIRECTORY"));
   }

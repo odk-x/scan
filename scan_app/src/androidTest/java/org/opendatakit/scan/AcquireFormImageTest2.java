@@ -30,10 +30,8 @@ import java.util.regex.Pattern;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.*;
 
 /**
  * This class contains UI tests regarding AcquireFormImageActivity that doesn't
@@ -74,8 +72,10 @@ public class AcquireFormImageTest2 {
   }
 
   @Test
-  public void scanNewForm_rotateCamera() throws InterruptedException, RemoteException {
+  public void scanNewForm_rotateCamera() throws InterruptedException, RemoteException{
     this.runCleanup = false;
+
+    mDevice.freezeRotation();
 
     //Press Scan New Form
     onView(withId(R.id.ScanButton)).perform(click());
@@ -115,35 +115,32 @@ public class AcquireFormImageTest2 {
       mDevice.findObject(By.desc(CHECK_DESC)).click();
     }
 
-    //Check that app is back to main menu
-    onView(withId(R.id.ScanButton)).check(matches(isCompletelyDisplayed()));
+    try {
+      EspressoUtils.checkOnMainMenu();
+    } finally {
+      //Turn device back
+      mDevice.setOrientationNatural();
 
-    //Turn device back
-    mDevice.setOrientationNatural();
+      //Wait for form processing to finish
+      mDevice.openNotification();
+      Pattern p = Pattern.compile(StringUtils.getString(mActivityRule, R.string
+          .finished_processing) + "|" + StringUtils.getString(mActivityRule, R.string.error_processing));
+      UiObject2 processDone = mDevice.wait(Until.findObject(By.text(p)), PROCESS_WAIT_TIME);
+      processDone.click();
+      mDevice.waitForIdle();
+      mDevice.pressBack();
 
-    //Wait for form processing to finish
-    mDevice.openNotification();
-    Pattern p = Pattern.compile(StringUtils.getString(mActivityRule, R.string
-        .finished_processing) + "|" + StringUtils.getString(mActivityRule, R.string.error_processing));
-    UiObject2 processDone = mDevice.wait(Until.findObject(By.text(p)), PROCESS_WAIT_TIME);
-    processDone.click();
-    mDevice.waitForIdle();
-    mDevice.pressBack();
-
-    //Delete files
-    deleteDir(path[0]);
+      //Delete files
+      deleteDir(new File(path[0]));
+    }
   }
 
-  private void deleteDir(String path) {
-    File f = new File(path);
-    if (!f.isDirectory()) {
-      f.delete();
-    } else {
-      String[] items = f.list();
-      for (String item : items) {
-        deleteDir(path + item);
+  private void deleteDir(File dir) {
+    if (dir.isDirectory()) {
+      for (File f : dir.listFiles()) {
+        deleteDir(f);
       }
-      f.delete();
     }
+    dir.delete();
   }
 }

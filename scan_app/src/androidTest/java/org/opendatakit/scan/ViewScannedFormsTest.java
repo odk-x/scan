@@ -14,8 +14,6 @@
 
 package org.opendatakit.scan;
 
-import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 
@@ -29,7 +27,6 @@ import org.junit.runner.RunWith;
 
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.DisplayProcessedFormActivity;
 import org.opendatakit.scan.android.activities.MainActivity;
 import org.opendatakit.scan.android.activities.ViewScannedForms;
 import org.opendatakit.scan.android.utils.ScanUtils;
@@ -47,15 +44,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDis
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
 import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ViewScannedFormsTest {
-  private static final String DATA_DIR = "scan_data";
-  private static final String SCAN_DATA = ODKFileUtils.getDataFolder("tables");
+  private static final String ASSET_DIR = "scan_data";
+  private static final String SCAN_DATA = ODKFileUtils.getDataFolder(ScanUtils.appName);
   private static final String TEMPLATE_NAME = "example";
 
   private String[] expectedEntries;
@@ -67,13 +63,13 @@ public class ViewScannedFormsTest {
   @BeforeClass
   public static void classSetUp() throws IOException {
     //populate dummy data
-    copyAssets(InstrumentationRegistry.getContext().getAssets(), DATA_DIR, SCAN_DATA);
+    copyAssets(InstrumentationRegistry.getContext().getAssets(), ASSET_DIR, SCAN_DATA);
   }
 
   @AfterClass
   public static void classCleanUp() throws IOException {
     //delete dummy data
-    deleteAssets(InstrumentationRegistry.getContext().getAssets(), DATA_DIR, SCAN_DATA);
+    deleteAssets(InstrumentationRegistry.getContext().getAssets(), ASSET_DIR, SCAN_DATA);
   }
 
   @Before
@@ -91,7 +87,6 @@ public class ViewScannedFormsTest {
 
   @After
   public void cleanUp() {
-    Espresso.pressBack();
     EspressoUtils.templateSetup(TEMPLATE_NAME, false);
   }
 
@@ -140,10 +135,6 @@ public class ViewScannedFormsTest {
 
   @Test
   public void viewForms_DisplayProcessedForm() {
-    //Cancel all internal intents
-    intending(isInternal()).respondWith(
-        new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
-
     //Iterate through all dummy data
     //If item is green -> launch DisplayProcessedForm
     //If tem is yellow or red -> stay in ViewScannedForms
@@ -160,8 +151,11 @@ public class ViewScannedFormsTest {
       //Press ith item
       onData(anything()).atPosition(i).perform(click());
 
+      //Land on display process form if entry is green, stay on form list if otherwise
       if (color == Color.GREEN) {
-        intended(hasComponent(DisplayProcessedFormActivity.class.getName()));
+        onView(withId(R.id.saveBtn)).check(matches(isCompletelyDisplayed()));
+        onView(withId(R.id.transcribeBtn)).check(matches(isCompletelyDisplayed()));
+        Espresso.pressBack();
       } else {
         intended(hasComponent(ViewScannedForms.class.getName()));
       }
