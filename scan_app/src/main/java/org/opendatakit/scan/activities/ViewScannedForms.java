@@ -12,15 +12,15 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
 
 import org.opendatakit.common.android.activities.BaseListActivity;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import android.content.Intent;
 import android.graphics.Color;

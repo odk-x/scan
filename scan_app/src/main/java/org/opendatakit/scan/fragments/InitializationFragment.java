@@ -1,4 +1,4 @@
-package org.opendatakit.scan.android.fragments;
+package org.opendatakit.scan.fragments;
 
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -18,9 +18,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.application.Scan;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.application.Scan;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
 import java.io.IOException;

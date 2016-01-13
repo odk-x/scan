@@ -14,7 +14,7 @@
 
 package org.opendatakit.scan;
 
-import org.opendatakit.scan.android.activities.MainActivity;
+import org.opendatakit.scan.activities.MainActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

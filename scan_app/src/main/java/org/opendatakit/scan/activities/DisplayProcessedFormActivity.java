@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.scan.android.utils.JSONUtils;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.utils.JSONUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;

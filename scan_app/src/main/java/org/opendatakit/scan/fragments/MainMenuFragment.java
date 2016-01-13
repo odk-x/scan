@@ -1,4 +1,4 @@
-package org.opendatakit.scan.android.fragments;
+package org.opendatakit.scan.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,9 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.AcquireFormImageActivity;
-import org.opendatakit.scan.android.activities.ViewScannedForms;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.AcquireFormImageActivity;
+import org.opendatakit.scan.activities.ViewScannedForms;
 
 import java.util.Random;
 import java.util.Set;

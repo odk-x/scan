@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <org.opendatakit.scan.android.preferences.TemplatePreference
+    <org.opendatakit.scan.preferences.TemplatePreference
             android:key="select_templates"
             android:title="@string/template_to_use"
             android:dialogTitle="@string/template_to_use"
