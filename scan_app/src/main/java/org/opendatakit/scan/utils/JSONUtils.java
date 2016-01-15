@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android.utils;
+package org.opendatakit.scan.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android.services;
+package org.opendatakit.scan.services;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -31,10 +31,10 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.DisplayProcessedFormActivity;
-import org.opendatakit.scan.android.activities.DisplayStatusActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.DisplayProcessedFormActivity;
+import org.opendatakit.scan.activities.DisplayStatusActivity;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
 import java.util.Arrays;

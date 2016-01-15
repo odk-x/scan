@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import java.io.File;
 
@@ -37,13 +37,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.application.Scan;
-import org.opendatakit.scan.android.fragments.InitializationFragment;
-import org.opendatakit.scan.android.fragments.InstructionsFragment;
-import org.opendatakit.scan.android.fragments.MainMenuFragment;
-import org.opendatakit.scan.android.fragments.ScanPreferencesFragment;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.application.Scan;
+import org.opendatakit.scan.fragments.InitializationFragment;
+import org.opendatakit.scan.fragments.InstructionsFragment;
+import org.opendatakit.scan.fragments.MainMenuFragment;
+import org.opendatakit.scan.fragments.ScanPreferencesFragment;
+import org.opendatakit.scan.utils.ScanUtils;
 
 public class MainActivity extends BaseActivity
     implements DatabaseConnectionListener, IInitResumeActivity {

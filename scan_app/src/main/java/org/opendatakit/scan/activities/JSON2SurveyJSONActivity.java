@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,9 +39,9 @@ import org.opendatakit.common.android.provider.DataTableColumns;
 import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.database.service.OdkDbHandle;
-import org.opendatakit.scan.android.utils.JSONUtils;
-import org.opendatakit.scan.android.utils.ScanUtils;
-import org.opendatakit.scan.android.application.Scan;
+import org.opendatakit.scan.utils.JSONUtils;
+import org.opendatakit.scan.utils.ScanUtils;
+import org.opendatakit.scan.application.Scan;
 
 import android.content.ContentValues;
 import android.content.Intent;

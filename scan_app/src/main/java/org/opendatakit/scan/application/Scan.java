@@ -12,12 +12,12 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.application;
+package org.opendatakit.scan.application;
 
 import org.opendatakit.common.android.application.CommonApplication;
 import org.opendatakit.common.android.logic.CommonToolProperties;
 import org.opendatakit.common.android.logic.PropertiesSingleton;
-import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.R;
 
 public class Scan extends CommonApplication {
 

@@ -12,13 +12,13 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.preferences;
+package org.opendatakit.scan.preferences;
 
 import android.content.Context;
 import android.preference.MultiSelectListPreference;
 import android.util.AttributeSet;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;

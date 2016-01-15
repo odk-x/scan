@@ -1,4 +1,4 @@
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -17,10 +17,10 @@ import android.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.application.Scan;
-import org.opendatakit.scan.android.services.ProcessFormsService;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.application.Scan;
+import org.opendatakit.scan.services.ProcessFormsService;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
