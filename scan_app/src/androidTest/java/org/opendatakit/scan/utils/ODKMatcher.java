@@ -12,30 +12,53 @@
  * the License.
  */
 
-package org.opendatakit.scan;
+package org.opendatakit.scan.utils;
 
 import android.support.test.espresso.matcher.BoundedMatcher;
 
+import android.widget.ListView;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
 import android.support.test.internal.util.Checks;
 import android.view.View;
 import android.widget.TextView;
+import org.hamcrest.TypeSafeMatcher;
 
-public class ColorMatcher {
+import java.util.List;
+
+public class ODKMatcher {
   public static Matcher<View> withTextColor(final int color) {
-    Checks.checkNotNull(color);
-
     return new BoundedMatcher<View, TextView>(TextView.class) {
+      private int textColor;
+
       @Override
       public boolean matchesSafely(TextView view) {
-        return color == view.getCurrentTextColor();
+        this.textColor = view.getCurrentTextColor();
+        return color == this.textColor;
       }
 
       @Override
       public void describeTo(Description description) {
-        description.appendText("With text color: " + color);
+        description.appendText("Text color should be: " + color + "; Got: " + this.textColor);
+      }
+    };
+  }
+
+  public static Matcher<View> withSize(final int size) {
+    return new BoundedMatcher<View, ListView>(ListView.class) {
+      private int listSize;
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("List size should be: " + size + "; Got: " + this.listSize);
+      }
+
+      @Override
+      protected boolean matchesSafely(ListView item) {
+        this.listSize = item.getCount();
+
+        return this.listSize == size;
       }
     };
   }

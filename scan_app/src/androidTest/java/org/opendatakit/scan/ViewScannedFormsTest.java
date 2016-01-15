@@ -14,136 +14,151 @@
 
 package org.opendatakit.scan;
 
-import org.junit.*;
+import android.content.res.AssetManager;
+import android.graphics.Color;
 
-import org.junit.runner.RunWith;
-
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
+import org.junit.*;
+import org.junit.runner.RunWith;
 
+import org.opendatakit.common.android.utilities.ODKFileUtils;
+import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.android.activities.MainActivity;
+import org.opendatakit.scan.android.activities.ViewScannedForms;
+import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.utils.EspressoUtils;
+import org.opendatakit.scan.utils.ODKMatcher;
+
+import java.io.*;
+import java.util.Date;
+
+import static android.support.test.espresso.Espresso.onData;
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ViewScannedFormsTest {
-  //private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
-  //.substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
+  private static final String ASSET_DIR = "scan_data";
+  private static final String SCAN_DATA = ODKFileUtils.getDataFolder(ScanUtils.appName);
+  private static final String TEMPLATE_NAME = "example";
 
-  // TODO: Fix these tests
-  @Test
-  public void dummyTest() {
-    assert (true);
-  }
+  private String[] expectedEntries;
 
-  /*
+  //Need to enter from MainActivity! Otherwise viewForms_DisplayProcessedForm() would not work
   @Rule
-  public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
-      MainActivity.class);
+  public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(MainActivity.class);
 
   @BeforeClass
-  public static void setUp() throws IOException {
+  public static void classSetUp() throws IOException {
     //populate dummy data
-    copyAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
+    copyAssets(InstrumentationRegistry.getContext().getAssets(), ASSET_DIR, SCAN_DATA);
   }
 
   @AfterClass
-  public static void cleanUp() throws IOException {
+  public static void classCleanUp() throws IOException {
     //delete dummy data
-    deleteAssets(InstrumentationRegistry.getContext().getAssets(), OUTPUT_DIR_NAME);
+    deleteAssets(InstrumentationRegistry.getContext().getAssets(), ASSET_DIR, SCAN_DATA);
   }
 
-  //Pre-condition to all tests in this class
-  //there must be at least one scanned form
   @Before
-  public void hasAtLeastOneForm() {
-    extendIdleWaitTimeout();
+  public void setup() {
+    EspressoUtils.adjustIdleWaitTimeout();
+    EspressoUtils.templateSetup(TEMPLATE_NAME, true);
 
+    //Enter "View Scanned Forms"
     onView(withId(R.id.ViewFormsButton)).perform(click());
-    onData(anything()).atPosition(0).check(matches(isCompletelyDisplayed()));
-  }
 
-  @Test
-  public void viewForms_displayEntries() {
-    String[] photoNames = getPhotoNames();
-
-    //Check if each output is displayed
-    for (String s : photoNames) {
-      onData(is(s)).check(matches(isCompletelyDisplayed()));
-    }
-
-    //List of expected entries
-    List<Matcher<? super String>> photoList = new ArrayList<>();
-    for (String s : photoNames) {
-      photoList.add(is(s));
-    }
-
-    //Check if there are extra entries
-    //If no extra entries exist, no exception will be thrown
-    //If extra entries exist, test fails
-    //Very ugly but it works
-    try {
-      onData(not(anyOf(photoList))).check(doesNotExist());
-    } catch (RuntimeException e) {
+    if (this.expectedEntries == null) {
+      this.expectedEntries = getPhotoNames();
     }
   }
 
-  @Test
-  public void viewForms_displayEntriesMetadata() {
-    String[] photoNames = getPhotoNames();
+  @After
+  public void cleanUp() {
+    EspressoUtils.templateSetup(TEMPLATE_NAME, false);
+  }
 
-    //Check if metadata of each output is displayed correctly
-    for (String s : photoNames) {
-      //check PhotoStatus
-      int color = Color.parseColor("#FF0000"); //red
-      if (new File(ScanUtils.getJsonPath(s)).exists()) {
-        color = Color.parseColor("#00FF00"); //green
-      } else if (new File(ScanUtils.getAlignedPhotoPath(s)).exists()) {
-        color = Color.parseColor("#FFFF00"); //yellow
+  @Test
+  public void viewForms_numOfEntries() {
+    onView(withId(android.R.id.list))
+        .check(matches(ODKMatcher.withSize(this.expectedEntries.length)));
+  }
+
+  @Test
+  public void viewForms_displayTemplateName() {
+    for (int i = 0; i < this.expectedEntries.length; i++) {
+      //Check if template name matches directory name
+      onData(anything()).atPosition(i).onChildView(withId(R.id.templateName)).check(matches(withText(this
+          .expectedEntries[i].split("_")[0])));
+    }
+  }
+
+  @Test
+  public void viewForms_displayEntriesPhotoStatus() {
+    for (int i = 0; i < this.expectedEntries.length; i++) {
+      String photoName = this.expectedEntries[i];
+
+      int color = Color.RED;
+      if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
+        color = Color.GREEN;
+      } else if (new File(ScanUtils.getAlignedPhotoPath(photoName)).exists()) {
+        color = Color.YELLOW;
       }
-      onData(is(s)).onChildView(withId(R.id.photoStatus))
-          .check(matches(ColorMatcher.withTextColor(color)));
 
-      //Check templateName
-      onData(is(s)).onChildView(withId(R.id.templateName))
-          .check(matches(withText(s.split("_")[0])));
+      onData(anything()).atPosition(i).onChildView(withId(R.id.photoStatus)).check(
+          matches(ODKMatcher.withTextColor(color)));
+    }
+  }
 
-      //Check createdTime
-      onData(is(s)).onChildView(withId(R.id.createdTime)).check(matches(
-          withText(new Date(new File(ScanUtils.getPhotoPath(s)).lastModified()).toString())));
+  @Test
+  public void viewForms_displayDateTime() {
+    for (int i  = 0; i < this.expectedEntries.length; i++) {
+      String dateTime = new Date(new File(ScanUtils.getPhotoPath(this.expectedEntries[i]))
+          .lastModified()).toString();
+
+      onData(anything()).atPosition(i).onChildView(withId(R.id.createdTime)).check(matches
+          (withText(dateTime)));
     }
   }
 
   @Test
   public void viewForms_DisplayProcessedForm() {
-    //if first item is green, activity should land on Display Processed Form
-    //if otherwise, should stay on the same activity
-    try {
-      //check color
-      onData(anything()).atPosition(0).onChildView(withId(R.id.photoStatus))
-          .check(matches(ColorMatcher.withTextColor(Color.parseColor("#00FF00"))));
+    //Iterate through all dummy data
+    //If item is green -> launch DisplayProcessedForm
+    //If tem is yellow or red -> stay in ViewScannedForms
+    for (int i = 0; i < this.expectedEntries.length; i++) {
+      String photoName = this.expectedEntries[i];
 
-      //click first item
-      onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
-      //check title
-      onView(withId(android.R.id.title)).check(matches(withText(
-          mActivityRule.getActivity().getResources()
-              .getString(R.string.display_processed_form_activity))));
-    } catch (junit.framework.AssertionFailedError e) {
-      //click first item
-      onData(anything()).atPosition(0).onChildView(withId(R.id.templateName)).perform(click());
-      //check title
-      onView(withId(android.R.id.title)).check(matches(withText(
-          mActivityRule.getActivity().getResources()
-              .getString(R.string.view_bubble_forms_activity))));
+      int color = Color.RED;
+      if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
+        color = Color.GREEN;
+      } else if (new File(ScanUtils.getAlignedPhotoPath(photoName)).exists()) {
+        color = Color.YELLOW;
+      }
+
+      //Press ith item
+      onData(anything()).atPosition(i).perform(click());
+
+      //Land on display process form if entry is green, stay on form list if otherwise
+      if (color == Color.GREEN) {
+        onView(withId(R.id.saveBtn)).check(matches(isCompletelyDisplayed()));
+        onView(withId(R.id.transcribeBtn)).check(matches(isCompletelyDisplayed()));
+        Espresso.pressBack();
+      } else {
+        intended(hasComponent(ViewScannedForms.class.getName()));
+      }
     }
   }
 
@@ -151,8 +166,8 @@ public class ViewScannedFormsTest {
    * Traverses "output" directory to find all expected entries of scanned forms
    *
    * @return A String[] of the entries
-   *
-  private String[] getPhotoNames() {
+   */
+  private static String[] getPhotoNames() {
     return new File(ScanUtils.getOutputDirPath()).list(new FilenameFilter() {
       public boolean accept(File dir, String name) {
         return (new File(dir, name)).isDirectory();
@@ -161,49 +176,52 @@ public class ViewScannedFormsTest {
   }
 
   /**
-   * Copies sourceDir from assets directory to ODKScan directory
+   * Copies sourceDir from assets directory to ODKScan directory, recursively.
    *
    * @param assetMngr
    * @param sourceDir
+   * @param targetDir
    * @throws IOException
-   *
-  private static void copyAssets(AssetManager assetMngr, String sourceDir) throws IOException {
+   */
+  private static void copyAssets(AssetManager assetMngr, String sourceDir, String targetDir) throws
+      IOException {
     String[] fileList = assetMngr.list(sourceDir);
 
     for (String s : fileList) {
-      String newDir = sourceDir + "/" + s;
+      String newDir = sourceDir + File.separator + s;
       String[] subDirFileList = assetMngr.list(newDir);
 
       if (subDirFileList.length == 0) {
         copyFile(assetMngr.open(newDir),
-            new FileOutputStream(new File(ScanUtils.appFolder + newDir)));
+            new FileOutputStream(new File(targetDir + File.separator + newDir)));
       } else {
-        new File(ScanUtils.appFolder + newDir).mkdir();
-
-        copyAssets(assetMngr, newDir);
+        new File(targetDir + File.separator + newDir).mkdir();
+        copyAssets(assetMngr, newDir, targetDir);
       }
     }
   }
 
   /**
-   * Deletes sourceDir of assets directory from ODKScan directory
+   * Deletes sourceDir of assets directory from ODKScan directory, recursively.
    *
    * @param assetMngr
    * @param sourceDir
+   * @param targetDir
    * @throws IOException
-   *
-  private static void deleteAssets(AssetManager assetMngr, String sourceDir) throws IOException {
+   */
+  private static void deleteAssets(AssetManager assetMngr, String sourceDir, String targetDir)
+      throws IOException {
     String[] fileList = assetMngr.list(sourceDir);
 
     for (String s : fileList) {
-      String newDir = sourceDir + "/" + s;
+      String newDir = sourceDir + File.separator + s;
       String[] subDirFileList = assetMngr.list(newDir);
 
       if (subDirFileList.length == 0) {
-        new File(ScanUtils.appFolder + newDir).delete();
+        new File(targetDir + File.separator + newDir).delete();
       } else {
-        deleteAssets(assetMngr, newDir);
-        new File(ScanUtils.appFolder + newDir).delete();
+        deleteAssets(assetMngr, newDir, targetDir);
+        new File(targetDir + File.separator + newDir).delete();
       }
     }
   }
@@ -214,7 +232,7 @@ public class ViewScannedFormsTest {
    * @param in
    * @param out
    * @throws IOException
-   *
+   */
   private static void copyFile(InputStream in, OutputStream out) throws IOException {
     byte[] buffer = new byte[1024];
     int read;
@@ -223,9 +241,4 @@ public class ViewScannedFormsTest {
       out.write(buffer, 0, read);
     }
   }
-
-  private void extendIdleWaitTimeout() {
-    IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
-  }
-  */
 }
