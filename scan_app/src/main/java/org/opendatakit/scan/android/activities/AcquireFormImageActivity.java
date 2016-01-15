@@ -75,6 +75,19 @@ public class AcquireFormImageActivity extends BaseActivity {
         extras = new Bundle();
         Log.i("SCAN", "No bundle");
       }
+
+      if (!extras.containsKey("intentRequestCode")) {
+        finish();
+        return;
+      } else {
+        int intentRequestCode = extras.getInt("intentRequestCode");
+        if (intentRequestCode != R.integer.scan_main_menu
+            && intentRequestCode != R.integer.external_intent) {
+          finish();
+          return;
+        }
+      }
+
       if (extras.containsKey("acquisitionMethod")) {
         acquisitionCode = extras.getInt("acquisitionMethod");
         Log.d(LOG_TAG, "Acquisition code: " + acquisitionCode);
@@ -110,7 +123,7 @@ public class AcquireFormImageActivity extends BaseActivity {
   }
 
   @Override
-  protected  void onSaveInstanceState(Bundle savedInstanceState) {
+  protected void onSaveInstanceState(Bundle savedInstanceState) {
     savedInstanceState.putString(PHOTO_NAME, photoName);
     savedInstanceState.putStringArray(TEMPLATE_PATHS, templatePaths);
     savedInstanceState.putInt(ACQUISITION_CODE, acquisitionCode);
@@ -121,7 +134,7 @@ public class AcquireFormImageActivity extends BaseActivity {
   }
 
   @Override
-  protected  void onRestoreInstanceState(Bundle savedInstanceState) {
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
     photoName = savedInstanceState.getString(PHOTO_NAME);
     templatePaths = savedInstanceState.getStringArray(TEMPLATE_PATHS);
@@ -137,9 +150,9 @@ public class AcquireFormImageActivity extends BaseActivity {
     super.onResume();
 
     if (afterResult || hasLaunched) {
-      finish();
       return;
     }
+    hasLaunched = true;
 
     launchAcquireIntent(acquisitionCode);
 
@@ -320,19 +333,9 @@ public class AcquireFormImageActivity extends BaseActivity {
 
   @Override
   public void finish() {
-    hasLaunched = false;
-    afterResult = false;
-    super.finish();
-  }
-
-  @Override
-  protected void onDestroy() {
-    // Default to taking pictures to acquire form images
-    acquisitionCode = R.integer.take_picture;
-    templatePaths = null;
-
     if (photoName == null) {
-      super.onDestroy();
+      super.finish();
+      return;
     }
 
     //Try to remove the forms directory if the photo couldn't be captured:
@@ -342,8 +345,13 @@ public class AcquireFormImageActivity extends BaseActivity {
       new File(ScanUtils.getOutputPath(photoName) + "/segments").delete();
       new File(ScanUtils.getOutputPath(photoName)).delete();
     }
+
     photoName = null;
-    super.onDestroy();
+    acquisitionCode = R.integer.take_picture;
+    templatePaths = null;
+    hasLaunched = false;
+    afterResult = true;
+    super.finish();
   }
 
   public void databaseAvailable() {

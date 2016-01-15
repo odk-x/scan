@@ -450,18 +450,24 @@ public class DisplayProcessedFormActivity extends BaseActivity {
     if (itemId == R.id.scanNewForm) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.take_picture);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;
     } else if (itemId == R.id.processImage) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.pick_file);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;
     } else if (itemId == R.id.processFolder) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;

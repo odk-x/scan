@@ -21,6 +21,7 @@ import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.AcquireFormImageActivity;
 import org.opendatakit.scan.android.activities.ViewScannedForms;
 
+import java.util.Random;
 import java.util.Set;
 
 public class MainMenuFragment extends Fragment {
@@ -40,11 +41,7 @@ public class MainMenuFragment extends Fragment {
     try {
       PackageInfo packInfo = containerActivity.getPackageManager()
           .getPackageInfo(containerActivity.getPackageName(), 0);
-      {
-        // dynamically construct the main screen version string
-        TextView mainMenuMessageLabel = (TextView) view.findViewById(R.id.version_display);
-        mainMenuMessageLabel.setText("version:\n" + packInfo.versionName);
-      }
+
       // check version and run setup if needed
       int storedVersionCode = settings.getInt("version", 0);
       int appVersionCode = packInfo.versionCode;
@@ -80,24 +77,8 @@ public class MainMenuFragment extends Fragment {
       public void onClick(View v) {
         Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
         intent.putExtra("acquisitionMethod", R.integer.take_picture);
-        startActivity(intent);
-      }
-    });
-
-    Button processImage = (Button) view.findViewById(R.id.ProcessImageButton);
-    processImage.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
-        intent.putExtra("acquisitionMethod", R.integer.pick_file);
-        startActivity(intent);
-      }
-    });
-
-    Button processFolder = (Button) view.findViewById(R.id.ProcessFolderButton);
-    processFolder.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
-        intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+        intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
       }
     });

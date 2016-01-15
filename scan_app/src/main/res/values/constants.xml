@@ -13,4 +13,8 @@
     <integer name="existing_image">579111517</integer>
     <integer name="image_directory">68101214</integer>
 
+    <!-- Acquire image intent codes -->
+    <integer name="scan_main_menu">101010</integer>
+    <integer name="external_intent">202020</integer>
+
 </resources>

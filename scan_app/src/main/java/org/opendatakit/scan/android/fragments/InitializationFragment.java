@@ -181,7 +181,6 @@ public class InitializationFragment extends Fragment
     new File(ScanUtils.getOutputDirPath()).mkdirs();
 
     try {
-      //android.os.Debug.waitForDebugger();
 
       //Creates a .nomedia file to prevent the images from showing up in the gallery.
       /*

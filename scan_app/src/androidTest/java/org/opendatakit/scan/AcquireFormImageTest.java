@@ -15,6 +15,7 @@
 package org.opendatakit.scan;
 
 import android.support.test.espresso.Espresso;
+import org.hamcrest.core.StringEndsWith;
 import org.junit.*;
 import org.opendatakit.scan.android.R;
 import org.opendatakit.scan.android.activities.MainActivity;
@@ -30,54 +31,48 @@ import android.test.suitebuilder.annotation.LargeTest;
 import org.hamcrest.Matcher;
 
 import org.junit.runner.RunWith;
+import org.opendatakit.scan.utils.EspressoUtils;
+import org.opendatakit.scan.utils.ODKMatcher;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.*;
 import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class AcquireFormImageTest {
-  private static final String SELECT_TEMPLATE_KEY = "select_templates";
-  private static final String TEMPLATE = "example";
+  private static final String TEMPLATE_NAME = "example";
 
   @Rule
   public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(MainActivity.class);
 
   @Before
-  @After
-  public void toggleTemplate() {
-    //Select a template before each test, and deselect the template after each test
-    //Has to be done this way because these lines cannot be placed under Before/AfterClass
-    onView(withId(R.id.menu_scan_preferences)).perform(click());
-    onData(withKey(SELECT_TEMPLATE_KEY)).perform(click());
-    onData(is(TEMPLATE)).perform(click());
-    onView(withId(android.R.id.button1)).perform(click());
-    Espresso.pressBack();
-  }
-
-  @Before
-  public void stubAllExternalIntents() {
-    extendIdleWaitTimeout();
+  public void setup() {
+    EspressoUtils.adjustIdleWaitTimeout();
+    EspressoUtils.templateSetup(TEMPLATE_NAME, true);
 
     //block external intents
     intending(not(isInternal()))
         .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null));
+  }
+
+  @After
+  public void cleanup() {
+    EspressoUtils.templateSetup(TEMPLATE_NAME, false);
   }
 
   @Test
@@ -92,22 +87,8 @@ public class AcquireFormImageTest {
     //Open "View Scanned Forms"
     onView(withId(R.id.ViewFormsButton)).perform(click());
 
-    //List of expected entries
-    List<Matcher<? super String>> photoList = new ArrayList<>();
-    for (String s : photoNames) {
-      photoList.add(is(s));
-    }
-
-    //Check if there are extra entries
-    //If no extra entries exist, no exception will be thrown
-    //If extra entries exist, test fails
-    //Very ugly but it works
-    try {
-      onData(not(anyOf(photoList))).check(doesNotExist());
-    } catch (RuntimeException ignored) {
-    } finally {
-      Espresso.pressBack();
-    }
+    //Check that there's no extraneous entry
+    onView(withId(android.R.id.list)).check(matches(ODKMatcher.withSize(photoNames.length)));
   }
 
   @Test
@@ -122,7 +103,8 @@ public class AcquireFormImageTest {
   @Test
   public void processSavedImage_launchChooser() {
     //Click "Process Saved Image"
-    onView(withId(R.id.ProcessImageButton)).perform(click());
+    onView(withClassName(endsWith("OverflowMenuButton"))).perform(click());
+    onView(withText(R.string.process_image)).perform(click());
 
     intended(hasAction("org.openintents.action.PICK_FILE"));
   }
@@ -130,7 +112,8 @@ public class AcquireFormImageTest {
   @Test
   public void processImageFolder_launchChooser() {
     //Click "Process Image Folder"
-    onView(withId(R.id.ProcessFolderButton)).perform(click());
+    onView(withClassName(endsWith("OverflowMenuButton"))).perform(click());
+    onView(withText(R.string.process_folder)).perform(click());
 
     intended(hasAction("org.openintents.action.PICK_DIRECTORY"));
   }
@@ -146,9 +129,5 @@ public class AcquireFormImageTest {
         return (new File(dir, name)).isDirectory();
       }
     });
-  }
-
-  private void extendIdleWaitTimeout() {
-    IdlingPolicies.setMasterPolicyTimeout(10, TimeUnit.MINUTES);
   }
 }
