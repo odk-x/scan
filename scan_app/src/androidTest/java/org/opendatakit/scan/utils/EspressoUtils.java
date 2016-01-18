@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.CheckedTextView;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.opendatakit.scan.android.R;
+import org.opendatakit.scan.R;
 
 import java.util.concurrent.TimeUnit;
 
