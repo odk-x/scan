@@ -15,9 +15,9 @@
 package org.opendatakit.scan;
 
 import android.graphics.Color;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.MainActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.MainActivity;
+import org.opendatakit.scan.utils.ScanUtils;
 import org.opendatakit.scan.utils.EspressoUtils;
 import org.opendatakit.scan.utils.ODKMatcher;
 import org.opendatakit.scan.utils.StringUtils;

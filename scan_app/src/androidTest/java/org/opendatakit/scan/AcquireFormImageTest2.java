@@ -19,9 +19,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.MainActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.MainActivity;
+import org.opendatakit.scan.utils.ScanUtils;
 import org.opendatakit.scan.utils.EspressoUtils;
 import org.opendatakit.scan.utils.StringUtils;
 

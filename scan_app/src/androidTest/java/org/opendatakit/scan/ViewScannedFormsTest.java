@@ -26,10 +26,10 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 
 import org.opendatakit.common.android.utilities.ODKFileUtils;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.MainActivity;
-import org.opendatakit.scan.android.activities.ViewScannedForms;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.MainActivity;
+import org.opendatakit.scan.activities.ViewScannedForms;
+import org.opendatakit.scan.utils.ScanUtils;
 import org.opendatakit.scan.utils.EspressoUtils;
 import org.opendatakit.scan.utils.ODKMatcher;
 

@@ -17,9 +17,9 @@ package org.opendatakit.scan;
 import android.support.test.espresso.Espresso;
 import org.hamcrest.core.StringEndsWith;
 import org.junit.*;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.MainActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.MainActivity;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import android.app.Activity;
 import android.app.Instrumentation;
