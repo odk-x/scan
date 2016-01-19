@@ -12,46 +12,45 @@ applicationScripts.each {
     apply from: it
 }
 
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.model.application'
 
 com.android.ddmlib.DdmPreferences.setTimeOut(60000)
 
-android {
-    // The following are set in the common.gradle file
-    compileSdkVersion(compileVersion)
-    buildToolsVersion(buildTools)
+model {
+    android {
+        // The following are set in the common.gradle file
+        compileSdkVersion(compileVersion)
+        buildToolsVersion(buildTools)
 
-    defaultConfig {
-        applicationId(groupId + scanName)
-        minSdkVersion(minVersion)
-        targetSdkVersion(targetVersion)
-        versionCode(releaseVersionCode)
-        versionName(versionCodeName)
+        defaultConfig {
+            applicationId(groupId + scanName)
+            minSdkVersion.apiLevel(minVersion)
+            targetSdkVersion.apiLevel(targetVersion)
+            versionCode(releaseVersionCode)
+            versionName(versionCodeName)
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
     }
 
-    buildTypes {
+    android.buildTypes {
         release {
             minifyEnabled(minify)
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-        snapshot {
-            // Build type for snapshots
         }
         debug {
-            testCoverageEnabled(testCoverage) // Allows AndroidTest JaCoCo reports to be generated
+            testCoverageEnabled(testCoverage)
+            // Allows AndroidTest JaCoCo reports to be generated
         }
     }
 
-    packagingOptions {
+    android.packagingOptions {
         // Pick first occurrence of any files that cause conflicts, as defined in common.gradle
         packageList.each {
             pickFirst it
         }
     }
 
-    compileOptions {
+    android.compileOptions {
         sourceCompatibility javaVersion
         targetCompatibility javaVersion
     }
