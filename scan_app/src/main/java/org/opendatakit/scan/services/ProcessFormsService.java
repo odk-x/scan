@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.opendatakit.scan.android.services;
+package org.opendatakit.scan.services;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -31,10 +31,10 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.activities.DisplayProcessedFormActivity;
-import org.opendatakit.scan.android.activities.DisplayStatusActivity;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.activities.DisplayProcessedFormActivity;
+import org.opendatakit.scan.activities.DisplayStatusActivity;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -56,6 +56,7 @@ public class ProcessFormsService extends IntentService {
 
   @Override
   public void onHandleIntent(Intent intent) {
+    Log.i(LOG_TAG, "Handling Intent to process form");
 
     // Retrieve input parameters
     final Bundle extras = intent.getExtras();
@@ -96,7 +97,7 @@ public class ProcessFormsService extends IntentService {
     try {
       switch (requestCode) {
       case R.integer.new_image:
-        Log.d(LOG_TAG, this.getString(R.string.acquired_from_camera));
+        Log.i(LOG_TAG, this.getString(R.string.acquired_from_camera));
 
         if (photoName == null) {
           Log.e(LOG_TAG, this.getString(R.string.error_photo_name_not_found));
@@ -289,7 +290,7 @@ public class ProcessFormsService extends IntentService {
 
     Notification beginNotification = new Notification.Builder(context)
         .setContentTitle(NOTIFICATION_APP_TITLE)
-        .setSmallIcon(android.R.drawable.status_bar_item_background)
+        .setSmallIcon(R.drawable.ic_schedule_white_24dp)
         .setContentText(this.getString(R.string.begin_processing))
         .setContentIntent(PendingIntent.getActivity(context, notificationId, waitingIntent, 0))
         .setWhen(System.currentTimeMillis()).build();
@@ -319,7 +320,7 @@ public class ProcessFormsService extends IntentService {
       finishedIntent.putExtras(extras);
 
       resultNotification = new Notification.Builder(context).setContentTitle(NOTIFICATION_APP_TITLE)
-          .setSmallIcon(android.R.drawable.stat_notify_more)
+          .setSmallIcon(R.drawable.ic_done_white_24dp)
           .setContentText(this.getString(R.string.finished_processing))
           .setContentIntent(PendingIntent.getActivity(context, notificationId, finishedIntent, 0))
           .setWhen(System.currentTimeMillis()).build();
@@ -331,7 +332,7 @@ public class ProcessFormsService extends IntentService {
       errorIntent.putExtras(extras);
 
       resultNotification = new Notification.Builder(context).setContentTitle(NOTIFICATION_APP_TITLE)
-          .setSmallIcon(android.R.drawable.stat_notify_error)
+          .setSmallIcon(R.drawable.ic_error_white_24dp)
           .setContentText(this.getString(R.string.error_processing))
           .setContentIntent(PendingIntent.getActivity(context, notificationId, errorIntent, 0))
           .setWhen(System.currentTimeMillis()).build();

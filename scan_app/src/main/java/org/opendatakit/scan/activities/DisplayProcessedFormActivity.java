@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.activities;
+package org.opendatakit.scan.activities;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import java.util.Arrays;
 
 import org.json.JSONObject;
 import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.scan.android.utils.JSONUtils;
-import org.opendatakit.scan.android.R;
-import org.opendatakit.scan.android.utils.ScanUtils;
+import org.opendatakit.scan.utils.JSONUtils;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -450,18 +450,24 @@ public class DisplayProcessedFormActivity extends BaseActivity {
     if (itemId == R.id.scanNewForm) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.take_picture);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;
     } else if (itemId == R.id.processImage) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.pick_file);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;
     } else if (itemId == R.id.processFolder) {
       intent = new Intent(getApplication(), AcquireFormImageActivity.class);
       intent.putExtra("acquisitionMethod", R.integer.pick_directory);
+      intent.putExtra("intentRequestCode", R.integer.scan_main_menu);
+      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
       startActivity(intent);
       finish();
       return true;

@@ -14,9 +14,11 @@ applicationScripts.each {
 
 apply plugin: 'com.android.application'
 
+com.android.ddmlib.DdmPreferences.setTimeOut(60000)
+
 android {
     // The following are set in the common.gradle file
-    compileSdkVersion(20)
+    compileSdkVersion(compileVersion)
     buildToolsVersion(buildTools)
 
     defaultConfig {
@@ -100,7 +102,6 @@ dependencies {
                 version: (useLatestPlayServices ? latestVersion : playServicesSnapshot), ext: 'aar')
     }
 
-    androidTestCompile 'com.android.support:support-v4:23.1.0'
     androidTestCompile 'junit:junit:4.12'
     testCompile 'junit:junit:4.12'
 
@@ -109,5 +110,5 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
-    compile 'com.android.support:support-v4:23.1.0'
+    androidTestCompile 'com.android.support:support-v4:23.1.0'
 }

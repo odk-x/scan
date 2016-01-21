@@ -12,17 +12,18 @@
  * the License.
  */
 
-package org.opendatakit.scan.android.fragments;
+package org.opendatakit.scan;
 
-import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import org.opendatakit.scan.android.R;
+import android.test.AndroidTestCase;
 
-public class ScanPreferencesFragment extends PreferenceFragment {
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+import org.opendatakit.scan.utils.ScanUtils;
 
-    addPreferencesFromResource(R.xml.prefs);
+public class ScanUtilsTest extends AndroidTestCase {
+  private static final String APP_NAME = "tables";
+
+  public void testValuesMatch() {
+    String appName = ScanUtils.getODKAppName();
+    assertEquals(appName, APP_NAME);
   }
+
 }
