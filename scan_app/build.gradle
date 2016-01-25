@@ -142,7 +142,7 @@ model {
         compileSdkVersion(compileVersion)
         buildToolsVersion(buildTools)
 
-        defaultConfig.with {
+        defaultConfig {
             applicationId = (groupId + scanName)
             minSdkVersion.apiLevel = (minVersion)
             targetSdkVersion.apiLevel = (targetVersion)
@@ -150,6 +150,45 @@ model {
             versionName = (versionCodeName)
 
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+
+        ndk {
+            moduleName = "bubblebot"
+            platformVersion = minVersion // Must match minSdkVersion
+            stl = "gnustl_static"
+            abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
+            cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
+            ldLibs.addAll(["log", "dl", "GLESv2"])
+        }
+
+        sources {
+            main {
+                jni {
+                    dependencies {
+                        //TODO: figure out which ones are actually used
+                        library "opencv_contrib" linkage "static"
+                        library "opencv_calib3d" linkage "static"
+                        library "opencv_objdetect" linkage "static"
+                        library "opencv_features2d" linkage "static"
+                        library "opencv_imgproc" linkage "static"
+                        library "opencv_video" linkage "static"
+                        library "opencv_highgui" linkage "static"
+                        library "opencv_ml" linkage "static"
+                        library "opencv_legacy" linkage "static"
+                        library "opencv_flann" linkage "static"
+                        library "opencv_core" linkage "static"
+
+                        //opencv 3rdparty
+                        library "opencv_jpeg" linkage "static"
+                        library "opencv_png" linkage "static"
+                        library "opencv_tiff" linkage "static"
+                        library "opencv_jasper" linkage "static"
+                        library "opencv_zlib" linkage "static"
+
+                        project ":scan_core" linkage "static"
+                    }
+                }
+            }
         }
     }
 
@@ -174,45 +213,6 @@ model {
     android.compileOptions {
         sourceCompatibility javaVersion
         targetCompatibility javaVersion
-    }
-
-    android.ndk {
-        moduleName = "bubblebot"
-        platformVersion = minVersion // Must match minSdkVersion
-        stl = "gnustl_static"
-        abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
-        cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
-        ldLibs.addAll(["log", "dl", "GLESv2"])
-    }
-
-    android.sources {
-        main {
-            jni {
-                dependencies {
-                    //TODO: figure out which ones are actually used
-                    library "opencv_contrib" linkage "static"
-                    library "opencv_calib3d" linkage "static"
-                    library "opencv_objdetect" linkage "static"
-                    library "opencv_features2d" linkage "static"
-                    library "opencv_imgproc" linkage "static"
-                    library "opencv_video" linkage "static"
-                    library "opencv_highgui" linkage "static"
-                    library "opencv_ml" linkage "static"
-                    library "opencv_legacy" linkage "static"
-                    library "opencv_flann" linkage "static"
-                    library "opencv_core" linkage "static"
-
-                    //opencv 3rdparty
-                    library "opencv_jpeg" linkage "static"
-                    library "opencv_png" linkage "static"
-                    library "opencv_tiff" linkage "static"
-                    library "opencv_jasper" linkage "static"
-                    library "opencv_zlib" linkage "static"
-
-                    project ":scan_core" linkage "static"
-                }
-            }
-        }
     }
 }
 
