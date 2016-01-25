@@ -15,10 +15,9 @@
  *
  * TODO:
  * Remove SWIG
- * /
+ */
 
 #define SWIGJAVA
-
 
 #ifdef __cplusplus
 /* SwigValueWrapper is described in swig.swg */
