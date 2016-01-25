@@ -1,0 +1,52 @@
+if ((new File(gradle.local)).exists()) {
+    apply from: gradle.local
+} else {
+    apply from: gradle.remote
+}
+
+applicationScripts.each {
+    apply from: it
+}
+
+apply plugin: "com.android.model.native"
+
+model {
+    android {
+        compileSdkVersion = compileVersion
+    }
+
+    android.ndk {
+        moduleName = "scan_core"
+        platformVersion = minVersion // Must match minSdkVersion
+        stl = "gnustl_static"
+        CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
+        cppFlags.addAll(["-frtti", "-fexceptions"])
+    }
+
+    android.sources {
+        main {
+            jni {
+                exportedHeaders {
+                    //ODKScan-core
+                    srcDir "src/main/jni"
+                    srcDir "src/main/jni/src"
+
+                    //OpenCV
+                    srcDir "src/main/jni/opencv/include"
+
+                    //zxing
+                    srcDir "src/main/jni/zxing/cli/src"
+                    srcDir "src/main/jni/zxing/core/src"
+
+                    //jsoncpp
+                    srcDir "src/main/jni/jsoncpp/include"
+                }
+
+                source {
+                    //"exclude" doesn't work (0.6.0-alpha7)
+                    //experimental cpp's are manually renamed to avoid compilation
+                }
+            }
+        }
+    }
+}

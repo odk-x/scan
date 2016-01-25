@@ -33,6 +33,8 @@ settingsScripts.each {
 
 include(scanProjectChild)
 
+include(":scan_core")
+
 if (libraryProjectPath.exists() && gradle.ext.useLocal) {
     // check if local library project is present
     include libraryProjectName
