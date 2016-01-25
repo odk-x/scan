@@ -179,8 +179,8 @@ model {
         platformVersion = minVersion // Must match minSdkVersion
         stl = "gnustl_static"
         abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
-        cppFlags.addAll(["-frtti", "-fexceptions"])
-        ldLibs.addAll(["log", "dl", "GLESv2"]) // not sure if "android" is needed
+        cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
+        ldLibs.addAll(["log", "dl", "GLESv2"])
     }
 
     android.sources {
