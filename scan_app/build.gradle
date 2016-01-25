@@ -18,7 +18,8 @@ com.android.ddmlib.DdmPreferences.setTimeOut(60000)
 
 model {
     repositories {
-        def opencvLibPath = file(project(':scan_core').projectDir).absolutePath + "/src/main/jniLibs"
+        def opencvLibPath = file(project(':scan_core').projectDir).absolutePath +
+                            "/src/main/jni/opencv/libs"
 
         //Gradle limitation: one library can only have 1 .a/.so (Gradle 2.10)
         libs(PrebuiltLibraries) {
