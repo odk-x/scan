@@ -18,6 +18,7 @@ model {
             moduleName = "scan_core"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
+            abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
             CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
             cppFlags.addAll(["-frtti", "-fexceptions"])
         }
@@ -50,3 +51,13 @@ model {
         }
     }
 }
+
+tasks.getByPath(":scan_core:compileScan_coreArmeabiDebugSharedLibraryScan_coreMainCpp").setEnabled (false)
+tasks.getByPath(":scan_core:compileScan_coreArmeabi-v7aDebugSharedLibraryScan_coreMainCpp").setEnabled(false)
+tasks.getByPath(":scan_core:compileScan_coreArmeabiReleaseSharedLibraryScan_coreMainCpp").setEnabled(false)
+tasks.getByPath(":scan_core:compileScan_coreArmeabi-v7aReleaseSharedLibraryScan_coreMainCpp").setEnabled(false)
+
+tasks.getByPath(":scan_core:linkScan_coreArmeabiDebugSharedLibrary").setEnabled(false)
+tasks.getByPath(":scan_core:linkScan_coreArmeabi-v7aDebugSharedLibrary").setEnabled(false)
+tasks.getByPath(":scan_core:linkScan_coreArmeabiReleaseSharedLibrary").setEnabled(false)
+tasks.getByPath(":scan_core:linkScan_coreArmeabi-v7aReleaseSharedLibrary").setEnabled(false)
