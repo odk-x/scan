@@ -13,38 +13,38 @@ apply plugin: "com.android.model.native"
 model {
     android {
         compileSdkVersion = compileVersion
-    }
 
-    android.ndk {
-        moduleName = "scan_core"
-        platformVersion = minVersion // Must match minSdkVersion
-        stl = "gnustl_static"
-        CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
-        cppFlags.addAll(["-frtti", "-fexceptions"])
-    }
+        ndk {
+            moduleName = "scan_core"
+            platformVersion = minVersion // Must match minSdkVersion
+            stl = "gnustl_static"
+            CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
+            cppFlags.addAll(["-frtti", "-fexceptions"])
+        }
 
-    android.sources {
-        main {
-            jni {
-                exportedHeaders {
-                    //ODKScan-core
-                    srcDir "src/main/jni"
-                    srcDir "src/main/jni/src"
+        sources {
+            main {
+                jni {
+                    exportedHeaders {
+                        //ODKScan-core
+                        srcDir "src/main/jni"
+                        srcDir "src/main/jni/src"
 
-                    //OpenCV
-                    srcDir "src/main/jni/opencv/include"
+                        //OpenCV
+                        srcDir "src/main/jni/opencv/include"
 
-                    //zxing
-                    srcDir "src/main/jni/zxing/cli/src"
-                    srcDir "src/main/jni/zxing/core/src"
+                        //zxing
+                        srcDir "src/main/jni/zxing/cli/src"
+                        srcDir "src/main/jni/zxing/core/src"
 
-                    //jsoncpp
-                    srcDir "src/main/jni/jsoncpp/include"
-                }
+                        //jsoncpp
+                        srcDir "src/main/jni/jsoncpp/include"
+                    }
 
-                source {
-                    //"exclude" doesn't work (0.6.0-alpha7)
-                    //experimental cpp's are manually renamed to avoid compilation
+                    source {
+                        //"exclude" doesn't work (0.6.0-alpha7)
+                        //experimental cpp's are manually renamed to avoid compilation
+                    }
                 }
             }
         }
