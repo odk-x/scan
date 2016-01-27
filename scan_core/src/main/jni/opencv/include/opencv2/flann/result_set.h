@@ -28,8 +28,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *************************************************************************/
 
-#ifndef FLANN_RESULTSET_H
-#define FLANN_RESULTSET_H
+#ifndef OPENCV_FLANN_RESULTSET_H
+#define OPENCV_FLANN_RESULTSET_H
 
 #include <algorithm>
 #include <cstring>
@@ -449,7 +449,7 @@ class RadiusUniqueResultSet : public UniqueResultSet<DistanceType>
 {
 public:
     /** Constructor
-     * @param capacity the number of neighbors to store at max
+     * @param radius the maximum distance of a neighbor
      */
     RadiusUniqueResultSet(DistanceType radius) :
         radius_(radius)
@@ -509,6 +509,7 @@ class KNNRadiusUniqueResultSet : public KNNUniqueResultSet<DistanceType>
 public:
     /** Constructor
      * @param capacity the number of neighbors to store at max
+     * @param radius the maximum distance of a neighbor
      */
     KNNRadiusUniqueResultSet(unsigned int capacity, DistanceType radius)
     {
@@ -539,5 +540,4 @@ private:
 };
 }
 
-#endif //FLANN_RESULTSET_H
-
+#endif //OPENCV_FLANN_RESULTSET_H

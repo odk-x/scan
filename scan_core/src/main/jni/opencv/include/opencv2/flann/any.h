@@ -12,11 +12,12 @@
  * Adapted for FLANN by Marius Muja
  */
 
+#include "defines.h"
 #include <stdexcept>
 #include <ostream>
 #include <typeinfo>
 
-namespace cdiggins
+namespace cvflann
 {
 
 namespace anyimpl
@@ -30,6 +31,12 @@ struct empty_any
 {
 };
 
+inline std::ostream& operator <<(std::ostream& out, const empty_any&)
+{
+    out << "[empty_any]";
+    return out;
+}
+
 struct base_any_policy
 {
     virtual void static_delete(void** x) = 0;
@@ -37,15 +44,19 @@ struct base_any_policy
     virtual void clone(void* const* src, void** dest) = 0;
     virtual void move(void* const* src, void** dest) = 0;
     virtual void* get_value(void** src) = 0;
-    virtual size_t get_size() = 0;
+    virtual ::size_t get_size() = 0;
     virtual const std::type_info& type() = 0;
     virtual void print(std::ostream& out, void* const* src) = 0;
+
+#ifdef OPENCV_CAN_BREAK_BINARY_COMPATIBILITY
+    virtual ~base_any_policy() {}
+#endif
 };
 
 template<typename T>
 struct typed_base_any_policy : base_any_policy
 {
-    virtual size_t get_size() { return sizeof(T); }
+    virtual ::size_t get_size() { return sizeof(T); }
     virtual const std::type_info& type() { return typeid(T); }
 
 };
@@ -88,6 +99,16 @@ struct big_any_policy : typed_base_any_policy<T>
     virtual void print(std::ostream& out, void* const* src) { out << *reinterpret_cast<T const*>(*src); }
 };
 
+template<> inline void big_any_policy<flann_centers_init_t>::print(std::ostream& out, void* const* src)
+{
+    out << int(*reinterpret_cast<flann_centers_init_t const*>(*src));
+}
+
+template<> inline void big_any_policy<flann_algorithm_t>::print(std::ostream& out, void* const* src)
+{
+    out << int(*reinterpret_cast<flann_algorithm_t const*>(*src));
+}
+
 template<typename T>
 struct choose_policy
 {
@@ -114,7 +135,7 @@ struct choose_policy<any>
 #define SMALL_POLICY(TYPE) \
     template<> \
     struct choose_policy<TYPE> { typedef small_any_policy<TYPE> type; \
-    };
+    }
 
 SMALL_POLICY(signed char);
 SMALL_POLICY(unsigned char);
@@ -129,13 +150,27 @@ SMALL_POLICY(bool);
 
 #undef SMALL_POLICY
 
-/// This function will return a different policy for each type.
-template<typename T>
-base_any_policy* get_policy()
+template <typename T>
+class SinglePolicy
 {
+    SinglePolicy();
+    SinglePolicy(const SinglePolicy& other);
+    SinglePolicy& operator=(const SinglePolicy& other);
+
+public:
+    static base_any_policy* get_policy();
+
+private:
     static typename choose_policy<T>::type policy;
-    return &policy;
-}
+};
+
+template <typename T>
+typename choose_policy<T>::type SinglePolicy<T>::policy;
+
+/// This function will return a different policy for each type.
+template <typename T>
+inline base_any_policy* SinglePolicy<T>::get_policy() { return &policy; }
+
 } // namespace anyimpl
 
 struct any
@@ -149,26 +184,26 @@ public:
     /// Initializing constructor.
     template <typename T>
     any(const T& x)
-        : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+        : policy(anyimpl::SinglePolicy<anyimpl::empty_any>::get_policy()), object(NULL)
     {
         assign(x);
     }
 
     /// Empty constructor.
     any()
-        : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+        : policy(anyimpl::SinglePolicy<anyimpl::empty_any>::get_policy()), object(NULL)
     { }
 
     /// Special initializing constructor for string literals.
     any(const char* x)
-        : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+        : policy(anyimpl::SinglePolicy<anyimpl::empty_any>::get_policy()), object(NULL)
     {
         assign(x);
     }
 
     /// Copy constructor.
     any(const any& x)
-        : policy(anyimpl::get_policy<anyimpl::empty_any>()), object(NULL)
+        : policy(anyimpl::SinglePolicy<anyimpl::empty_any>::get_policy()), object(NULL)
     {
         assign(x);
     }
@@ -193,7 +228,7 @@ public:
     any& assign(const T& x)
     {
         reset();
-        policy = anyimpl::get_policy<T>();
+        policy = anyimpl::SinglePolicy<T>::get_policy();
         policy->copy_from_value(&x, &object);
         return *this;
     }
@@ -234,8 +269,7 @@ public:
     const T& cast() const
     {
         if (policy->type() != typeid(T)) throw anyimpl::bad_any_cast();
-        void* obj = const_cast<void*>(object);
-        T* r = reinterpret_cast<T*>(policy->get_value(&obj));
+        T* r = reinterpret_cast<T*>(policy->get_value(const_cast<void **>(&object)));
         return *r;
     }
 
@@ -249,7 +283,7 @@ public:
     void reset()
     {
         policy->static_delete(&object);
-        policy = anyimpl::get_policy<anyimpl::empty_any>();
+        policy = anyimpl::SinglePolicy<anyimpl::empty_any>::get_policy();
     }
 
     /// Returns true if the two types are the same.

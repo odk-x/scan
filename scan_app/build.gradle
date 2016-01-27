@@ -134,6 +134,13 @@ model {
                             file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libzlib.a")
                 }
             }
+
+            opencv_ilmif {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libilmif.a")
+                }
+            }
         }
     }
 
@@ -158,7 +165,7 @@ model {
             stl = "gnustl_static"
             abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
             cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
-            ldLibs.addAll(["log", "dl", "GLESv2"])
+            ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])
         }
 
         sources {
