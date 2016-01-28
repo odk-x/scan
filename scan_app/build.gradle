@@ -210,7 +210,7 @@ model {
             *   NOTE:
             *   armeabi temporarily removed for this branch to reduce build.gradle complexity
             */
-            abiFilters.addAll(["armeabi-v7a"]) //TODO: add x86 and arm64
+            abiFilters.addAll(["armeabi-v7a", "x86"]) //TODO: add x86 and arm64
 
             cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
             ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])

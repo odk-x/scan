@@ -23,7 +23,7 @@ model {
             *   NOTE:
             *   armeabi temporarily removed for this branch to reduce build.gradle complexity
             */
-            abiFilters.addAll(["armeabi-v7a"]) //TODO: add x86 and arm64
+            abiFilters.addAll(["armeabi-v7a", "x86"]) //TODO: add x86 and arm64
 
             //DEBUG_ALIGN_IMAGE uses cout, modify to use LOG?
             cppFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
