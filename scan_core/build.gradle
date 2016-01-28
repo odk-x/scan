@@ -19,7 +19,7 @@ model {
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
             abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
-            CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
+            cppFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
             cppFlags.addAll(["-frtti", "-fexceptions"])
         }
 
