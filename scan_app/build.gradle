@@ -93,10 +93,45 @@ model {
                 }
             }
 
+            opencv_ocl {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_ocl.a")
+                }
+            }
+
+            opencv_photo {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_photo.a")
+                }
+            }
+
+            opencv_stitching {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_stitching.a")
+                }
+            }
+
+            opencv_superres {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_superres.a")
+                }
+            }
+
             opencv_video {
                 binaries.withType(StaticLibraryBinary) {
                     staticLibraryFile =
                             file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_video.a")
+                }
+            }
+
+            opencv_videostab {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_videostab.a")
                 }
             }
 
@@ -135,10 +170,17 @@ model {
                 }
             }
 
-            opencv_ilmif {
+            opencv_IlmImf {
                 binaries.withType(StaticLibraryBinary) {
                     staticLibraryFile =
-                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libilmif.a")
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libIlmImf.a")
+                }
+            }
+
+            opencv_tbb {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libtbb.a")
                 }
             }
         }
@@ -163,7 +205,13 @@ model {
             moduleName = "bubblebot"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
-            abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
+
+            /*
+            *   NOTE:
+            *   armeabi temporarily removed for this branch to reduce build.gradle complexity
+            */
+            abiFilters.addAll(["armeabi-v7a"]) //TODO: add x86 and arm64
+
             cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
             ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])
         }
@@ -174,23 +222,29 @@ model {
                     dependencies {
                         //TODO: figure out which ones are actually used
                         library "opencv_contrib" linkage "static"
-                        library "opencv_calib3d" linkage "static"
-                        library "opencv_objdetect" linkage "static"
-                        library "opencv_features2d" linkage "static"
-                        library "opencv_imgproc" linkage "static"
-                        library "opencv_video" linkage "static"
-                        library "opencv_highgui" linkage "static"
-                        library "opencv_ml" linkage "static"
                         library "opencv_legacy" linkage "static"
+                        library "opencv_stitching" linkage "static"
+                        library "opencv_superres" linkage "static"
+                        library "opencv_ocl" linkage "static"
+                        library "opencv_objdetect" linkage "static"
+                        library "opencv_ml" linkage "static"
+                        library "opencv_videostab" linkage "static"
+                        library "opencv_video" linkage "static"
+                        library "opencv_photo" linkage "static"
+                        library "opencv_calib3d" linkage "static"
+                        library "opencv_features2d" linkage "static"
+                        library "opencv_highgui" linkage "static"
+                        library "opencv_imgproc" linkage "static"
                         library "opencv_flann" linkage "static"
                         library "opencv_core" linkage "static"
 
                         //opencv 3rdparty
+                        library "opencv_tbb" linkage "static"
                         library "opencv_jpeg" linkage "static"
                         library "opencv_png" linkage "static"
                         library "opencv_tiff" linkage "static"
                         library "opencv_jasper" linkage "static"
-                        library "opencv_zlib" linkage "static"
+                        library "opencv_IlmImf" linkage "static"
 
                         project ":scan_core" linkage "static"
                     }
