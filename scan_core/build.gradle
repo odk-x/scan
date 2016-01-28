@@ -23,6 +23,18 @@ model {
             cppFlags.addAll(["-frtti", "-fexceptions"])
         }
 
+        buildTypes {
+            debug {
+                ndk {
+                    //DEBUG_CLASSIFIER uses cout, modify to use LOG?
+                    cppFlags.addAll(["-DDEBUG_CLASSIFIER", "-DOUTPUT_BUBBLE_IMAGES"])
+
+                    //uncomment to enable model training
+                    cppFlags.add("-DALWAYS_COMPUTE_TEMPLATE_FEATURES")
+                }
+            }
+        }
+
         sources {
             main {
                 jni {
