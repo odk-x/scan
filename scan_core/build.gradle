@@ -18,9 +18,28 @@ model {
             moduleName = "scan_core"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
-            abiFilters.addAll(["armeabi", "armeabi-v7a"]) //TODO: add x86 and arm64
-            CFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
+
+            /*
+            *   NOTE:
+            *   armeabi temporarily removed for this branch to reduce build.gradle complexity
+            */
+            abiFilters.addAll(["armeabi-v7a"]) //TODO: add x86 and arm64
+
+            //DEBUG_ALIGN_IMAGE uses cout, modify to use LOG?
+            cppFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
             cppFlags.addAll(["-frtti", "-fexceptions"])
+        }
+
+        buildTypes {
+            debug {
+                ndk {
+                    //DEBUG_CLASSIFIER uses cout, modify to use LOG?
+                    cppFlags.addAll(["-DDEBUG_CLASSIFIER", "-DOUTPUT_BUBBLE_IMAGES"])
+
+                    //uncomment to enable model training
+                    cppFlags.add("-DALWAYS_COMPUTE_TEMPLATE_FEATURES")
+                }
+            }
         }
 
         sources {
@@ -52,7 +71,7 @@ model {
     }
 }
 
-tasks.getByPath(":scan_core:compileScan_coreArmeabiDebugSharedLibraryScan_coreMainCpp").setEnabled (false)
+tasks.getByPath(":scan_core:compileScan_coreArmeabiDebugSharedLibraryScan_coreMainCpp").setEnabled(false)
 tasks.getByPath(":scan_core:compileScan_coreArmeabi-v7aDebugSharedLibraryScan_coreMainCpp").setEnabled(false)
 tasks.getByPath(":scan_core:compileScan_coreArmeabiReleaseSharedLibraryScan_coreMainCpp").setEnabled(false)
 tasks.getByPath(":scan_core:compileScan_coreArmeabi-v7aReleaseSharedLibraryScan_coreMainCpp").setEnabled(false)
