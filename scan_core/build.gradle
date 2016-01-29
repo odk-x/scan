@@ -34,7 +34,7 @@ model {
             debug {
                 ndk {
                     //DEBUG_CLASSIFIER uses cout, modify to use LOG?
-                    cppFlags.addAll(["-DDEBUG_CLASSIFIER", "-DOUTPUT_BUBBLE_IMAGES"])
+                    cppFlags.addAll(["-DDEBUG_CLASSIFIER", "-DOUTPUT_BUBBLE_IMAGES", "-DTIME_IT"])
 
                     //uncomment to enable model training
                     cppFlags.add("-DALWAYS_COMPUTE_TEMPLATE_FEATURES")
