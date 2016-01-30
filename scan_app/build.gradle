@@ -16,11 +16,11 @@ apply plugin: 'com.android.model.application'
 
 com.android.ddmlib.DdmPreferences.setTimeOut(60000)
 
+def opencvLibPath = file(project(':scan_core').projectDir).absolutePath +
+        "/src/main/jni/opencv/libs"
+
 model {
     repositories {
-        def opencvLibPath = file(project(':scan_core').projectDir).absolutePath +
-                            "/src/main/jni/opencv/libs"
-
         //Gradle limitation: one library can only have 1 .a/.so (Gradle 2.10)
         libs(PrebuiltLibraries) {
             opencv_calib3d {
@@ -205,15 +205,33 @@ model {
             moduleName = "bubblebot"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
-
-            /*
-            *   NOTE:
-            *   armeabi temporarily removed for this branch to reduce build.gradle complexity
-            */
-            abiFilters.addAll(["armeabi-v7a", "x86"]) //TODO: add x86 and arm64
-
             cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
             ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])
+        }
+
+        productFlavors {
+            create("x86") {
+                ndk {
+                    abiFilters.add("x86")
+
+                    ldLibs.add(opencvLibPath + "/3rdparty/x86/libtbb.a")
+                }
+            }
+
+            create("armeabi") {
+                ndk {
+                    abiFilters.add("armeabi")
+                    // no libtbb for armeabi
+                }
+            }
+
+            create("armeabi-v7a") {
+                ndk {
+                    abiFilters.add("armeabi-v7a")
+
+                    ldLibs.add(opencvLibPath + "/3rdparty/armeabi-v7a/libtbb.a")
+                }
+            }
         }
 
         sources {
@@ -239,7 +257,6 @@ model {
                         library "opencv_core" linkage "static"
 
                         //opencv 3rdparty
-                        library "opencv_tbb" linkage "static"
                         library "opencv_jpeg" linkage "static"
                         library "opencv_png" linkage "static"
                         library "opencv_tiff" linkage "static"
