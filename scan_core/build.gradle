@@ -18,7 +18,7 @@ model {
             moduleName = "scan_core"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
-            abiFilters.addAll(rootProject.ext.abiFilters) //TODO: add x86 and arm64
+            abiFilters.addAll(rootProject.ext.abiFilters) //TODO: add arm64
             //DEBUG_ALIGN_IMAGE uses cout, modify to use LOG?
             cppFlags.addAll(["-DDEBUG_PROCESSOR", "-DDEBUG_ALIGN_IMAGE"])
             cppFlags.addAll(["-frtti", "-fexceptions"])
