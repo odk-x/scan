@@ -153,7 +153,7 @@ Aligner::Aligner(){
 	//IMPORTANT: Make sure you define ALWAYS_COMPUTE_TEMPLATE_FEATURES
 	//when trying new parameterizations, otherwise your cached features will be used.
 
-	#define PARAM_SET 6
+	#define PARAM_SET 8
 	#if PARAM_SET == 0
 		detector = Ptr<FeatureDetector>(
 			new GridAdaptedFeatureDetector(
@@ -232,6 +232,15 @@ Aligner::Aligner(){
 	#elif PARAM_SET == 7
 		detector = FeatureDetector::create("GridORB");
 		descriptorExtractor = DescriptorExtractor::create("ORB");
+		#define MATCHER_TYPE "BruteForce-HammingLUT"
+		#define FH_REPROJECT_THRESH 4.0
+		#define STANDARD_AREA 1259712.f
+    #elif PARAM_SET == 8
+        detector = Ptr<FeatureDetector>(
+				new GridAdaptedFeatureDetector(
+						new FastFeatureDetector(10, true), 3500, 7, 7));
+		descriptorExtractor = Ptr<DescriptorExtractor>(
+				new FREAK(true, true, 22.0f, 4, vector<int>()));
 		#define MATCHER_TYPE "BruteForce-HammingLUT"
 		#define FH_REPROJECT_THRESH 4.0
 		#define STANDARD_AREA 1259712.f
