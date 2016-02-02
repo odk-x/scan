@@ -265,163 +265,6 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
   }
 
   /**
-   * Creating the database table needed from the information provided by the
-   * Scan app
-   *
-   * @param db
-   * @param tableName
-   * @param fieldsToProcess
-   * @return
-   */
-  public OrderedColumns createSurveyTables(OdkDbHandle db, String tableName,
-      JSONArray fieldsToProcess) {
-    List<Column> columns = new ArrayList<Column>();
-
-    // Always add the scan output directory to the table definition
-    // This is used to map a Survey instance with a Scan photo
-    columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
-
-    // Now we will always add the output.json file to the table
-    // TODO: What about multi-page forms?
-    columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI,
-        "[\"" + rawOutputFileName + "_contentType\",\"" + rawOutputFileName + "_uriFragment\"]"));
-    columns.add(
-        new Column(rawOutputFileName + "_contentType", "contentType", ElementDataType.string.name(),
-            "[]"));
-    columns.add(new Column(rawOutputFileName + "_uriFragment", "uriFragment",
-        ElementDataType.rowpath.name(), "[]"));
-
-    OrderedColumns orderedColumns = null;
-
-    try {
-      int fieldsLength = fieldsToProcess.length();
-      for (int i = 0; i < fieldsLength; i++) {
-        JSONObject field = fieldsToProcess.optJSONObject(i);
-        // Not sure how best to deal with notes?
-        String fieldName = validate(field.getString("name"));
-
-        JSONArray segments = field.optJSONArray("segments");
-        if (segments == null) {
-          segments = new JSONArray();
-        }
-        // Add segment images to columns
-        for (int j = 0; j < segments.length(); j++) {
-          JSONObject segment = segments.getJSONObject(j);
-
-          // Should I check the image_path for the
-          // segment before including it - I don't think so
-          if (segment != null) {
-            String imageName = fieldName + "_image" + j;
-            columns.add(new Column(imageName, imageName, DataTypeNamesToRemove.MIMEURI,
-                "[\"" + imageName + "_uriFragment\",\"" + imageName + "_contentType\"]"));
-            columns.add(new Column(imageName + "_uriFragment", "uriFragment",
-                ElementDataType.rowpath.name(), "[]"));
-            columns.add(
-                new Column(imageName + "_contentType", "contentType", ElementDataType.string.name(),
-                    "[]"));
-          }
-        }
-
-        // Add column for field
-        String type = field.getString("type").toUpperCase(Locale.US);
-        if (type.equals("INT")) {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.integer.name(), "[]"));
-        } else if (type.equals("FLOAT")) {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.number.name(), "[]"));
-        } else {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.string.name(), "[]"));
-        }
-      }
-
-      // Create the database table with the columns or verify that it has exactly these columns
-      // TODO: Not have this hardcoded to the appName of tables
-      orderedColumns = Scan.getInstance().getDatabase()
-          .createOrOpenDBTableWithColumns(ScanUtils.getODKAppName(), db, tableName,
-              new ColumnList(columns));
-    } catch (Exception e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, "Error - Could NOT create table " + tableName + " with columns");
-      throw new IllegalArgumentException("Unable to create table");
-    }
-    return orderedColumns;
-  }
-
-  /**
-   * Creating the database table needed from the information provided by the
-   * form designer. This is used for the subforms case since we can't loop
-   * through it as we normally would.
-   *
-   * @param db
-   * @param tableName
-   * @param subformFieldsToProcess
-   */
-  public OrderedColumns createSurveyTablesFromFormDesigner(OdkDbHandle db, String tableName,
-      JSONObject subformFieldsToProcess) {
-    List<Column> columns = new ArrayList<Column>();
-
-    // Always add the scan output directory to the table definition
-    // This is used to map a Survey instance with a Scan photo
-    columns.add(new Column(scanOutputDir, scanOutputDir, ElementDataType.string.name(), "[]"));
-
-    // Now we will always add the output.json file to the table
-    columns.add(new Column(rawOutputFileName, rawOutputFileName, DataTypeNamesToRemove.MIMEURI,
-        "[\"" + rawOutputFileName + "_contentType\",\"" + rawOutputFileName + "_uriFragment\"]"));
-    columns.add(
-        new Column(rawOutputFileName + "_contentType", "contentType", ElementDataType.string.name(),
-            "[]"));
-    columns.add(new Column(rawOutputFileName + "_uriFragment", "uriFragment",
-        ElementDataType.rowpath.name(), "[]"));
-
-    OrderedColumns orderedColumns = null;
-
-    try {
-      JSONArray subformFieldNames = subformFieldsToProcess.names();
-
-      for (int i = 0; i < subformFieldNames.length(); i++) {
-        String field = subformFieldNames.getString(i);
-        // Not sure how best to deal with notes?
-        String fieldName = validate(field);
-
-        // We are now making the assumption that all
-        // the accepted fields will have only ONE image
-        String imageName = fieldName + "_image0";
-
-        // Add column for field
-        // It may be better to have ODKFormDesignerDefinedTypes
-        // this would be nice to do once the FormDesigner is stable
-        String type = subformFieldsToProcess.getString(fieldName);
-        if (type.equals("integer")) {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.integer.name(), "[]"));
-        } else if (type.equals("decimal")) {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.number.name(), "[]"));
-        } else {
-          columns.add(new Column(fieldName, fieldName, ElementDataType.string.name(), "[]"));
-        }
-
-        columns.add(new Column(imageName, imageName, DataTypeNamesToRemove.MIMEURI,
-            "[\"" + imageName + "_contentType\",\"" + imageName + "_uriFragment\"]"));
-        columns.add(
-            new Column(imageName + "_contentType", "contentType", ElementDataType.string.name(),
-                "[]"));
-        columns.add(
-            new Column(imageName + "_uriFragment", "uriFragment", ElementDataType.rowpath.name(),
-                "[]"));
-      }
-
-      // Create the database table with the columns
-      // TODO: Not have this hardcoded to the appName of tables
-      orderedColumns = Scan.getInstance().getDatabase()
-          .createOrOpenDBTableWithColumns(ScanUtils.getODKAppName(), db, tableName,
-              new ColumnList(columns));
-    } catch (Exception e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, "Error - Could NOT create subform table " + tableName + " with columns");
-      throw new IllegalArgumentException("Unable to create subform table");
-    }
-    return orderedColumns;
-  }
-
-  /**
    * Map a scan instance to a survey instance
    */
   public void mapScanInstanceToSurveyInstance(JSONObject field, String fieldNameToValidate,
@@ -614,7 +457,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
       db = Scan.getInstance().getDatabase().openDatabase(ScanUtils.getODKAppName());
 
-      orderedColumns = createSurveyTables(db, tableId, fields);
+      orderedColumns = Scan.getInstance().getDatabase()
+          .getUserDefinedColumns(ScanUtils.getODKAppName(), db, tableId);
 
       String selection = scanOutputDir + "=?";
       String[] selectionArgs = { appRelativeUniqueScanImageFolder };
@@ -799,8 +643,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       }
 
       // create or verify that the table matches our table definition.
-      orderedColumns = createSurveyTablesFromFormDesigner(db, tableId,
-          subforms.getJSONObject(0).getJSONObject("fields"));
+      orderedColumns = Scan.getInstance().getDatabase().getUserDefinedColumns(ScanUtils
+          .getODKAppName(), db, tableId);
 
       // Check if the instance already exists in survey
       String selection = scanOutputDir + "=?";
@@ -916,14 +760,6 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
           if (writeOutCustomCss) {
             writeOutToFile(cssDir, customCssFileNameStr, cssStr.toString());
             writeOutCustomCss = false;
-          }
-          // Move only formDef.json over for now if it doesn't exist already
-          String directoryForSurveyFormDef = ScanUtils.getAppFormDirPath(subformId);
-          File surveyFormDef = new File(directoryForSurveyFormDef, "formDef.json");
-          if (!surveyFormDef.exists()) {
-            String jsonPath = new File(templatePath, subformId + "_formDef.json").getAbsolutePath();
-            String val = JSONUtils.parseFileToJSONObject(jsonPath).toString();
-            writeOutToFile(ScanUtils.getAppFormDirPath(subformId), "formDef.json", val);
           }
 
           Log.i(LOG_TAG,
@@ -1057,22 +893,6 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
         createSurveyInstanceBasedOnFormDesignerForms(rootTemplatePath);
         return;
       } else {
-        String directoryForFormDef = ScanUtils.getAppFormDirPath(formId);
-        File formDefFile = new File(directoryForFormDef, "formDef.json");
-
-        // If the form does exist already, there could be a versioning issue
-        if (!formDefFile.exists()) {
-          try {
-            File formDefToWrite = findFileThatEndsIn(rootTemplatePath, "formDef.json");
-            JSONObject formDefObjToWrite = getJSONFromFile(formDefToWrite);
-            String val = formDefObjToWrite.toString();
-            writeOutToFile(ScanUtils.getAppFormDirPath(formId), "formDef.json", val);
-          } catch (Exception e) {
-            e.printStackTrace();
-            Log.e(LOG_TAG, "Could not write out formDef.json to proper tables directory " + formId);
-          }
-        }
-
         // Check if there is a registered Survey instance or create one
         createSurveyInstance(formId);
       }
