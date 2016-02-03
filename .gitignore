@@ -8,6 +8,10 @@ local.properties
 # NDK files
 obj
 
+#Swig
+bubblebot_lib/src/com/bubblebot/jni
+bubblebot_lib/jni/gen
+
 # ZXing files
 /.sconsign.dblite
 xcuserdata

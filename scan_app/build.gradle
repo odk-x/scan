@@ -12,43 +12,283 @@ applicationScripts.each {
     apply from: it
 }
 
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.model.application'
 
 com.android.ddmlib.DdmPreferences.setTimeOut(60000)
 
-android {
-    // The following are set in the common.gradle file
-    compileSdkVersion(compileVersion)
-    buildToolsVersion(buildTools)
+def opencvLibPath = file(project(':scan_core').projectDir).absolutePath +
+        "/src/main/jni/opencv/libs"
 
-    defaultConfig {
-        applicationId(groupId + scanName)
-        minSdkVersion(minVersion)
-        targetSdkVersion(targetVersion)
-        versionCode(releaseVersionCode)
-        versionName(versionCodeName)
+model {
+    repositories {
+        //Gradle limitation: one library can only have 1 .a/.so (Gradle 2.10)
+        libs(PrebuiltLibraries) {
+            opencv_calib3d {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_calib3d.a")
+                }
+            }
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            opencv_contrib {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_contrib.a")
+                }
+            }
+
+            opencv_core {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_core.a")
+                }
+            }
+
+            opencv_features2d {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_features2d.a")
+                }
+            }
+
+            opencv_flann {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_flann.a")
+                }
+            }
+
+            opencv_highgui {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_highgui.a")
+                }
+            }
+
+            opencv_imgproc {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_imgproc.a")
+                }
+            }
+
+            opencv_legacy {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_legacy.a")
+                }
+            }
+
+            opencv_ml {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_ml.a")
+                }
+            }
+
+            opencv_objdetect {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_objdetect.a")
+                }
+            }
+
+            opencv_ocl {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_ocl.a")
+                }
+            }
+
+            opencv_photo {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_photo.a")
+                }
+            }
+
+            opencv_stitching {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_stitching.a")
+                }
+            }
+
+            opencv_superres {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_superres.a")
+                }
+            }
+
+            opencv_video {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_video.a")
+                }
+            }
+
+            opencv_videostab {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_videostab.a")
+                }
+            }
+
+            opencv_jasper {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/liblibjasper.a")
+                }
+            }
+
+            opencv_jpeg {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/liblibjpeg.a")
+                }
+            }
+
+            opencv_png {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/liblibpng.a")
+                }
+            }
+
+            opencv_tiff {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/liblibtiff.a")
+                }
+            }
+
+            opencv_zlib {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libzlib.a")
+                }
+            }
+
+            opencv_IlmImf {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libIlmImf.a")
+                }
+            }
+
+            opencv_tbb {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libtbb.a")
+                }
+            }
+        }
     }
 
-    buildTypes {
+    android {
+        // The following are set in the common.gradle file
+        compileSdkVersion(compileVersion)
+        buildToolsVersion(buildTools)
+
+        defaultConfig {
+            applicationId = (groupId + scanName)
+            minSdkVersion.apiLevel = (minVersion)
+            targetSdkVersion.apiLevel = (targetVersion)
+            versionCode = (releaseVersionCode)
+            versionName = (versionCodeName)
+
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+
+        ndk {
+            moduleName = "bubblebot"
+            platformVersion = minVersion // Must match minSdkVersion
+            stl = "gnustl_static"
+            cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
+            ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])
+        }
+
+        productFlavors {
+            create("x86") {
+                ndk {
+                    abiFilters.add("x86")
+
+                    ldLibs.add(opencvLibPath + "/3rdparty/x86/libtbb.a")
+                }
+            }
+
+            create("armeabi") {
+                ndk {
+                    abiFilters.add("armeabi")
+                    // no libtbb for armeabi
+                }
+            }
+
+            create("armeabi-v7a") {
+                ndk {
+                    abiFilters.add("armeabi-v7a")
+
+                    ldLibs.add(opencvLibPath + "/3rdparty/armeabi-v7a/libtbb.a")
+                }
+            }
+        }
+
+        sources {
+            main {
+                jni {
+                    dependencies {
+                        //TODO: figure out which ones are actually used
+                        library "opencv_contrib" linkage "static"
+                        library "opencv_legacy" linkage "static"
+                        library "opencv_stitching" linkage "static"
+                        library "opencv_superres" linkage "static"
+                        library "opencv_ocl" linkage "static"
+                        library "opencv_objdetect" linkage "static"
+                        library "opencv_ml" linkage "static"
+                        library "opencv_videostab" linkage "static"
+                        library "opencv_video" linkage "static"
+                        library "opencv_photo" linkage "static"
+                        library "opencv_calib3d" linkage "static"
+                        library "opencv_features2d" linkage "static"
+                        library "opencv_highgui" linkage "static"
+                        library "opencv_imgproc" linkage "static"
+                        library "opencv_flann" linkage "static"
+                        library "opencv_core" linkage "static"
+
+                        //opencv 3rdparty
+                        library "opencv_jpeg" linkage "static"
+                        library "opencv_png" linkage "static"
+                        library "opencv_tiff" linkage "static"
+                        library "opencv_jasper" linkage "static"
+                        library "opencv_IlmImf" linkage "static"
+
+                        project ":scan_core" linkage "static"
+                    }
+                }
+            }
+        }
+    }
+
+    android.buildTypes {
         release {
             minifyEnabled(minify)
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
         debug {
-            testCoverageEnabled(testCoverage) // Allows AndroidTest JaCoCo reports to be generated
+            testCoverageEnabled(testCoverage)
+            // Allows AndroidTest JaCoCo reports to be generated
         }
     }
 
-    packagingOptions {
+    android.packagingOptions {
         // Pick first occurrence of any files that cause conflicts, as defined in common.gradle
         packageList.each {
             pickFirst it
         }
     }
 
-    compileOptions {
+    android.compileOptions {
         sourceCompatibility javaVersion
         targetCompatibility javaVersion
     }
