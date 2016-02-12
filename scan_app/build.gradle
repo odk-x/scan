@@ -216,7 +216,9 @@ model {
             moduleName = "bubblebot"
             platformVersion = minVersion // Must match minSdkVersion
             stl = "gnustl_static"
-            cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char"])
+            CFlags.addAll(["-g"])
+            cppFlags.addAll(["-frtti", "-fexceptions", "-fPIC", "-DANDROID", "-fsigned-char",
+                             "-g", "-fno-inline"])
             ldLibs.addAll(["c", "log", "m", "dl", "z", "GLESv2"])
         }
 
@@ -283,9 +285,15 @@ model {
 
     android.buildTypes {
         release {
+            ndk {
+                debuggable true
+            }
             minifyEnabled(minify)
         }
         debug {
+            ndk {
+                debuggable true
+            }
             testCoverageEnabled(testCoverage)
             // Allows AndroidTest JaCoCo reports to be generated
         }
