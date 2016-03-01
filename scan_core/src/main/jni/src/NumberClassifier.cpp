@@ -432,7 +432,12 @@ void NumberClassifier::print_results(void) {
     std::cout << "Total: " << total_correct << "/" << c_numbers << std::endl;
 }
 
-Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Point& item_location, const string weight_file_path, int classifier_height, int classifier_width) {
+Json::Value NumberClassifier::classify_segment(const cv::Mat& img,
+                                               const cv::Point& item_location,
+                                               const string weight_file_path,
+                                               int classifier_height,
+                                               int classifier_width,
+                                               string img_path) {
 
 	Json::Value output;
 	cv::Mat query_pixels;
@@ -464,7 +469,7 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 
 	cv::resize(query_pixels, query_pixels, cv::Size(50,70), 0, 0, cv::INTER_AREA);
 
-  get_data(query_pixels, features);
+  get_data(img_path, features);
 
 	vector<vector<double> > W(features.size() + 1, vector<double>(num_hidden_units, 0));
 	vector<vector<double> > V(num_hidden_units + 1, vector<double>(NUM_CLASSES, 0));
@@ -498,6 +503,8 @@ Json::Value NumberClassifier::classify_segment(const cv::Mat& img, const cv::Poi
 	  output["type"] = "number";
   }
 	output["confidence"] = 1;
+
+    infile.close();
 
 	return output;
 }

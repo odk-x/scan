@@ -110,8 +110,13 @@ public:
                 find_roi(i, iw, ih, mw, mh);
             }
         };
-    
-    Json::Value classify_segment(const cv::Mat& img, const cv::Point& item_location, const string weight_file_path, int classifier_height, int classifier_width);
+
+    Json::Value classify_segment(const cv::Mat& img,
+                                 const cv::Point& item_location,
+                                 const string weight_file_path,
+                                 int classifier_height,
+                                 int classifier_width,
+                                 string img_path);
     void print_results(void);
     void print_rois(void);
 };

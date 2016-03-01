@@ -450,6 +450,7 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 	Mat segmentImg;
 	vector <Point> segBubbleLocs;
 	vector <int> bubbleVals;
+	bool createdSegmentImage = false;
 	Rect segmentRect( SCALEPARAM * Point(extendedSegment.get( "segment_x", INT_MIN ).asInt(),
 	                                     extendedSegment.get( "segment_y", INT_MIN ).asInt()),
 	                                     SCALEPARAM * Size(extendedSegment.get("segment_width", INT_MIN).asInt(),
@@ -545,6 +546,11 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		{
 			LOGI("Classifying numbers");
 
+			/// TODO: JEFF This is not the correct place to do this. This segment is the full
+			// piece I think, not the single image. Or is it? Look into this.
+			string img_path = createSegmentImage(segmentImg, segmentJsonOut, extendedSegment);
+			createdSegmentImage = true;
+
 			//HARDCODING SIZE OF NUMBERS FOR NOW!!!!
 			int classifier_height = 28;
 			int classifier_width = 20;
@@ -565,7 +571,12 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 			//Classify items
 			for (size_t i = 0; i < items.size(); i++) {
 				Json::Value itemJsonOut = items[i];
-				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg, locations[i], dataPath, classifier_height, classifier_width);
+				itemJsonOut["classification"] = numberClassifier.classify_segment(segmentImg,
+																				  locations[i],
+																				  dataPath,
+																				  classifier_height,
+																				  classifier_width,
+																				  img_path);
 
 				//std::stringstream ss;
 				//ss << classifiedNumber;
@@ -686,37 +697,48 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		segmentJsonOut["value"] = result;
 		cout << "qrcode: " << result << endl;
 	}
-	
+
+	if (!createdSegmentImage) {
+		createSegmentImage(segmentImg, segmentJsonOut, extendedSegment);
+		createdSegmentImage = true;
+	}
+
+	return segmentJsonOut;
+}
+
+string createSegmentImage(Mat& segmentImg, Json::Value& segmentJsonOut,
+						const Json::Value& extendedSegment) {
 	//Output the segment image:
 	Mat segment_out, tmp;
 	cvtColor(segmentImg, segment_out, CV_GRAY2RGB);
-	resize(segment_out, tmp, 2*segment_out.size());
+	resize(segment_out, tmp, 2 * segment_out.size());
 	segment_out = tmp;
 
 	string segmentOutPath;
 	string segmentName;
-	try{
+	try {
 		segmentOutPath = extendedSegment.get("output_path", 0).asString() + "segments/";
 		segmentName = extendedSegment["name"].asString() + "_image_" +
-		              intToStr(extendedSegment.get("index", 0).asInt()) + ".jpg";
+					  intToStr(extendedSegment.get("index", 0).asInt()) + ".jpg";
 
 		/*
-		//Mark-up the segment image with classification results.
-		rectangle(segment_out, expectedBubbleLocs[i] - .5 * classifier_size,
-		          expectedBubbleLocs[i] + .5 * classifier_size,
-		          colors[bubbleVals[i]]);
+        //Mark-up the segment image with classification results.
+        rectangle(segment_out, expectedBubbleLocs[i] - .5 * classifier_size,
+                  expectedBubbleLocs[i] + .5 * classifier_size,
+                  colors[bubbleVals[i]]);
 
-		circle(segment_out, segBubbleLocs[i], 1, Scalar(255, 2555, 255), -1);
-		*/
+        circle(segment_out, segBubbleLocs[i], 1, Scalar(255, 2555, 255), -1);
+        */
 
 		imwrite(segmentOutPath + segmentName, segment_out);
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
-	catch(...){
-		LOGI("Could not output segment to: %s + %s", segmentOutPath.c_str(), segmentName.c_str());
+	catch (...) {
+		LOGI("Could not output segment to: %s + %s", segmentOutPath.c_str(),
+			 segmentName.c_str());
 	}
 
-	return segmentJsonOut;
+	return (segmentOutPath + segmentName);
 }
 
 Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentProperties){

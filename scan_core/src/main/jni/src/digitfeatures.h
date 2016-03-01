@@ -31,7 +31,7 @@ static bool GRAY_THIN = false;
 
 /* --- BEGIN FEATURE EXTRACTION -- */
 
-static int STRUCTURAL_CHARS = 0, GRADIENT_DIR = 1;
+static int STRUCTURAL_CHARS = 0, GRADIENT_DIR = 1, COLLAPSED_PIXELS = 2;
 
 static int EXTRACTION_ALG = STRUCTURAL_CHARS;
 
@@ -57,9 +57,11 @@ double fraction_remove_stopped(vector<bool> stopped);
 
 void structural_characteristics(Mat binary_image, vector<double>& feature_vector);
 void gradient_directional(Mat gray_unscaled, vector<double>& feature_vector);
+void collapsed_pixels(Mat binary_unscaled, vector<double>& feature_vector);
 
 void get_structural_characteristics_data_set(vector<Mat>& binary_images, vector<vector<double> >& features);
 void get_gradient_directional_data_set(vector<Mat>& gray_images, vector<vector<double> >& features);
+void get_collapsed_pixels_data_set(vector<Mat>& binary_images, vector<vector<double> >& features);
 
 void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, vector<int>& targets, string directory, vector<string>& files);
 
@@ -79,7 +81,7 @@ void get_data_set(string directory, vector<vector<double> >& features_training, 
 			vector<Mat>& images_training, vector<Mat>& images_validation, vector<Mat>& images_testing,
 			vector<string>& image_names_training, vector<string>& image_names_validation, vector<string>& image_names_testing);
 
-void get_data(cv::Mat src, vector<double>& features);
+void get_data(string file_name, vector<double>& features);
 
 void prune_error_samples(vector<vector<double> >& features, vector<vector<double> >& encoded_targets, vector<int>& targets, vector<vector<double> >& pruned_features, vector<vector<double> >& pruned_encoded_targets, vector<int>& pruned_targets, vector<Mat>& images, vector<Mat>& pruned_images, vector<string>& image_names, vector<string>& pruned_image_names);
 
