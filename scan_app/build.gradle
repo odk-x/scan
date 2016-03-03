@@ -135,6 +135,24 @@ model {
                 }
             }
 
+            opencv_nonfree {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_nonfree.a")
+                }
+            }
+
+            opencv_gpu {
+                binaries.withType(StaticLibraryBinary) {
+                    staticLibraryFile =
+                            file("${opencvLibPath}/${targetPlatform.getName()}/libopencv_gpu.a")
+                }
+            }
+
+            //
+            //  OpenCV 3rd Party
+            //
+
             opencv_jasper {
                 binaries.withType(StaticLibraryBinary) {
                     staticLibraryFile =
@@ -176,13 +194,6 @@ model {
                             file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libIlmImf.a")
                 }
             }
-
-            opencv_tbb {
-                binaries.withType(StaticLibraryBinary) {
-                    staticLibraryFile =
-                            file("${opencvLibPath}/3rdparty/${targetPlatform.getName()}/libtbb.a")
-                }
-            }
         }
     }
 
@@ -213,23 +224,18 @@ model {
             create("x86") {
                 ndk {
                     abiFilters.add("x86")
-
-                    ldLibs.add(opencvLibPath + "/3rdparty/x86/libtbb.a")
                 }
             }
 
             create("armeabi") {
                 ndk {
                     abiFilters.add("armeabi")
-                    // no libtbb for armeabi
                 }
             }
 
             create("armeabi-v7a") {
                 ndk {
                     abiFilters.add("armeabi-v7a")
-
-                    ldLibs.add(opencvLibPath + "/3rdparty/armeabi-v7a/libtbb.a")
                 }
             }
         }
@@ -239,22 +245,27 @@ model {
                 jni {
                     dependencies {
                         //TODO: figure out which ones are actually used
+                        //contrib stitching nonfree superres ocl ts videostab photo objdetect
+                        //legacy video ml calib3d features2d highgui imgproc flann
+                        //androidcamera core
                         library "opencv_contrib" linkage "static"
-                        library "opencv_legacy" linkage "static"
                         library "opencv_stitching" linkage "static"
+                        library "opencv_nonfree" linkage "static"
                         library "opencv_superres" linkage "static"
                         library "opencv_ocl" linkage "static"
-                        library "opencv_objdetect" linkage "static"
-                        library "opencv_ml" linkage "static"
                         library "opencv_videostab" linkage "static"
-                        library "opencv_video" linkage "static"
                         library "opencv_photo" linkage "static"
+                        library "opencv_objdetect" linkage "static"
+                        library "opencv_legacy" linkage "static"
+                        library "opencv_video" linkage "static"
+                        library "opencv_ml" linkage "static"
                         library "opencv_calib3d" linkage "static"
                         library "opencv_features2d" linkage "static"
                         library "opencv_highgui" linkage "static"
                         library "opencv_imgproc" linkage "static"
                         library "opencv_flann" linkage "static"
                         library "opencv_core" linkage "static"
+                        library "opencv_gpu" linkage "static"
 
                         //opencv 3rdparty
                         library "opencv_jpeg" linkage "static"
