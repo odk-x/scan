@@ -204,7 +204,7 @@ model {
 
         defaultConfig {
             applicationId = (groupId + scanName)
-            minSdkVersion.apiLevel = (minVersion)
+            minSdkVersion.apiLevel = (19)
             targetSdkVersion.apiLevel = (targetVersion)
             versionCode = (releaseVersionCode)
             versionName = (versionCodeName)
@@ -358,4 +358,8 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
     androidTestCompile 'com.android.support:support-v4:23.1.0'
+
+    //for UI Automator
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-integration:1.3'
 }
