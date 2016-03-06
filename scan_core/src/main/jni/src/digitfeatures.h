@@ -45,7 +45,7 @@ static int TRAINING_SET_PROP = 75, VALIDATION_SET_PROP = 10, TEST_SET_PROP = 15;
 
 /* FEATURE EXTRACTION FUNCTIONS */
 Rect bounding_box(Mat image);
-Mat binary_processed_image(Mat src);
+Mat binary_processed_image(Mat& src);
 Mat gray_processed_image(Mat src);
 
 void remove_dots(Mat image, int dot_radius);

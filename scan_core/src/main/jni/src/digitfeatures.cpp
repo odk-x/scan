@@ -9,6 +9,7 @@ void set_extraction_alg(int extraction_alg)
 	EXTRACTION_ALG = extraction_alg;
 }
 
+/*
 void get_data_set(string directory, vector<vector<double> >& features_training, vector<int>& targets_training, vector<vector<double> >& encoded_targets_training,
 			vector<vector<double> >& features_validation, vector<int>& targets_validation, vector<vector<double> >& encoded_targets_validation,
 			vector<vector<double> >& features_testing, vector<int>& targets_testing, vector<vector<double> >& encoded_targets_testing,
@@ -49,11 +50,12 @@ void get_data_set(string directory, vector<vector<double> >& features_training, 
 		image_names_training, image_names_validation, image_names_testing);
 
 }
+*/
 
 void get_data(Mat src, vector<double>& features)
 {
-	Mat binary_image = binary_processed_image(src.clone());
-	Mat gray_image = gray_processed_image(src.clone());
+	Mat binary_image = binary_processed_image(src);
+//	Mat gray_image = gray_processed_image(src.clone());
 
 	features.resize(0);
 	if(EXTRACTION_ALG == STRUCTURAL_CHARS)
@@ -62,12 +64,12 @@ void get_data(Mat src, vector<double>& features)
 
 		structural_characteristics(binary_image, features);
 	}
-	else if(EXTRACTION_ALG == GRADIENT_DIR)
-	{
-		features.resize(128, 0);
-
-		gradient_directional(gray_image, features);
-	}
+//	else if(EXTRACTION_ALG == GRADIENT_DIR)
+//	{
+//		features.resize(128, 0);
+//
+//		gradient_directional(gray_image, features);
+//	}
 }
 
 void split_data_set(vector<vector<double> >& features, vector<int>& targets, vector<vector<double> >& encoded_targets, vector<Mat>& images, vector<string>& image_names,
@@ -162,7 +164,7 @@ vector<vector<double> > encode_targets(vector<int>& targets, int num_classes)
 	return encoded_targets;
 }
 
-void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, vector<int>& targets, string directory, vector<string>& files)
+/*void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, vector<int>& targets, string directory, vector<string>& files)
 {
 	//namedWindow("binary_test", WINDOW_NORMAL);
 	//namedWindow("original_test", WINDOW_NORMAL);
@@ -194,12 +196,12 @@ void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, 
 		Mat binary = binary_processed_image(src.clone());
 		Mat gray = gray_processed_image(src.clone());
 
-		/*if(!strcmp(files[file_index].c_str(), "4-567.jpg"))
+		*//*if(!strcmp(files[file_index].c_str(), "4-567.jpg"))
 		{
 			imshow("original_test", src);
 			imshow("binary_test", binary);
 			waitKey(0);
-		}*/
+		}*//*
 
 		char * filename = new char[files[file_index].size() + 1];
 		copy(files[file_index].begin(), files[file_index].end(), filename);
@@ -222,7 +224,7 @@ void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, 
 		}
 	}
 	cout << "Data set size: " << targets.size() << endl;
-}
+}*/
 
 void get_structural_characteristics_data_set(vector<Mat>& binary_images, vector<vector<double> >& features)
 {
@@ -460,7 +462,7 @@ void structural_characteristics(Mat binary_unscaled, vector<double>& feature_vec
 	return;
 }
 
-Mat binary_processed_image(Mat src)
+Mat binary_processed_image(Mat& src)
 {
   Mat dst = src;
 	//cvtColor(src, dst, CV_RGB2GRAY, 1);
@@ -487,11 +489,11 @@ Mat binary_processed_image(Mat src)
 
 	if(BINARY_REMOVE_BORDERS)
 	{
-		remove_top_border(cropped);
-		remove_bottom_border(cropped);
-		remove_left_border(cropped);
-		remove_right_border(cropped);
-		remove_dots(cropped, 3);
+//		remove_top_border(cropped);
+//		remove_bottom_border(cropped);
+//		remove_left_border(cropped);
+//		remove_right_border(cropped);
+//		remove_dots(cropped, 3);
 	}
 
 	Mat eroded;
@@ -499,15 +501,15 @@ Mat binary_processed_image(Mat src)
 
 	if(BINARY_THIN)
 	{
-		Mat thinner;
-		thinner = getStructuringElement(MORPH_RECT, Size(7, 7));
-		erode(eroded, eroded, thinner);
-		dilate(eroded, eroded, thinner);
-
-		Mat thinner2;
-		thinner = getStructuringElement(MORPH_RECT, Size(3, 3));
-		dilate(eroded, eroded, thinner2);
-		erode(eroded, eroded, thinner2);
+//		Mat thinner;
+//		thinner = getStructuringElement(MORPH_RECT, Size(7, 7));
+//		erode(eroded, eroded, thinner);
+//		dilate(eroded, eroded, thinner);
+//
+//		Mat thinner2;
+//		thinner = getStructuringElement(MORPH_RECT, Size(3, 3));
+//		dilate(eroded, eroded, thinner2);
+//		erode(eroded, eroded, thinner2);
 	}
 
 	return eroded;
