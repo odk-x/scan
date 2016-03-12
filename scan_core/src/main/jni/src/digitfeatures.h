@@ -48,11 +48,11 @@ Rect bounding_box(Mat image);
 Mat binary_processed_image(Mat& src);
 Mat gray_processed_image(Mat src);
 
-void remove_dots(Mat image, int dot_radius);
-void remove_top_border(Mat image);
-void remove_bottom_border(Mat image);
-void remove_left_border(Mat image);
-void remove_right_border(Mat image);
+void remove_dots(Mat& image, int dot_radius);
+void remove_top_border(Mat& image);
+void remove_bottom_border(Mat& image);
+void remove_left_border(Mat& image);
+void remove_right_border(Mat& image);
 double fraction_remove_stopped(vector<bool> stopped);
 
 void structural_characteristics(Mat binary_image, vector<double>& feature_vector);

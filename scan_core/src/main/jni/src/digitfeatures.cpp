@@ -33,7 +33,7 @@ void get_data_set(string directory, vector<vector<double> >& features_training, 
 	}
 	vector<vector<double> > encoded_targets = encode_targets(targets, NUM_CLASSES);
 
-		
+
 	vector<vector<double> > pruned_features;
 	vector<int> pruned_targets;
 	vector<vector<double> > pruned_encoded_targets;
@@ -489,11 +489,11 @@ Mat binary_processed_image(Mat& src)
 
 	if(BINARY_REMOVE_BORDERS)
 	{
-//		remove_top_border(cropped);
-//		remove_bottom_border(cropped);
-//		remove_left_border(cropped);
-//		remove_right_border(cropped);
-//		remove_dots(cropped, 3);
+		remove_top_border(cropped);
+		remove_bottom_border(cropped);
+		remove_left_border(cropped);
+		remove_right_border(cropped);
+		remove_dots(cropped, 3);
 	}
 
 	Mat eroded;
@@ -626,7 +626,7 @@ double fraction_remove_stopped(vector<bool> stopped)
 	return fraction / ((double) stopped.size());
 }
 
-void remove_top_border(Mat image)
+void remove_top_border(Mat& image)
 {
 	vector<bool> started(image.cols, false);
 	vector<bool> stopped(image.cols, false);
@@ -658,7 +658,7 @@ void remove_top_border(Mat image)
 	}
 }
 
-void remove_bottom_border(Mat image)
+void remove_bottom_border(Mat& image)
 {
 	vector<bool> started(image.cols, false);
 	vector<bool> stopped(image.cols, false);
@@ -690,7 +690,7 @@ void remove_bottom_border(Mat image)
 	}
 }
 
-void remove_left_border(Mat image)
+void remove_left_border(Mat& image)
 {
 	vector<bool> started(image.rows, false);
 	vector<bool> stopped(image.rows, false);
@@ -722,7 +722,7 @@ void remove_left_border(Mat image)
 	}
 }
 
-void remove_right_border(Mat image)
+void remove_right_border(Mat& image)
 {
 	vector<bool> started(image.rows, false);
 	vector<bool> stopped(image.rows, false);
@@ -754,7 +754,7 @@ void remove_right_border(Mat image)
 	}
 }
 
-void remove_dots(Mat image, int dot_radius)
+void remove_dots(Mat& image, int dot_radius)
 {
 	for(int row = 0; row < image.rows; row++)
 	{
