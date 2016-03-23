@@ -34,7 +34,7 @@ public class Scan extends CommonApplication {
     if (singleton == null) {
       PropertiesSingleton props = CommonToolProperties
           .get(this.getBaseContext(), this.getToolName());
-      props.setStartCoreServices(this.getBaseContext());
+      props.setStartServices(this.getBaseContext());
     }
     singleton = this;
 
