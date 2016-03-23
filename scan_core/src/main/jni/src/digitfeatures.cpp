@@ -9,67 +9,14 @@ void set_extraction_alg(int extraction_alg)
 	EXTRACTION_ALG = extraction_alg;
 }
 
-/*
-void get_data_set(string directory, vector<vector<double> >& features_training, vector<int>& targets_training, vector<vector<double> >& encoded_targets_training,
-			vector<vector<double> >& features_validation, vector<int>& targets_validation, vector<vector<double> >& encoded_targets_validation,
-			vector<vector<double> >& features_testing, vector<int>& targets_testing, vector<vector<double> >& encoded_targets_testing,
-			vector<Mat>& images_training, vector<Mat>& images_validation, vector<Mat>& images_testing,
-			vector<string>& image_names_training, vector<string>& image_names_validation, vector<string>& image_names_testing)
-{
-	vector<Mat> binary_images;
-	vector<Mat> gray_images;
-	vector<int> targets;
-	vector<string> image_names;
-	get_processed_images(binary_images, gray_images, targets, directory, image_names);
-
-	vector<vector<double> > features;
-	if(EXTRACTION_ALG == STRUCTURAL_CHARS)
-	{
-		get_structural_characteristics_data_set(binary_images, features);
-	}
-	else if(EXTRACTION_ALG == GRADIENT_DIR)
-	{
-		get_gradient_directional_data_set(gray_images, features);
-	}
-	vector<vector<double> > encoded_targets = encode_targets(targets, NUM_CLASSES);
-
-
-	vector<vector<double> > pruned_features;
-	vector<int> pruned_targets;
-	vector<vector<double> > pruned_encoded_targets;
-	vector<Mat> pruned_binary_images;
-	vector<string> pruned_image_names;
-
-	prune_error_samples(features, encoded_targets, targets, pruned_features, pruned_encoded_targets, pruned_targets, binary_images, pruned_binary_images, image_names, pruned_image_names);
-
-	split_data_set(pruned_features, pruned_targets, pruned_encoded_targets, pruned_binary_images, pruned_image_names,
-		features_training, targets_training, encoded_targets_training,
-		features_validation, targets_validation, encoded_targets_validation,
-		features_testing, targets_testing, encoded_targets_testing,
-		images_training, images_validation, images_testing,
-		image_names_training, image_names_validation, image_names_testing);
-
-}
-*/
-
 void get_data(Mat src, vector<double>& features)
 {
 	Mat binary_image = binary_processed_image(src);
-//	Mat gray_image = gray_processed_image(src.clone());
 
 	features.resize(0);
-	if(EXTRACTION_ALG == STRUCTURAL_CHARS)
-	{
-		features.resize(280, 0);
 
-		structural_characteristics(binary_image, features);
-	}
-//	else if(EXTRACTION_ALG == GRADIENT_DIR)
-//	{
-//		features.resize(128, 0);
-//
-//		gradient_directional(gray_image, features);
-//	}
+	features.resize(280, 0);
+	structural_characteristics(binary_image, features);
 }
 
 void split_data_set(vector<vector<double> >& features, vector<int>& targets, vector<vector<double> >& encoded_targets, vector<Mat>& images, vector<string>& image_names,
@@ -162,90 +109,6 @@ vector<vector<double> > encode_targets(vector<int>& targets, int num_classes)
 		encoded_targets[i][target_class] = 1.f;
 	}
 	return encoded_targets;
-}
-
-/*void get_processed_images(vector<Mat>& binary_images, vector<Mat>& gray_images, vector<int>& targets, string directory, vector<string>& files)
-{
-	//namedWindow("binary_test", WINDOW_NORMAL);
-	//namedWindow("original_test", WINDOW_NORMAL);
-
-	DIR * dpdf;
-	struct dirent * epdf;
-
-	dpdf = opendir(("./" + directory).c_str());
-	//vector<string> files;
-
-	if(dpdf != NULL)
-	{
-		while(epdf = readdir(dpdf))
-		{
-			char *dot = strrchr(epdf->d_name, '.');
-			if (dot && !strcmp(dot, ".jpg"))
-			{
-				files.push_back(epdf->d_name);
-			}
-		}
-	}
-
-	//cout << "Images read from data set:" << endl;
-
-	for(int file_index = 0; file_index < files.size(); file_index++)
-	{
-		//cout << directory + "/" + files[file_index] << endl;
-		Mat src = imread(directory + "/" + files[file_index], 1);
-		Mat binary = binary_processed_image(src.clone());
-		Mat gray = gray_processed_image(src.clone());
-
-		*//*if(!strcmp(files[file_index].c_str(), "4-567.jpg"))
-		{
-			imshow("original_test", src);
-			imshow("binary_test", binary);
-			waitKey(0);
-		}*//*
-
-		char * filename = new char[files[file_index].size() + 1];
-		copy(files[file_index].begin(), files[file_index].end(), filename);
-		filename[files[file_index].size()] = '\0';
-
-		string target_string = strtok(filename, "-");
-
-		if(!strcmp(target_string.c_str(), "empty"))
-		{
-			binary_images.push_back(binary.clone());
-			gray_images.push_back(gray.clone());
-			targets.push_back(NUM_CLASSES - 1);
-		}
-		else if(atoi(target_string.c_str()) < NUM_CLASSES - 1 )
-		{
-			binary_images.push_back(binary.clone());
-			gray_images.push_back(gray.clone());
-			int target = atoi(target_string.c_str());
-			targets.push_back(target);
-		}
-	}
-	cout << "Data set size: " << targets.size() << endl;
-}*/
-
-void get_structural_characteristics_data_set(vector<Mat>& binary_images, vector<vector<double> >& features)
-{
-	cout << "Constructing structural characteristics vectors for image set..." << endl;
-	for(int i = 0; i < binary_images.size(); i++)
-	{
-		vector<double> feature_vector(280, 0);
-		structural_characteristics(binary_images[i], feature_vector);
-		features.push_back(feature_vector);
-	}
-}
-
-void get_gradient_directional_data_set(vector<Mat>& gray_images, vector<vector<double> >& features)
-{
-	cout << "Constructing gradient directional vectors for image set..." << endl;
-	for(int i = 0; i < gray_images.size(); i++)
-	{
-		vector<double> feature_vector(128, 0);
-		gradient_directional(gray_images[i], feature_vector);
-		features.push_back(feature_vector);
-	}
 }
 
 void gradient_directional(Mat gray_unscaled, vector<double>& feature_vector)
@@ -515,71 +378,6 @@ Mat binary_processed_image(Mat& src)
 	return eroded;
 }
 
-Mat gray_processed_image(Mat src)
-{
-  Mat dst = src;
-//	cvtColor(src, dst, CV_RGB2GRAY, 1);
-
-	for(int i = 0; i < dst.rows; i++)
-	{
-		for(int j = 0; j < dst.cols; j++)
-		{
-			dst.at<uchar>(i, j) = (uchar) (255 - (int) dst.at<uchar>(i, j));
-		}
-	}
-
-	threshold(dst, dst, 0, 255, CV_THRESH_TOZERO | CV_THRESH_OTSU);
-
-	if(GRAY_REMOVE_DOTS)
-	{
-		remove_dots(dst, 5);
-	}
-
-	Mat cropped;
-	if(GRAY_AUTOCROP)
-	{
-		Rect bound_box = bounding_box(dst);
-		dst(bound_box).copyTo(cropped);
-	}
-	else
-	{
-		cropped = dst;
-	}
-
-	if(GRAY_REMOVE_BORDERS)
-	{
-		remove_top_border(cropped);
-		remove_bottom_border(cropped);
-		remove_left_border(cropped);
-		remove_right_border(cropped);
-	}
-
-	Mat eroded = cropped;
-	
-	for(int i = 0; i < eroded.rows; i++)
-	{
-		for(int j = 0; j < eroded.cols; j++)
-		{
-			eroded.at<uchar>(i, j) = (uchar) (255 - (int) eroded.at<uchar>(i, j));
-		}
-	}
-
-	if(GRAY_THIN)
-	{
-		Mat thinner;
-		thinner = getStructuringElement(MORPH_RECT, Size(7, 7));
-		erode(eroded, eroded, thinner);
-		dilate(eroded, eroded, thinner);
-
-		Mat thinner2;
-		thinner = getStructuringElement(MORPH_RECT, Size(3, 3));
-		dilate(eroded, eroded, thinner2);
-		erode(eroded, eroded, thinner2);
-	}
-
-	return eroded;
-}
-
 Rect bounding_box(Mat image)
 {
 	Mat image_copy = image.clone();
@@ -813,6 +611,6 @@ void remove_dots(Mat& image, int dot_radius)
 					}
 				}
 			}
-    		}
+		}
 	}
 }
