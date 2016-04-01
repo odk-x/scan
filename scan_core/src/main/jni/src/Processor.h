@@ -1,6 +1,7 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 #include "configuration.h"
+#include "MatchElastic.h"
 #include <tr1/memory>
 #include <string>
 
