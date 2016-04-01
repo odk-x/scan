@@ -346,9 +346,25 @@ class Processor::ProcessorImpl
 {
 public:
 	string trainingDataPath;
-  string trainingModelPath;
+    string trainingModelPath;
 	Mat formImage;
 	Aligner aligner;
+	//Transfromation and offest are used to get absolute bubble locations.
+	Mat transformation = (Mat_<double>(3,3) << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+
+	
+	// Debug image to paint elastic matching output
+	Mat imgMATout;
+
+    // Data structures that contain candidates for different regions of interest
+	vector<Rect> bgboxes, fgboxes;
+	vector<Rect> bubbles;
+	vector<Rect> holes;
+
+	vector<Rect> hbubBoxes, vbubBoxes;
+	vector<Rect> qrBoxes;
+	vector<Rect> numBoxes;
+
 private:
 	
 	Json::Value root;
@@ -446,33 +462,225 @@ Ptr<PCA_classifier>& getClassifier(const Json::Value& classifier) {
 	return classifiers[key];
 }
 
+// Function for extracting region candidates
+void extractRegions()
+{
+	try {
+		Mat imgMATBIN;
+		cvtColor(formImage, imgMATout, CV_GRAY2RGB);
+		binarizeShafait(formImage, imgMATBIN, 30, 0.1);
+		Mat imgInv = 255 - imgMATBIN;
+
+		conCompFast(imgMATBIN, fgboxes);
+		conCompFast(imgInv, bgboxes);
+
+        Mat imgMATSmeared = imgInv / 255;
+        despeckle(imgMATSmeared, fgboxes);
+        smearHorizontal(imgMATSmeared, 7);
+        Mat imgMATs2 = 255 * (1-imgMATSmeared);
+        
+        vector<Rect> fgboxesSmeared;
+        conCompFast(imgMATs2, fgboxesSmeared);
+        detectBubbles(fgboxesSmeared, bubbles);
+		detectHoles(bgboxes, holes);
+
+		if(DEBUG_OUTPUT)
+		{
+		    for (int i = 0; i < bubbles.size(); i++) {
+			    rectangle(imgMATout, bubbles[i], Scalar(255, 0, 0), 2);
+		    }
+
+		    for (int i = 0; i < holes.size(); i++) {
+			    rectangle(imgMATout, holes[i], Scalar(0, 255, 0), 2);
+		    }
+        }
+        
+		Mat bubbleImg(imgMATBIN.rows, imgMATBIN.cols, CV_8UC1, Scalar(0));
+		for (int i = 0; i < bubbles.size(); i++) {
+			rectangle(bubbleImg, bubbles[i], Scalar(1), 2);
+		}
+
+		Mat smearH = bubbleImg.clone();
+		Mat smearV = bubbleImg.clone();
+		smearHorizontal(smearH, 45);
+		smearVertical(smearV, 15);
+
+		Mat hbubImg = 255 * (1 - smearH);
+		Mat vbubImg = 255 * (1 - smearV);
+		conCompFast(hbubImg, hbubBoxes);
+		conCompFast(vbubImg, vbubBoxes);
+
+		detectNumBoxes(fgboxes, numBoxes);
+		detectQRCodes(imgInv, qrBoxes);
+
+		// Write Debug outputs
+		if(DEBUG_OUTPUT)
+		{
+			imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/binary.jpg", imgMATBIN);
+			imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/binary-inv.jpg", imgInv);
+			imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/smearH.jpg", 255 * smearH);
+			imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/smearV.jpg", 255 * smearV);
+			imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/init-out.jpg", imgMATout);
+		}
+	}
+	catch(exception& e)
+	{
+		LOGI( e.what() );
+	}
+}
+
+cv::Rect getMatchedRect(const Json::Value& segment)
+{
+	int sx = segment.get( "segment_x", INT_MIN ).asInt();
+	int sy = segment.get( "segment_y", INT_MIN ).asInt();
+	int sw = segment.get("segment_width", INT_MIN).asInt();
+	int sh = segment.get("segment_height", INT_MIN).asInt();
+	Rect fbox = Rect(sx, sy, sw, sh);
+
+	string fieldType = segment["type"].asString();
+	if(segment.isMember("delim_type"))
+	{
+		string delim = segment["delim_type"].asString();
+		fieldType += delim;
+	}
+
+	if(fieldType == "string")
+	{
+		double maxOverlap = -1.0;
+		int bestMatchIdx = -1;
+		for(int j=0; j<bgboxes.size(); j++){
+			Rect rintersect = fbox & bgboxes[j];
+			Rect runion = fbox | bgboxes[j];
+			double overlap = rintersect.area() / (1.0*runion.area());
+			if(overlap > maxOverlap){
+				maxOverlap = overlap;
+				bestMatchIdx = j;
+			}
+		}
+		rectangle(imgMATout, bgboxes[bestMatchIdx], Scalar(0,0,255), 2);
+		return bgboxes[bestMatchIdx];
+	}
+
+	if( (fieldType == "string/") ||
+		(fieldType == "string-")  ||
+		(fieldType == "int") )
+	{
+		double minOverlap = 0.1;
+		Rect imgbox;
+		for(int j=0; j<numBoxes.size(); j++){
+			Rect inter = fbox & numBoxes[j];
+			if(inter.area()){
+				imgbox = (imgbox.area()) ? imgbox | numBoxes[j] : numBoxes[j];
+			}
+		}
+		rectangle(imgMATout, imgbox, Scalar(0,255,0), 2);
+		return imgbox;
+	}
+
+	if(fieldType == "qrcode")
+	{
+		double maxOverlap = -1.0;
+		int bestMatchIdx = -1;
+		for(int j=0; j<qrBoxes.size(); j++){
+			Rect rintersect = fbox & qrBoxes[j];
+			Rect runion = fbox | qrBoxes[j];
+			double overlap = rintersect.area() / (1.0*runion.area());
+			if(overlap > maxOverlap){
+				maxOverlap = overlap;
+				bestMatchIdx = j;
+			}
+		}
+		rectangle(imgMATout, qrBoxes[bestMatchIdx], Scalar(0,255,0), 2);
+		return qrBoxes[bestMatchIdx];
+	}
+
+	if(fieldType == "select1")
+	{
+		Rect bestMatch;
+		if(fbox.width > fbox.height){
+			Rect fboxlarge(fbox.x-10, fbox.y-10, fbox.width+20, fbox.height+20);
+			double maxOverlap = -1.0;
+			int bestMatchIdx = -1;
+			for(int j=0; j<hbubBoxes.size(); j++){
+				Rect rintersect = fboxlarge & hbubBoxes[j];
+				Rect runion = fboxlarge | hbubBoxes[j];
+				double overlap = rintersect.area() / (1.0*runion.area());
+				if(overlap > maxOverlap){
+					maxOverlap = overlap;
+					bestMatchIdx = j;
+				}
+			}
+			bestMatch = hbubBoxes[bestMatchIdx];
+		}
+		else
+		{
+			Rect fboxlarge(fbox.x-20, fbox.y-10, fbox.width+40, fbox.height+20);
+			double maxOverlap = -1.0;
+			int bestMatchIdx = -1;
+			for(int j=0; j<vbubBoxes.size(); j++){
+				Rect rintersect = fboxlarge & vbubBoxes[j];
+				Rect runion = fboxlarge | vbubBoxes[j];
+				double overlap = rintersect.area() / (1.0*runion.area());
+				if(overlap > maxOverlap){
+					maxOverlap = overlap;
+					bestMatchIdx = j;
+				}
+			}
+			bestMatch = vbubBoxes[bestMatchIdx];
+		}
+
+		rectangle(imgMATout, bestMatch, Scalar(0,255,0), 2);
+		return bestMatch;
+	}
+}
+
 Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& extendedSegment) {
 	Mat segmentImg;
 	vector <Point> segBubbleLocs;
 	vector <int> bubbleVals;
-	Rect segmentRect( SCALEPARAM * Point(extendedSegment.get( "segment_x", INT_MIN ).asInt(),
-	                                     extendedSegment.get( "segment_y", INT_MIN ).asInt()),
-	                                     SCALEPARAM * Size(extendedSegment.get("segment_width", INT_MIN).asInt(),
-	                                                       extendedSegment.get("segment_height", INT_MIN).asInt()));
-	//Transfromation and offest are used to get absolute bubble locations.
-	Mat transformation = (Mat_<double>(3,3) << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-	Point offset = segmentRect.tl();
+	Rect segmentRectPrev( SCALEPARAM * Point(extendedSegment.get( "segment_x", INT_MIN ).asInt(),
+										 extendedSegment.get( "segment_y", INT_MIN ).asInt()),
+					  SCALEPARAM * Size(extendedSegment.get("segment_width", INT_MIN).asInt(),
+										extendedSegment.get("segment_height", INT_MIN).asInt()));
 
-		Rect expandedRect = resizeRect(segmentRect, 1 + SEGMENT_BUFFER);
-	
-		//Reduce the segment buffer if it goes over the image edge.
-		if(expandedRect.x < 0){
-			expandedRect.x = 0;
-		}
-		if(expandedRect.y < 0){
-			expandedRect.y = 0;
-		}
-		if(expandedRect.br().x > formImage.cols){
-			expandedRect.width = formImage.cols - expandedRect.x;
-		}
-		if(expandedRect.br().y > formImage.rows){
-			expandedRect.height = formImage.rows - expandedRect.y;
-		}
+	Rect adjustedRect = getMatchedRect(extendedSegment);
+
+	// If error in adjusting bounding rect
+	if((adjustedRect.width == 0) || (adjustedRect.height == 0) ||
+			(adjustedRect.x >= formImage.cols) || (adjustedRect.y >= formImage.rows) ||
+			(adjustedRect.width >= formImage.cols) || (adjustedRect.height >= formImage.rows) ||
+			((adjustedRect.x + adjustedRect.width) >= formImage.cols) ||
+			((adjustedRect.y + adjustedRect.height) >= formImage.rows))
+	{
+		LOGI("Warning: Reverting to default segment region!");
+		adjustedRect = segmentRectPrev;
+	}
+
+	Rect segmentRect = adjustedRect;
+
+	// Accommodate the difference of bounding box sizes
+	int pixelDifferenceX = segmentRect.x - segmentRectPrev.x;
+	int pixelDifferenceY = segmentRect.y - segmentRectPrev.y;
+
+	Point offset = segmentRect.tl();
+	offset.x -= pixelDifferenceX;
+	offset.y -= pixelDifferenceY;
+
+	Rect expandedRect = resizeRect(segmentRect, 1 + SEGMENT_BUFFER);
+
+	//Reduce the segment buffer if it goes over the image edge.
+	if(expandedRect.x < 0){
+		expandedRect.x = 0;
+	}
+	if(expandedRect.y < 0){
+		expandedRect.y = 0;
+	}
+	if(expandedRect.br().x > formImage.cols){
+		expandedRect.width = formImage.cols - expandedRect.x;
+	}
+	if(expandedRect.br().y > formImage.rows){
+		expandedRect.height = formImage.rows - expandedRect.y;
+	}
 
 	//Get the cropped (transformed) segment image:
 	//QR codes are not aligned because the interpolation
@@ -712,7 +920,8 @@ Json::Value segmentFunction(Json::Value& segmentJsonOut, const Json::Value& exte
 		imwrite(segmentOutPath + segmentName, segment_out);
 		segmentJsonOut["image_path"] = segmentOutPath + segmentName;
 	}
-	catch(...){
+	catch(exception& e){
+		LOGI(e.what());
 		LOGI("Could not output segment to: %s + %s", segmentOutPath.c_str(), segmentName.c_str());
 	}
 
@@ -761,6 +970,7 @@ Json::Value fieldFunction(const Json::Value& field, const Json::Value& parentPro
 }
 
 Json::Value formFunction(const Json::Value& templateRoot){
+    extractRegions();
 	const Json::Value fields = templateRoot["fields"];
 	Json::Value outForm = Json::Value(templateRoot);
 	Json::Value outFields;
@@ -772,6 +982,13 @@ Json::Value formFunction(const Json::Value& templateRoot){
 			outFields.append(outField);
 		}
 	}
+	
+	// Write the resulting image
+	if(DEBUG_OUTPUT)
+	{
+		imwrite("/storage/emulated/0/opendatakit/tables/data/scan_data/debug/FinalMat.jpg", imgMATout);
+	}
+
 	outForm["fields"] = outFields;
 	outForm["form_scale"] = SCALEPARAM;
 	outForm["timestamp"] = currentDateTime();
