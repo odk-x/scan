@@ -536,6 +536,8 @@ cv::Rect getMatchedRect(const Json::Value& segment)
 	int sw = segment.get("segment_width", INT_MIN).asInt();
 	int sh = segment.get("segment_height", INT_MIN).asInt();
 	Rect fbox = Rect(sx, sy, sw, sh);
+    Rect imgDim(0,0,imgMATout.cols-1,imgMATout.rows-1);
+    int minPadding = 5;
 
 	string fieldType = segment["type"].asString();
 	if(segment.isMember("delim_type"))
@@ -573,6 +575,13 @@ cv::Rect getMatchedRect(const Json::Value& segment)
 				imgbox = (imgbox.area()) ? imgbox | numBoxes[j] : numBoxes[j];
 			}
 		}
+        int wd = max(2*minPadding, fbox.width - imgbox.width);
+        int hd = max(2*minPadding, fbox.height - imgbox.height);
+        imgbox.x -= (wd>>1);
+        imgbox.y -= (hd>>1);
+        imgbox.width += wd ;
+        imgbox.height += hd ;
+        imgbox &= imgDim;
 		rectangle(imgMATout, imgbox, Scalar(0,255,0), 2);
 		return imgbox;
 	}
@@ -628,7 +637,13 @@ cv::Rect getMatchedRect(const Json::Value& segment)
 			}
 			bestMatch = vbubBoxes[bestMatchIdx];
 		}
-
+        int wd = max(0, fbox.width - bestMatch.width);
+        int hd = max(0, fbox.height - bestMatch.height);
+        bestMatch.x -= (wd>>1);
+        bestMatch.y -= (hd>>1);
+        bestMatch.width += wd ;
+        bestMatch.height += hd ;
+        bestMatch &= imgDim;
 		rectangle(imgMATout, bestMatch, Scalar(0,255,0), 2);
 		return bestMatch;
 	}
