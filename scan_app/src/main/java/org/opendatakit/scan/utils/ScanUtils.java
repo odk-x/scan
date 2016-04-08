@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.util.Log;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.common.android.utilities.UrlUtils;
 
@@ -38,7 +39,8 @@ public class ScanUtils {
   private ScanUtils() {
   }
 
-  public static final String appName = "tables";
+  // TODO: Implement dynamic app names in Scan
+  public static final String appName = ODKFileUtils.getOdkDefaultAppName();
 
   public static final String odk_file_system_sub_path = "scan";
 
