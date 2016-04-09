@@ -32,9 +32,7 @@ public class Scan extends CommonApplication {
   @Override
   public void onCreate() {
     if (singleton == null) {
-      PropertiesSingleton props = CommonToolProperties
-          .get(this.getBaseContext(), this.getToolName());
-      props.setStartServices(this.getBaseContext());
+      PropertiesSingleton.setToolStartedProperty(this.getBaseContext(), this.getToolName());
     }
     singleton = this;
 

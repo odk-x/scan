@@ -16,10 +16,11 @@ package org.opendatakit.scan;
 
 import android.test.AndroidTestCase;
 
+import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.scan.utils.ScanUtils;
 
 public class ScanUtilsTest extends AndroidTestCase {
-  private static final String APP_NAME = "tables";
+  private static final String APP_NAME = ODKFileUtils.getOdkDefaultAppName();
 
   public void testValuesMatch() {
     String appName = ScanUtils.getODKAppName();
