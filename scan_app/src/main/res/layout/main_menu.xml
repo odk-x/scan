@@ -38,4 +38,16 @@
 
     </Button>
 
+    <TextView
+                android:id="@+id/version_display"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:paddingBottom="1dp"
+                android:paddingTop="6dp"
+                android:text="version"
+                android:textSize="21dp"
+                android:textStyle="bold"/>
+
 </LinearLayout>
