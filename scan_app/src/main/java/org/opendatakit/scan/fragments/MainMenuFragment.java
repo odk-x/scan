@@ -42,14 +42,6 @@ public class MainMenuFragment extends Fragment {
       PackageInfo packInfo = containerActivity.getPackageManager()
           .getPackageInfo(containerActivity.getPackageName(), 0);
 
-      {
-
-        // dynamically construct the main screen version string
-        TextView mainMenuMessageLabel = (TextView) view.findViewById(R.id.version_display);
-        mainMenuMessageLabel.setText("Elastic Matching");
-      }
-
-
       // check version and run setup if needed
       int storedVersionCode = settings.getInt("version", 0);
       int appVersionCode = packInfo.versionCode;
