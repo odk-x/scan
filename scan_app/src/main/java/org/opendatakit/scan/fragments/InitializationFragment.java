@@ -261,7 +261,7 @@ public class InitializationFragment extends Fragment
     } else {
 
       ProgressDialogFragment f = ProgressDialogFragment
-          .newInstance(getId(), mAlertTitle, mAlertMsg);
+          .newInstance(mAlertTitle, mAlertMsg);
 
       mDialogState = DialogState.Progress;
       if (mPendingDialogState != mDialogState) {
