@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="80sp"
+            android:layout_marginBottom="20sp"
+            android:layout_marginTop="10sp"
+            android:contentDescription="ODKScan title"
+            android:src="@drawable/odk_scan_logo"/>
+
+    <TextView
+            android:id="@+id/TemplateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/template_selected"
+            android:textSize="20sp"
+            android:layout_margin="5sp"/>
+
+    <Button
+            android:id="@+id/ScanButton"
+            style="@style/StandardButton"
+            android:layout_width="match_parent"
+            android:text="@string/scan_new_form">
+
+    </Button>
+
+    <Button
+            android:id="@+id/ViewFormsButton"
+            style="@style/StandardButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/view_forms_button">
+
+    </Button>
+
+</LinearLayout>

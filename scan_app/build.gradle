@@ -1,0 +1,133 @@
+/**************************************************************************************************
+ GRADLE CONFIG
+ *************************************************************************************************/
+
+if ((new File(gradle.local)).exists()) {
+    apply from: gradle.local
+} else {
+    apply from: gradle.remote
+}
+
+applicationScripts.each {
+    apply from: it
+}
+
+apply plugin: 'com.android.application'
+
+com.android.ddmlib.DdmPreferences.setTimeOut(60000)
+
+android {
+    // The following are set in the common.gradle file
+    compileSdkVersion(compileVersion)
+    buildToolsVersion(buildTools)
+
+    defaultConfig {
+        applicationId(groupId + scanName)
+        minSdkVersion(minVersion)
+        targetSdkVersion(targetVersion)
+        versionCode(releaseVersionCode)
+        versionName(versionCodeName)
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    productFlavors {
+        demo {
+        }
+
+        master {
+        }
+
+        snapshot {
+        }
+
+        uitest {
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (shouldSign) {
+                storeFile file(signStoreFilePath)
+                storePassword signStorePass
+                keyAlias signKeyAlias
+                keyPassword signKeyPass
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled(minify)
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+
+            if (shouldSign) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            debuggable(true)
+            testCoverageEnabled(testCoverage) // Allows AndroidTest JaCoCo reports to be generated
+        }
+    }
+
+    packagingOptions {
+        // Pick first occurrence of any files that cause conflicts, as defined in common.gradle
+        packageList.each {
+            pickFirst it
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility javaVersion
+        targetCompatibility javaVersion
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        cacheDynamicVersionsFor(0, 'seconds')
+        cacheChangingModulesFor(0, 'seconds')
+    }
+}
+
+
+dependencies {
+    compile fileTree(include: '*.jar', dir: 'libs')
+
+    if (libraryProjectPath.exists() && gradle.useLocal) { // Local project is favoured
+        compile project(libraryProjectName)
+    } else {
+        demoCompile(group: groupId, name: libraryDemoArtifactName, classifier: demoRelease,
+                version: latestVersion, ext: 'aar')
+        masterCompile(group: groupId, name: libraryMasterArtifactName, classifier: masterRelease,
+                version: masterArtifactVersion, ext: 'aar')
+        snapshotCompile(group: groupId, name: librarySnapshotArtifactName,
+                classifier: snapshotRelease, version: latestVersion, ext: 'aar')
+        uitestCompile(group: groupId, name: librarySnapshotArtifactName,
+                      classifier: snapshotRelease, version: latestVersion, ext: 'aar')
+    }
+
+    if (commonProjectPath.exists() && gradle.useLocal) { // Local project is favoured
+        compile project(commonProjectName)
+    } else {
+        demoCompile(group: groupId, name: commonDemoArtifactName, classifier: demoRelease,
+                version: latestVersion, ext: 'aar')
+        masterCompile(group: groupId, name: commonMasterArtifactName, classifier: masterRelease,
+                version: masterArtifactVersion, ext: 'aar')
+        snapshotCompile(group: groupId, name: commonSnapshotArtifactName,
+                classifier: snapshotRelease, version: latestVersion, ext: 'aar')
+        uitestCompile(group: groupId, name: commonSnapshotArtifactName,
+                      classifier: snapshotRelease, version: latestVersion, ext: 'aar')
+    }
+
+    androidTestCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
+
+    //for Espresso
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
+    androidTestCompile 'com.android.support:support-v4:23.1.0'
+}

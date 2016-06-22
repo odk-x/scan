@@ -1,0 +1,23 @@
+# AndroidStudio/Gradle files
+build
+.gradle
+.idea
+local.properties
+*.iml
+
+# NDK files
+obj
+
+# ZXing files
+/.sconsign.dblite
+xcuserdata
+callgrind.out.*
+contents.xcworkspacedata
+*.pyc
+/.rbenv-version
+*.o
+sample
+testsuite
+testsuite.expected
+testsuite.out
+testsuite.err

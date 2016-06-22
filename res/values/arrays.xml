@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<string-array name="select_templates_default_entries">
-		<item>No templates available.</item>
-	</string-array>
-	<string-array name="select_templates_default_values">
-		<item>none</item>
-	</string-array>
-</resources>

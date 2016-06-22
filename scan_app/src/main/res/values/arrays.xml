@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="select_templates_default_entries">
+    </string-array>
+    <string-array name="select_templates_default_values">
+    </string-array>
+
+    <string-array name="directory_search_entries">
+        <item>Flat</item>
+        <item>Recursive</item>
+    </string-array>
+    <string-array name="directory_search_values">
+        <item>flat</item>
+        <item>recursive</item>
+    </string-array>
+</resources>
