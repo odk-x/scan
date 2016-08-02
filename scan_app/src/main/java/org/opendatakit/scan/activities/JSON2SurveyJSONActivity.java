@@ -469,8 +469,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
       // Check if the instance already exists in survey
       if (data.getNumberOfRows() >= 1) {
-        String foundUuidStr = data.getRowAtIndex(0)
-            .getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        String foundUuidStr = data.getRawDataOrMetadataByElementKey(0, DataTableColumns.ID);
         setIntentToReturn(tableId, formId, foundUuidStr, RESULT_OK);
         finish();
         return;
@@ -655,8 +654,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
               selectionArgs, empty, null, null, null);
 
       if (data.getNumberOfRows() >= 1) {
-        String foundUuidStr = data.getRowAtIndex(0)
-            .getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        String foundUuidStr = data.getRawDataOrMetadataByElementKey(0, DataTableColumns.ID);
         //String uriStr = ScanUtils
         //    .getSurveyUriForInstanceAndDisplayContents(subformId, foundUuidStr);
         setIntentToReturn(tableId, subformId, foundUuidStr, RESULT_OK);
