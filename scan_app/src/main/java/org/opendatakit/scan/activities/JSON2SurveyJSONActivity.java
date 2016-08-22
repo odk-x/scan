@@ -465,7 +465,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
-              selectionArgs, empty, null, null, null);
+              selectionArgs, empty, null, null, null, null, null);
 
       // Check if the instance already exists in survey
       if (data.getNumberOfRows() >= 1) {
@@ -651,7 +651,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
-              selectionArgs, empty, null, null, null);
+              selectionArgs, empty, null, null, null, null, null);
 
       if (data.getNumberOfRows() >= 1) {
         String foundUuidStr = data.getRowAtIndex(0).getDataByKey(DataTableColumns.ID);
