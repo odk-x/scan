@@ -21,22 +21,17 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.aggregate.odktables.rest.ElementDataType;
-import org.opendatakit.aggregate.odktables.rest.entity.Column;
 import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.common.android.data.ColumnList;
 import org.opendatakit.common.android.data.OrderedColumns;
 import org.opendatakit.common.android.data.UserTable;
+import org.opendatakit.common.android.exception.ServicesAvailabilityException;
 import org.opendatakit.common.android.provider.DataTableColumns;
-import org.opendatakit.common.android.utilities.DataTypeNamesToRemove;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
 import org.opendatakit.database.service.OdkDbHandle;
 import org.opendatakit.scan.utils.JSONUtils;
@@ -47,7 +42,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.webkit.WebView;
@@ -465,12 +459,11 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
-              selectionArgs, empty, null, null, null);
+              selectionArgs, empty, null, null, null, null, null);
 
       // Check if the instance already exists in survey
       if (data.getNumberOfRows() >= 1) {
-        String foundUuidStr = data.getRowAtIndex(0)
-            .getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        String foundUuidStr = data.getRowAtIndex(0).getDataByKey(DataTableColumns.ID);
         setIntentToReturn(tableId, formId, foundUuidStr, RESULT_OK);
         finish();
         return;
@@ -560,7 +553,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       if (db != null) {
         try {
           Scan.getInstance().getDatabase().closeDatabase(ScanUtils.getODKAppName(), db);
-        } catch (RemoteException e) {
+        } catch (ServicesAvailabilityException e) {
           e.printStackTrace();
           Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
         }
@@ -652,11 +645,10 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
-              selectionArgs, empty, null, null, null);
+              selectionArgs, empty, null, null, null, null, null);
 
       if (data.getNumberOfRows() >= 1) {
-        String foundUuidStr = data.getRowAtIndex(0)
-            .getRawDataOrMetadataByElementKey(DataTableColumns.ID);
+        String foundUuidStr = data.getRowAtIndex(0).getDataByKey(DataTableColumns.ID);
         //String uriStr = ScanUtils
         //    .getSurveyUriForInstanceAndDisplayContents(subformId, foundUuidStr);
         setIntentToReturn(tableId, subformId, foundUuidStr, RESULT_OK);
@@ -779,7 +771,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       if (db != null) {
         try {
           Scan.getInstance().getDatabase().closeDatabase(ScanUtils.getODKAppName(), db);
-        } catch (RemoteException e) {
+        } catch (ServicesAvailabilityException e) {
           e.printStackTrace();
           Log.e(LOG_TAG, "Error - Could NOT write data into table " + tableId);
         }
