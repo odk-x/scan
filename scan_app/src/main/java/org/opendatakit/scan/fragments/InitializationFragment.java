@@ -10,7 +10,7 @@ import org.opendatakit.common.android.fragment.ProgressDialogFragment;
 import org.opendatakit.common.android.fragment.ProgressDialogFragment.CancelProgressDialog;
 import org.opendatakit.common.android.listener.DatabaseConnectionListener;
 import org.opendatakit.common.android.listener.InitializationListener;
-import org.opendatakit.common.android.utilities.WebLogger;
+import org.opendatakit.common.android.logging.WebLogger;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

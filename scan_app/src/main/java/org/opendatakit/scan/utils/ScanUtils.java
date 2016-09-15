@@ -22,7 +22,7 @@ import java.util.Date;
 
 import android.util.Log;
 import org.opendatakit.common.android.utilities.ODKFileUtils;
-import org.opendatakit.common.android.utilities.UrlUtils;
+import org.opendatakit.common.android.webkitserver.utilities.UrlUtils;
 
 import android.view.View;
 import android.webkit.WebSettings;

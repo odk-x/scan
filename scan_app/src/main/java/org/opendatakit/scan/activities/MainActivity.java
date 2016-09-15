@@ -22,8 +22,8 @@ import org.opendatakit.common.android.activities.BaseActivity;
 import org.opendatakit.common.android.activities.IInitResumeActivity;
 import org.opendatakit.common.android.fragment.AboutMenuFragment;
 import org.opendatakit.common.android.listener.DatabaseConnectionListener;
-import org.opendatakit.common.android.utilities.DependencyChecker;
-import org.opendatakit.common.android.utilities.WebLogger;
+import org.opendatakit.common.android.dependencies.DependencyChecker;
+import org.opendatakit.common.android.logging.WebLogger;
 
 import android.app.FragmentManager.BackStackEntry;
 import android.content.Intent;
