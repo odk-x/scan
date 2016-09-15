@@ -458,7 +458,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] selectionArgs = { appRelativeUniqueScanImageFolder };
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
-          .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
+          .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
               selectionArgs, empty, null, null, null, null, null);
 
       // Check if the instance already exists in survey
@@ -644,7 +644,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
-          .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
+          .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
               selectionArgs, empty, null, null, null, null, null);
 
       if (data.getNumberOfRows() >= 1) {
