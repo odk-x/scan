@@ -40,7 +40,7 @@ static int TRAINING_SET_PROP = 75, VALIDATION_SET_PROP = 10, TEST_SET_PROP = 15;
 
 /* FEATURE EXTRACTION FUNCTIONS */
 Rect bounding_box(Mat image);
-Mat binary_processed_image(Mat& src);
+void binary_processed_image(Mat& src);
 
 void remove_dots(Mat& image, int dot_radius);
 void remove_top_border(Mat& image);
@@ -54,6 +54,6 @@ void structural_characteristics(Mat binary_image, vector<double>& feature_vector
 void set_num_classes(int num_classes);
 void set_extraction_alg(int extraction_alg);
 
-void get_data(cv::Mat src, vector<double>& features);
+void get_data(cv::Mat &src, vector<double>& features);
 
 #endif // _DIGIT_FEATURES_H_
