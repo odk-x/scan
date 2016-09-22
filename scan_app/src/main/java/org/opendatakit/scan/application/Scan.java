@@ -14,9 +14,9 @@
 
 package org.opendatakit.scan.application;
 
-import org.opendatakit.common.android.application.CommonApplication;
-import org.opendatakit.common.android.logic.CommonToolProperties;
-import org.opendatakit.common.android.logic.PropertiesSingleton;
+import org.opendatakit.application.CommonApplication;
+import org.opendatakit.properties.CommonToolProperties;
+import org.opendatakit.properties.PropertiesSingleton;
 import org.opendatakit.scan.R;
 
 public class Scan extends CommonApplication {

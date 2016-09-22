@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Date;
 
-import org.opendatakit.common.android.activities.BaseListActivity;
+import org.opendatakit.activities.BaseListActivity;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.utils.ScanUtils;
 
