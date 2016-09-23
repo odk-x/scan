@@ -2,15 +2,15 @@ package org.opendatakit.scan.fragments;
 
 import android.content.SharedPreferences;
 import android.util.Log;
-import org.opendatakit.common.android.activities.IAppAwareActivity;
-import org.opendatakit.common.android.activities.IInitResumeActivity;
-import org.opendatakit.common.android.fragment.AlertDialogFragment;
-import org.opendatakit.common.android.fragment.AlertDialogFragment.ConfirmAlertDialog;
-import org.opendatakit.common.android.fragment.ProgressDialogFragment;
-import org.opendatakit.common.android.fragment.ProgressDialogFragment.CancelProgressDialog;
-import org.opendatakit.common.android.listener.DatabaseConnectionListener;
-import org.opendatakit.common.android.listener.InitializationListener;
-import org.opendatakit.common.android.logging.WebLogger;
+import org.opendatakit.activities.IAppAwareActivity;
+import org.opendatakit.activities.IInitResumeActivity;
+import org.opendatakit.fragment.AlertDialogFragment;
+import org.opendatakit.fragment.AlertDialogFragment.ConfirmAlertDialog;
+import org.opendatakit.fragment.ProgressDialogFragment;
+import org.opendatakit.fragment.ProgressDialogFragment.CancelProgressDialog;
+import org.opendatakit.listener.DatabaseConnectionListener;
+import org.opendatakit.listener.InitializationListener;
+import org.opendatakit.logging.WebLogger;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

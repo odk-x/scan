@@ -16,7 +16,7 @@ package org.opendatakit.scan.activities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.utils.ScanUtils;
 
