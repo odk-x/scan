@@ -121,6 +121,8 @@ dependencies {
 
     androidTestCompile 'junit:junit:4.12'
     testCompile 'junit:junit:4.12'
+	androidTestCompile 'joda-time:joda-time:2.2'
+	 testCompile 'joda-time:joda-time:2.2'
 
     //for Espresso
     androidTestCompile 'com.android.support.test:runner:0.4.1'
