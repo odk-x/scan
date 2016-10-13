@@ -18,12 +18,12 @@ package org.opendatakit.scan.activities;
 import java.io.File;
 
 import android.app.*;
-import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.common.android.activities.IInitResumeActivity;
-import org.opendatakit.common.android.fragment.AboutMenuFragment;
-import org.opendatakit.common.android.listener.DatabaseConnectionListener;
-import org.opendatakit.common.android.utilities.DependencyChecker;
-import org.opendatakit.common.android.utilities.WebLogger;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.activities.IInitResumeActivity;
+import org.opendatakit.fragment.AboutMenuFragment;
+import org.opendatakit.listener.DatabaseConnectionListener;
+import org.opendatakit.dependencies.DependencyChecker;
+import org.opendatakit.logging.WebLogger;
 
 import android.app.FragmentManager.BackStackEntry;
 import android.content.Intent;

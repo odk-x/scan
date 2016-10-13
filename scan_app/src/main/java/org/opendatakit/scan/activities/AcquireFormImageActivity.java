@@ -16,7 +16,7 @@ import org.apache.commons.io.FileUtils;
 import android.preference.MultiSelectListPreference;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.application.Scan;
 import org.opendatakit.scan.services.ProcessFormsService;

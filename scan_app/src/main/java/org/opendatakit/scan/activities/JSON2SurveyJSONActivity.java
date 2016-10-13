@@ -27,13 +27,13 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.opendatakit.common.android.activities.BaseActivity;
-import org.opendatakit.common.android.data.OrderedColumns;
-import org.opendatakit.common.android.data.UserTable;
-import org.opendatakit.common.android.exception.ServicesAvailabilityException;
-import org.opendatakit.common.android.provider.DataTableColumns;
-import org.opendatakit.common.android.utilities.ODKFileUtils;
-import org.opendatakit.database.service.OdkDbHandle;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.database.data.OrderedColumns;
+import org.opendatakit.database.data.UserTable;
+import org.opendatakit.exception.ServicesAvailabilityException;
+import org.opendatakit.provider.DataTableColumns;
+import org.opendatakit.utilities.ODKFileUtils;
+import org.opendatakit.database.service.DbHandle;
 import org.opendatakit.scan.utils.JSONUtils;
 import org.opendatakit.scan.utils.ScanUtils;
 import org.opendatakit.scan.application.Scan;
@@ -414,7 +414,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     String tableId = formId;
 
     String rowId = null;
-    OdkDbHandle db = null;
+    DbHandle db = null;
     OrderedColumns orderedColumns = null;
 
     StringBuilder dbValuesToWrite = new StringBuilder();
@@ -458,7 +458,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] selectionArgs = { appRelativeUniqueScanImageFolder };
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
-          .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
+          .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
               selectionArgs, empty, null, null, null, null, null);
 
       // Check if the instance already exists in survey
@@ -573,7 +573,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     ContentValues tablesValues;
     String subformId = null;
     String tableId = null;
-    OdkDbHandle db = null;
+    DbHandle db = null;
     String rowId = null;
     OrderedColumns orderedColumns = null;
     try {
@@ -644,7 +644,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
       String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
-          .rawSqlQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
+          .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
               selectionArgs, empty, null, null, null, null, null);
 
       if (data.getNumberOfRows() >= 1) {

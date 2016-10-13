@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.json.JSONObject;
-import org.opendatakit.common.android.activities.BaseActivity;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.consts.IntentConsts;
 import org.opendatakit.scan.utils.JSONUtils;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.utils.ScanUtils;
@@ -241,7 +242,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
    */
   public Intent makeSurveyIntent() {
     // Initialize the intent that will start Survey.
-    Intent intent = getPackageManager().getLaunchIntentForPackage("org.opendatakit.survey.android");
+    Intent intent = getPackageManager().getLaunchIntentForPackage(IntentConsts.Survey.SURVEY_PACKAGE_NAME);
 
     if (intent != null) {
       intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -303,7 +304,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
           //	public void onClick(DialogInterface dialog,
           //			int id) {
           //		Intent goToMarket = new Intent(Intent.ACTION_VIEW)
-          //	    	.setData(Uri.parse("market://details?id=org.odk.survey.android"));
+          //	    	.setData(Uri.parse("market://details?id=org.opendatakit.survey"));
           //		startActivity(goToMarket);
           //		dialog.cancel();
           //	}
