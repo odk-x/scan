@@ -25,7 +25,11 @@ namespace {
 		return len;
 	}
 	unsigned int ceilingDiv(unsigned int a, unsigned int b) {
-		return (a + b - 1) / b;
+        if (b != 0) {
+		    return (a + b - 1) / b;
+        } else {
+            return 0;
+        }
 	}
 }
 
