@@ -11,16 +11,11 @@
     <uses-feature android:name="android.hardware.touchscreen">
     </uses-feature>
 
-    <uses-permission android:name="android.permission.CAMERA">
-    </uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE">
-    </uses-permission>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <permission
-            android:name="org.opendatakit.database.RUN_DATABASE"
-            android:protectionLevel="signature"/>
-
+    <!-- this is defined in org.opendatakit.services -->
     <uses-permission android:name="org.opendatakit.database.RUN_DATABASE"/>
 
     <supports-screens
