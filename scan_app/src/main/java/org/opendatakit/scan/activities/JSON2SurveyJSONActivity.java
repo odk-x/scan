@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.database.data.OrderedColumns;
 import org.opendatakit.database.data.UserTable;
+import org.opendatakit.database.queries.BindArgs;
 import org.opendatakit.exception.ServicesAvailabilityException;
 import org.opendatakit.provider.DataTableColumns;
 import org.opendatakit.utilities.ODKFileUtils;
@@ -455,7 +456,7 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
           .getUserDefinedColumns(ScanUtils.getODKAppName(), db, tableId);
 
       String selection = scanOutputDir + "=?";
-      String[] selectionArgs = { appRelativeUniqueScanImageFolder };
+      BindArgs selectionArgs = new BindArgs( new Object[] { appRelativeUniqueScanImageFolder } );
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
@@ -641,7 +642,8 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
 
       // Check if the instance already exists in survey
       String selection = scanOutputDir + "=?";
-      String[] selectionArgs = { ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) };
+      BindArgs selectionArgs = new BindArgs(
+          new Object[]{ ScanUtils.getOutputPath(photoNames.get(photoNames.size() - 1)) });
       String[] empty = {};
       UserTable data = Scan.getInstance().getDatabase()
           .simpleQuery(ScanUtils.getODKAppName(), db, tableId, orderedColumns, selection,
@@ -855,7 +857,6 @@ public class JSON2SurveyJSONActivity extends BaseActivity {
     args.putString(TABLE_DISPLAY_TYPE, TABLES_DISPLAY_LIST);
     intent.putExtras(args);
     */
-
     // Launch Survey
     intent.setData(
         Uri.parse(ScanUtils.getSurveyUriForInstanceAndDisplayContents(tableId, formId, rowId)));
