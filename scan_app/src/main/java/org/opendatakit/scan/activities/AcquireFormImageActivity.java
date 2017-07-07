@@ -12,22 +12,12 @@ import android.util.Log;
 import android.app.Activity;
 
 import android.widget.Toast;
-import org.apache.commons.io.FileUtils;
-import android.preference.MultiSelectListPreference;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.scan.R;
-import org.opendatakit.scan.application.Scan;
 import org.opendatakit.scan.services.ProcessFormsService;
 import org.opendatakit.scan.utils.ScanUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Set;
 
 /**

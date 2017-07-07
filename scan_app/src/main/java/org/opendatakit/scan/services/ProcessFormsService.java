@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.bubblebot.jni.Processor;
-import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +34,7 @@ import org.opendatakit.scan.R;
 import org.opendatakit.scan.activities.DisplayProcessedFormActivity;
 import org.opendatakit.scan.activities.DisplayStatusActivity;
 import org.opendatakit.scan.utils.ScanUtils;
+import org.opendatakit.utilities.ODKFileUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -143,7 +143,7 @@ public class ProcessFormsService extends IntentService {
 
         // Copy the new file into the Scan file system
         destFile = new File(ScanUtils.getPhotoPath(photoName));
-        FileUtils.copyFile(sourceFile, destFile);
+        ODKFileUtils.copyFile(sourceFile, destFile);
 
         try {
           configJSON = prepareConfig(templatePaths, photoName);
@@ -229,7 +229,7 @@ public class ProcessFormsService extends IntentService {
 
         // Copy the new file into the Scan file system
         File destFile = new File(ScanUtils.getPhotoPath(photoName));
-        FileUtils.copyFile(curr, destFile);
+        ODKFileUtils.copyFile(curr, destFile);
 
         Log.d(LOG_TAG, "Acquired form: " + ScanUtils.getPhotoPath(photoName));
         processForm(extras, configJSON);

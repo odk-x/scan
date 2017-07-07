@@ -71,8 +71,7 @@ public class MainActivity extends BaseActivity
     super.onCreate(savedInstanceState);
     this.setContentView(R.layout.activity_main_activity);
 
-    DependencyChecker dc = new DependencyChecker(this);
-    boolean dependable = dc.checkDependencies();
+    boolean dependable = DependencyChecker.checkDependencies(this);
     if (!dependable) { // dependencies missing
       return;
     }
@@ -96,8 +95,7 @@ public class MainActivity extends BaseActivity
   protected void onResume() {
     super.onResume();
 
-    DependencyChecker dc = new DependencyChecker(this);
-    boolean dependable = dc.checkDependencies();
+    boolean dependable = DependencyChecker.checkDependencies(this);
     if (!dependable) { // dependencies missing
       return;
     }
