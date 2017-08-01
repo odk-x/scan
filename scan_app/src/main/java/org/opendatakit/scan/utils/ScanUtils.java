@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.util.Log;
+import org.opendatakit.provider.FormsProviderUtils;
 import org.opendatakit.utilities.ODKFileUtils;
 import org.opendatakit.webkitserver.utilities.UrlUtils;
 
@@ -95,13 +96,13 @@ public class ScanUtils {
 
   public static String getSurveyUriForInstanceAndDisplayContents(String tableId, String formId,
       String instanceId) {
-    return "content://org.opendatakit.provider.forms/" + appName + "/" + tableId
-        + "/" + formId + "/#instanceId=" + instanceId + "&screenPath=survey/_contents";
+    return  FormsProviderUtils.constructSurveyUri(appName, tableId, formId, instanceId,
+        "survey/_contents", null);
   }
 
   public static String getSurveyUriForInstance(String tableId, String formId, String instanceId) {
-    return "content://org.opendatakit.provider.forms/" + appName + "/" + tableId
-        + "/" + formId + "/#instanceId=" + instanceId;
+    return  FormsProviderUtils.constructSurveyUri(appName, tableId, formId, instanceId,
+        null, null);
   }
 
   // TODO: place this in the correct spot
