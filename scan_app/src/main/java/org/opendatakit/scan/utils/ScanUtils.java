@@ -69,9 +69,6 @@ public class ScanUtils {
 
   public static final String formViewHTMLDir = "transcription";
 
-  public static final String extStorageDir = Environment.getExternalStorageDirectory()
-      .getAbsolutePath();
-
   public static final String getODKAppName() {
     return appName;
   }
@@ -89,44 +86,10 @@ public class ScanUtils {
     return ODKFileUtils.getSystemFolder(appName) + File.separator + odk_file_system_sub_path;
   }
 
-  // TODO: remove trailing slash
-  public static String getAppInstancesDirPath(String formId) {
-    return ODKFileUtils.getInstancesFolder(appName, formId) + File.separator;
-  }
-
   public static String getSurveyUriForInstanceAndDisplayContents(String tableId, String formId,
       String instanceId) {
     return  FormsProviderUtils.constructSurveyUri(appName, tableId, formId, instanceId,
         "survey/_contents", null);
-  }
-
-  public static String getSurveyUriForInstance(String tableId, String formId, String instanceId) {
-    return  FormsProviderUtils.constructSurveyUri(appName, tableId, formId, instanceId,
-        null, null);
-  }
-
-  // TODO: place this in the correct spot
-  public static String getTablesUriForInstance(String formId) {
-    return "assets/" + formId + "/html/" + formId + "_list.html";
-  }
-
-  // TODO: place this in the correct spot
-  public static String getTablesUriForInstanceWithScanOutputDir(String formId,
-      String scanOutputDir) {
-    // Need to encode the scan_output_directory query parameter
-    String encodedScanOutputDir = UrlUtils.encodeSegment(scanOutputDir);
-    return "assets/" + formId + "/html/" + formId + ".html?scan_output_directory="
-        + encodedScanOutputDir;
-  }
-
-  public static String getXlsxConverterUri() {
-    return "http:///localhost:8635/" + appName + "/xlsxconverter/conversion.html";
-  }
-
-  // TODO: remove trailing slash
-  public static String getAppRelativeInstancesDirPath(String formId, String instancesDir) {
-    return ODKFileUtils.asRelativePath(appName,
-        new File(ODKFileUtils.getInstanceFolder(appName, formId, instancesDir))) + File.separator;
   }
 
   // TODO: remove trailing slash
