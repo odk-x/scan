@@ -4,6 +4,9 @@ build
 .idea
 local.properties
 *.iml
+scan_app/google-services.json
+scan_app/fabric.properties
+odkanalytics/
 
 # NDK files
 obj
