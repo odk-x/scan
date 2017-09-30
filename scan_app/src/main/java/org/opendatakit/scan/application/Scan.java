@@ -49,9 +49,4 @@ public class Scan extends CommonApplication {
     return R.raw.systemzip;
   }
 
-  @Override
-  public int getWebKitResourceId() {
-    return -1;
-  }
-
 }
