@@ -1,5 +1,10 @@
 package org.opendatakit.scan.fragments;
 
+import android.app.Fragment;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import org.opendatakit.activities.IAppAwareActivity;
 import org.opendatakit.activities.IInitResumeActivity;
 import org.opendatakit.fragment.AlertDialogFragment.ConfirmAlertDialog;
@@ -7,12 +12,6 @@ import org.opendatakit.fragment.AlertNProgessMsgFragmentMger;
 import org.opendatakit.listener.DatabaseConnectionListener;
 import org.opendatakit.listener.InitializationListener;
 import org.opendatakit.logging.WebLogger;
-
-import android.app.Fragment;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.application.Scan;
 import org.opendatakit.scan.utils.ScanUtils;
