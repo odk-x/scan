@@ -70,7 +70,7 @@ public class InitializationFragment extends Fragment
       // if message manager was not created from saved state, create fresh
       if (msgManager == null) {
          msgManager = new AlertNProgessMsgFragmentMger(appName, ALERT_DIALOG_TAG,
-             PROGRESS_DIALOG_TAG);
+             PROGRESS_DIALOG_TAG, false, false);
       }
 
       return view;
