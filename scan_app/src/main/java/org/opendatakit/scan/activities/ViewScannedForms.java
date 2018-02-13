@@ -14,14 +14,6 @@
 
 package org.opendatakit.scan.activities;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Date;
-
-import org.opendatakit.activities.BaseListActivity;
-import org.opendatakit.scan.R;
-import org.opendatakit.scan.utils.ScanUtils;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -33,6 +25,13 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import org.opendatakit.activities.BaseListActivity;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Date;
 
 /**
  * This activity displays a list of previously scanned forms.

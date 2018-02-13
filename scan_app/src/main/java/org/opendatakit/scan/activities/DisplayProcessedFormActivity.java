@@ -14,17 +14,6 @@
 
 package org.opendatakit.scan.activities;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.json.JSONObject;
-import org.opendatakit.activities.BaseActivity;
-import org.opendatakit.consts.IntentConsts;
-import org.opendatakit.scan.utils.JSONUtils;
-import org.opendatakit.scan.R;
-import org.opendatakit.scan.utils.ScanUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,6 +28,16 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import org.json.JSONObject;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.consts.IntentConsts;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.JSONUtils;
+import org.opendatakit.scan.utils.ScanUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This activity displays the image of a processed form.

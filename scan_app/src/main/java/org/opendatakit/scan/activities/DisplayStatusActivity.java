@@ -14,12 +14,6 @@
 
 package org.opendatakit.scan.activities;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.opendatakit.activities.BaseActivity;
-import org.opendatakit.scan.R;
-import org.opendatakit.scan.utils.ScanUtils;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +21,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.TextView;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.scan.R;
+import org.opendatakit.scan.utils.ScanUtils;
 
 /**
  * This activity is mainly for error reporting

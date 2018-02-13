@@ -15,21 +15,23 @@
  */
 package org.opendatakit.scan.utils;
 
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import android.util.Log;
-import org.opendatakit.provider.FormsProviderUtils;
-import org.opendatakit.utilities.ODKFileUtils;
-import org.opendatakit.webkitserver.utilities.UrlUtils;
-
+import android.os.StatFs;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.os.Environment;
-import android.os.StatFs;
+import org.opendatakit.provider.FormsProviderUtils;
+import org.opendatakit.utilities.ODKFileUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * ScanUtils contains methods and data shared across the application. For
