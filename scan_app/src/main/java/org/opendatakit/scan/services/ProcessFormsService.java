@@ -21,10 +21,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import com.bubblebot.jni.Processor;
 import org.json.JSONArray;
@@ -38,7 +36,6 @@ import org.opendatakit.utilities.ODKFileUtils;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * This service invokes the cpp image processing code to run in the background.

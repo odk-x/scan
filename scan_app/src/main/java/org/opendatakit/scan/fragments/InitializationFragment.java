@@ -1,23 +1,17 @@
 package org.opendatakit.scan.fragments;
 
-import android.content.SharedPreferences;
-import android.util.Log;
-import org.opendatakit.activities.IAppAwareActivity;
-import org.opendatakit.activities.IInitResumeActivity;
-import org.opendatakit.fragment.AlertDialogFragment;
-import org.opendatakit.fragment.AlertDialogFragment.ConfirmAlertDialog;
-import org.opendatakit.fragment.ProgressDialogFragment;
-import org.opendatakit.fragment.ProgressDialogFragment.CancelProgressDialog;
-import org.opendatakit.listener.DatabaseConnectionListener;
-import org.opendatakit.listener.InitializationListener;
-import org.opendatakit.logging.WebLogger;
-
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import org.opendatakit.activities.IAppAwareActivity;
+import org.opendatakit.activities.IInitResumeActivity;
+import org.opendatakit.fragment.AlertDialogFragment.ConfirmAlertDialog;
+import org.opendatakit.fragment.AlertNProgessMsgFragmentMger;
+import org.opendatakit.listener.DatabaseConnectionListener;
+import org.opendatakit.listener.InitializationListener;
+import org.opendatakit.logging.WebLogger;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.application.Scan;
 import org.opendatakit.scan.utils.ScanUtils;
@@ -33,329 +27,186 @@ import java.util.ArrayList;
  * @author jbeorse@cs.washington.edu
  */
 public class InitializationFragment extends Fragment
-    implements InitializationListener, ConfirmAlertDialog, CancelProgressDialog,
-    DatabaseConnectionListener {
+    implements InitializationListener, ConfirmAlertDialog, DatabaseConnectionListener {
 
-  private static final String t = "InitializationFragment";
+   private static final String t = InitializationFragment.class.getSimpleName();
 
-  private static final int ID = R.layout.copy_expansion_files_layout;
+   private static final int ID = R.layout.copy_expansion_files_layout;
+   private static final String ALERT_DIALOG_TAG = "alertDialogScan";
+   private static final String PROGRESS_DIALOG_TAG = "progressDialogScan";
 
-  private static enum DialogState {
-    Init, Progress, Alert, None
-  }
+   private static final String INIT_STATE_KEY = "IF_initStateKeyScan";
 
-  ;
+   // The types of dialogs we handle
+   public enum InitializationState {
+      START, IN_PROGRESS, FINISH
+   }
 
-  // keys for the data being retained
+   private static String appName;
 
-  private static final String DIALOG_TITLE = "dialogTitle";
-  private static final String DIALOG_MSG = "dialogMsg";
-  private static final String DIALOG_STATE = "dialogState";
+   private InitializationState initState = InitializationState.START;
+   private AlertNProgessMsgFragmentMger msgManager;
 
-  // data to retain across orientation changes
+   private String mainDialogTitle;
 
-  private String mAlertTitle;
-  private String mAlertMsg;
-  private DialogState mDialogState = DialogState.Init;
-  private DialogState mPendingDialogState = DialogState.Init;
+   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
+       Bundle savedInstanceState) {
+      appName = ((IAppAwareActivity) getActivity()).getAppName();
 
-  // data that is not retained
+      View view = inflater.inflate(ID, container, false);
 
-  private View view;
-
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-  }
-
-  @Override
-  public void onActivityCreated(Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
-  }
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    view = inflater.inflate(ID, container, false);
-
-    if (savedInstanceState != null) {
-
-      // to restore alert dialog.
-      if (savedInstanceState.containsKey(DIALOG_TITLE)) {
-        mAlertTitle = savedInstanceState.getString(DIALOG_TITLE);
-      }
-      if (savedInstanceState.containsKey(DIALOG_MSG)) {
-        mAlertMsg = savedInstanceState.getString(DIALOG_MSG);
-      }
-      if (savedInstanceState.containsKey(DIALOG_STATE)) {
-        mDialogState = DialogState.valueOf(savedInstanceState.getString(DIALOG_STATE));
-      }
-    }
-
-    return view;
-  }
-
-  /**
-   * Starts the download task and shows the progress dialog.
-   */
-  private void intializeAppName() {
-    // set up the first dialog, but don't show it...
-    mAlertTitle = getString(R.string.configuring_app,
-        getString(Scan.getInstance().getApkDisplayNameResourceId()));
-    mAlertMsg = getString(R.string.please_wait);
-    mDialogState = DialogState.Progress;
-
-    restoreProgressDialog();
-
-    // launch the copy operation
-    WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-        .i(t, "initializeAppName called ");
-    Scan.getInstance().initializeAppName(((IAppAwareActivity) getActivity()).getAppName(), this);
-
-
-  }
-
-  @Override
-  public void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    if (mAlertTitle != null) {
-      outState.putString(DIALOG_TITLE, mAlertTitle);
-    }
-    if (mAlertMsg != null) {
-      outState.putString(DIALOG_MSG, mAlertMsg);
-    }
-    outState.putString(DIALOG_STATE, mDialogState.name());
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-
-    if (mDialogState == DialogState.Init) {
-      WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-          .i(t, "onResume -- calling initializeAppName");
-      intializeAppName();
-    } else {
-
-      if (mDialogState == DialogState.Progress) {
-        restoreProgressDialog();
-      } else if (mDialogState == DialogState.Alert) {
-        restoreAlertDialog();
+      mainDialogTitle = getString(R.string.configuring_app,
+          getString(Scan.getInstance().getApkDisplayNameResourceId()));
+      // restore any state
+      if (savedInstanceState != null) {
+         if (savedInstanceState.containsKey(INIT_STATE_KEY)) {
+            initState = InitializationState.valueOf(savedInstanceState.getString(INIT_STATE_KEY));
+         }
+         msgManager = AlertNProgessMsgFragmentMger
+             .restoreInitMessaging(appName, ALERT_DIALOG_TAG, PROGRESS_DIALOG_TAG,
+                 savedInstanceState);
       }
 
-      // re-attach to the task for task notifications...
-      Scan.getInstance().establishInitializationListener(this);
-    }
-  }
+      // if message manager was not created from saved state, create fresh
+      if (msgManager == null) {
+         msgManager = new AlertNProgessMsgFragmentMger(appName, ALERT_DIALOG_TAG,
+             PROGRESS_DIALOG_TAG, false, false);
+      }
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    Scan.getInstance().possiblyFireDatabaseCallback(getActivity(), this);
-  }
+      return view;
+   }
 
-  @Override
-  public void onPause() {
-    FragmentManager mgr = getFragmentManager();
+   @Override public void onStart() {
+      super.onStart();
+      Scan.getInstance().possiblyFireDatabaseCallback(getActivity(), this);
+   }
 
-    // dismiss dialogs...
-    AlertDialogFragment alertDialog = (AlertDialogFragment) mgr.findFragmentByTag("alertDialog");
-    if (alertDialog != null) {
-      alertDialog.dismiss();
-    }
-    ProgressDialogFragment progressDialog = (ProgressDialogFragment) mgr
-        .findFragmentByTag("progressDialog");
-    if (progressDialog != null) {
-      progressDialog.dismiss();
-    }
-    mPendingDialogState = DialogState.None;
-    super.onPause();
-  }
 
-  @Override
-  public void initializationComplete(boolean overallSuccess, ArrayList<String> result) {
+   @Override public void onResume() {
+      super.onResume();
+
+      if (initState == InitializationState.START) {
+         WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName()).i(t,
+             "onResume -- calling initializeAppName");
+         msgManager.createProgressDialog(mainDialogTitle, getString(R.string.please_wait),
+             getFragmentManager());
+         Scan.getInstance().initializeAppName(((IAppAwareActivity) getActivity()).getAppName(),
+             this);
+         initState = InitializationState.IN_PROGRESS;
+      } else {
+
+         msgManager.restoreDialog(getFragmentManager(), getId());
+
+         // re-attach to the task for task notifications...
+         Scan.getInstance().establishInitializationListener(this);
+      }
+   }
+
+
+   @Override public void onPause() {
+      msgManager.clearDialogsAndRetainCurrentState(getFragmentManager());
+      super.onPause();
+   }
+
+   @Override public void onSaveInstanceState(Bundle outState) {
+      super.onSaveInstanceState(outState);
+      msgManager.addStateToSaveStateBundle(outState);
+      outState.putString(INIT_STATE_KEY, initState.name());
+   }
+
+
+
+   @Override public void initializationComplete(boolean overallSuccess, ArrayList<String> result) {
 
     /* Add runtime initialization */
 
-    // Create output dir if it doesn't exist
-    new File(ScanUtils.getOutputDirPath()).mkdirs();
+      // Create output dir if it doesn't exist
+      new File(ScanUtils.getOutputDirPath()).mkdirs();
 
-    try {
+      try {
 
-      //Creates a .nomedia file to prevent the images from showing up in the gallery.
+         //Creates a .nomedia file to prevent the images from showing up in the gallery.
       /*
       new File(ScanUtils.getSystemPath() + File.separator + ".nomedia").createNewFile();
       new File(ScanUtils.getConfigPath() + File.separator + ".nomedia").createNewFile();
       new File(ScanUtils.getOutputDirPath() + File.separator + ".nomedia").createNewFile();
       */
 
-      // TODO: Only adding dummy data while sync doesn't support empty files. Remove dummy data
-      // when that is fixed
-      PrintWriter systemPW = new PrintWriter(ScanUtils.getSystemPath() + File.separator + ""
-          + ".nomedia");
-      PrintWriter configPW = new PrintWriter(ScanUtils.getConfigPath() + File.separator + ""
-          + ".nomedia");
-      PrintWriter outputPW = new PrintWriter(ScanUtils.getOutputDirPath() + File.separator + ""
-          + ".nomedia");
+         // TODO: Only adding dummy data while sync doesn't support empty files. Remove dummy data
+         // when that is fixed
+         PrintWriter systemPW = new PrintWriter(
+             ScanUtils.getSystemPath() + File.separator + "" + ".nomedia");
+         PrintWriter configPW = new PrintWriter(
+             ScanUtils.getConfigPath() + File.separator + "" + ".nomedia");
+         PrintWriter outputPW = new PrintWriter(
+             ScanUtils.getOutputDirPath() + File.separator + "" + ".nomedia");
 
-      systemPW.print("Dummy data");
-      configPW.print("Dummy data");
-      outputPW.print("Dummy data");
+         systemPW.print("Dummy data");
+         configPW.print("Dummy data");
+         outputPW.print("Dummy data");
 
-      systemPW.close();
-      configPW.close();
-      outputPW.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-      WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-          .i(t, "Error creating nomedia");
-    }
+         systemPW.close();
+         configPW.close();
+         outputPW.close();
+      } catch (IOException e) {
+         e.printStackTrace();
+         WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
+             .i(t, "Error creating nomedia");
+      }
 
-    try {
-      dismissProgressDialog();
-    } catch (IllegalArgumentException e) {
-      WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-          .i(t, "Attempting to close a dialog that was not previously opened");
-    }
 
     /* Finish initialization */
+      initState = InitializationState.FINISH;
+      Scan.getInstance().clearInitializationTask();
 
-    Scan.getInstance().clearInitializationTask();
+      if (overallSuccess && result.isEmpty()) {
+         // do not require an OK if everything went well
+         if(msgManager != null) {
+            msgManager.dismissProgressDialog(getFragmentManager());
+         }
 
-    if (overallSuccess && result.isEmpty()) {
-      // do not require an OK if everything went well
-      Fragment progress = getFragmentManager().findFragmentByTag("progressDialog");
-      if (progress != null) {
-        ((ProgressDialogFragment) progress).dismiss();
-        mDialogState = DialogState.None;
+         ((IInitResumeActivity) getActivity()).initializationCompleted();
+         return;
       }
 
+      StringBuilder b = new StringBuilder();
+      for (String k : result) {
+         b.append(k);
+         b.append("\n\n");
+      }
+
+      if(msgManager != null) {
+         String revisedTitle = overallSuccess ?
+             getString(R.string.initialization_complete) :
+             getString(R.string.initialization_failed);
+         msgManager.createAlertDialog(revisedTitle, b.toString().trim(), getFragmentManager(),
+             getId());
+      }
+   }
+
+   @Override public void initializationProgressUpdate(String displayString) {
+      if(msgManager != null && msgManager.displayingProgressDialog()) {
+         msgManager.updateProgressDialogMessage(displayString, getFragmentManager());
+      }
+   }
+
+
+   @Override public void okAlertDialog() {
       ((IInitResumeActivity) getActivity()).initializationCompleted();
-      return;
-    }
+   }
 
-    StringBuilder b = new StringBuilder();
-    for (String k : result) {
-      b.append(k);
-      b.append("\n\n");
-    }
 
-    createAlertDialog(overallSuccess ?
-        getString(R.string.initialization_complete) :
-        getString(R.string.initialization_failed), b.toString().trim());
-  }
-
-  private void restoreProgressDialog() {
-    Fragment alert = getFragmentManager().findFragmentByTag("alertDialog");
-    if (alert != null) {
-      ((AlertDialogFragment) alert).dismiss();
-    }
-
-    Fragment dialog = getFragmentManager().findFragmentByTag("progressDialog");
-
-    if (dialog != null && ((ProgressDialogFragment) dialog).getDialog() != null) {
-      mDialogState = DialogState.Progress;
-      ((ProgressDialogFragment) dialog).getDialog().setTitle(mAlertTitle);
-      ((ProgressDialogFragment) dialog).setMessage(mAlertMsg);
-
-    } else {
-
-      ProgressDialogFragment f = ProgressDialogFragment
-          .newInstance(mAlertTitle, mAlertMsg);
-
-      mDialogState = DialogState.Progress;
-      if (mPendingDialogState != mDialogState) {
-        mPendingDialogState = mDialogState;
-        f.show(getFragmentManager(), "progressDialog");
+   @Override public void databaseAvailable() {
+      if (initState == InitializationState.IN_PROGRESS) {
+         Scan.getInstance()
+             .initializeAppName(((IAppAwareActivity) getActivity()).getAppName(), this);
       }
-    }
-  }
+   }
 
-  private void updateProgressDialogMessage(String message) {
-    if (mDialogState == DialogState.Progress) {
-      mAlertTitle = getString(R.string.configuring_app,
-          getString(Scan.getInstance().getApkDisplayNameResourceId()));
-      mAlertMsg = message;
-      restoreProgressDialog();
-    }
-  }
-
-  private void dismissProgressDialog() {
-    if (mDialogState == DialogState.Progress) {
-      mDialogState = DialogState.None;
-    }
-    Fragment dialog = getFragmentManager().findFragmentByTag("progressDialog");
-    if (dialog != null) {
-      ((ProgressDialogFragment) dialog).dismiss();
-      mPendingDialogState = DialogState.None;
-    }
-  }
-
-  private void restoreAlertDialog() {
-    Fragment progress = getFragmentManager().findFragmentByTag("progressDialog");
-    if (progress != null) {
-      ((ProgressDialogFragment) progress).dismiss();
-    }
-
-    Fragment dialog = getFragmentManager().findFragmentByTag("alertDialog");
-
-    if (dialog != null && ((AlertDialogFragment) dialog).getDialog() != null) {
-      mDialogState = DialogState.Alert;
-      ((AlertDialogFragment) dialog).getDialog().setTitle(mAlertTitle);
-      ((AlertDialogFragment) dialog).setMessage(mAlertMsg);
-
-    } else {
-
-      AlertDialogFragment f = AlertDialogFragment.newInstance(getId(), mAlertTitle, mAlertMsg);
-
-      mDialogState = DialogState.Alert;
-      if (mPendingDialogState != mDialogState) {
-        mPendingDialogState = mDialogState;
-        f.show(getFragmentManager(), "alertDialog");
+   @Override public void databaseUnavailable() {
+      if(msgManager != null && msgManager.displayingProgressDialog()) {
+         msgManager.updateProgressDialogMessage(getString(R.string.database_unavailable), getFragmentManager());
       }
-    }
-  }
-
-  @Override
-  public void okAlertDialog() {
-    mDialogState = DialogState.None;
-    ((IInitResumeActivity) getActivity()).initializationCompleted();
-  }
-
-  private void createAlertDialog(String title, String message) {
-    mAlertMsg = message;
-    mAlertTitle = title;
-    restoreAlertDialog();
-  }
-
-  @Override
-  public void initializationProgressUpdate(String displayString) {
-    updateProgressDialogMessage(displayString);
-  }
-
-  @Override
-  public void cancelProgressDialog() {
-    WebLogger.getLogger(((IAppAwareActivity) getActivity()).getAppName())
-        .i(t, "cancelProgressDialog -- calling cancelInitializationTask");
-    // signal the task that we want it to be cancelled.
-    // but keep the notification path...
-    // the task will call back with a copyExpansionFilesComplete()
-    // to report status (cancelled).
-    Scan.getInstance().cancelInitializationTask();
-  }
-
-  @Override
-  public void databaseAvailable() {
-    if (mDialogState == DialogState.Progress) {
-      Scan.getInstance().initializeAppName(((IAppAwareActivity) getActivity()).getAppName(), this);
-    }
-  }
-
-  @Override
-  public void databaseUnavailable() {
-    if (mDialogState == DialogState.Progress) {
-      updateProgressDialogMessage(getString(R.string.database_unavailable));
-    }
-  }
+   }
 
 }

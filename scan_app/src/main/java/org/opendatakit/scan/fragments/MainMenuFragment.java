@@ -3,6 +3,7 @@ package org.opendatakit.scan.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +21,6 @@ import org.opendatakit.scan.R;
 import org.opendatakit.scan.activities.AcquireFormImageActivity;
 import org.opendatakit.scan.activities.ViewScannedForms;
 
-import java.util.Random;
 import java.util.Set;
 
 public class MainMenuFragment extends Fragment {

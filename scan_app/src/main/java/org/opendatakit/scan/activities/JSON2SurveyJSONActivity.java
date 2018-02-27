@@ -14,6 +14,28 @@
 
 package org.opendatakit.scan.activities;
 
+import android.content.ContentValues;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.webkit.WebView;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.opendatakit.activities.BaseActivity;
+import org.opendatakit.database.data.OrderedColumns;
+import org.opendatakit.database.data.UserTable;
+import org.opendatakit.database.queries.BindArgs;
+import org.opendatakit.database.service.DbHandle;
+import org.opendatakit.exception.ServicesAvailabilityException;
+import org.opendatakit.provider.DataTableColumns;
+import org.opendatakit.scan.application.Scan;
+import org.opendatakit.scan.utils.JSONUtils;
+import org.opendatakit.scan.utils.ScanUtils;
+import org.opendatakit.utilities.ODKFileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,29 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.opendatakit.activities.BaseActivity;
-import org.opendatakit.database.data.OrderedColumns;
-import org.opendatakit.database.data.UserTable;
-import org.opendatakit.database.queries.BindArgs;
-import org.opendatakit.exception.ServicesAvailabilityException;
-import org.opendatakit.provider.DataTableColumns;
-import org.opendatakit.utilities.ODKFileUtils;
-import org.opendatakit.database.service.DbHandle;
-import org.opendatakit.scan.utils.JSONUtils;
-import org.opendatakit.scan.utils.ScanUtils;
-import org.opendatakit.scan.application.Scan;
-
-import android.content.ContentValues;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.webkit.WebView;
 
 public class JSON2SurveyJSONActivity extends BaseActivity {
 
