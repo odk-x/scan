@@ -71,7 +71,7 @@ public class MainMenuFragment extends Fragment {
   private void hookupButtonHandlers() {
     final Application scanApp = getActivity().getApplication();
 
-    Button scanForm = (Button) view.findViewById(R.id.ScanButton);
+    Button scanForm = view.findViewById(R.id.ScanButton);
     scanForm.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
@@ -82,7 +82,7 @@ public class MainMenuFragment extends Fragment {
       }
     });
 
-    Button viewForms = (Button) view.findViewById(R.id.ViewFormsButton);
+    Button viewForms = view.findViewById(R.id.ViewFormsButton);
     viewForms.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Intent intent = new Intent(scanApp, ViewScannedForms.class);
@@ -98,7 +98,7 @@ public class MainMenuFragment extends Fragment {
     SharedPreferences settings = PreferenceManager
         .getDefaultSharedPreferences(containerActivity.getApplicationContext());
 
-    TextView templateText = (TextView) view.findViewById(R.id.TemplateText);
+    TextView templateText = view.findViewById(R.id.TemplateText);
 
     // If no template is selected, present a warning
     if (!settings.contains("select_templates")) {
