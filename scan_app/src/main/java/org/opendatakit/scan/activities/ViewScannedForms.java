@@ -62,7 +62,7 @@ public class ViewScannedForms extends BaseListActivity {
 
         String photoName = photoNames[position];
 
-        TextView photoStatus = (TextView) view.findViewById(R.id.photoStatus);
+        TextView photoStatus = view.findViewById(R.id.photoStatus);
         if (new File(ScanUtils.getJsonPath(photoName)).exists()) {
           photoStatus.setTextColor(Color.parseColor("#00FF00"));
         } else if (new File(ScanUtils.getAlignedPhotoPath(photoName)).exists()) {
@@ -71,7 +71,7 @@ public class ViewScannedForms extends BaseListActivity {
           photoStatus.setTextColor(Color.parseColor("#FF0000"));
         }
 
-        TextView nameView = (TextView) view.findViewById(R.id.templateName);
+        TextView nameView = view.findViewById(R.id.templateName);
 
         String[] parts = photoName.split("_");
         String templateName = parts[0];
@@ -96,7 +96,7 @@ public class ViewScannedForms extends BaseListActivity {
 					Log.i("SCAN", "BOO ");
 				}*/
 
-        TextView type = (TextView) view.findViewById(R.id.createdTime);
+        TextView type = view.findViewById(R.id.createdTime);
         type.setText(
             new Date(new File(ScanUtils.getPhotoPath(photoName)).lastModified()).toString());
 
