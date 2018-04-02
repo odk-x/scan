@@ -120,7 +120,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
       morePagesToScan = nextPageTemplatePath
           .exists(); //TODO: This doesn't work on the "View Scanned forms" path.
       if (morePagesToScan) {
-        Button nextPage = (Button) findViewById(R.id.nextPageBtn);
+        Button nextPage = findViewById(R.id.nextPageBtn);
         nextPage.setVisibility(View.VISIBLE);
         nextPage.setOnClickListener(new View.OnClickListener() {
           public void onClick(View v) {
@@ -151,7 +151,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
           }
         });
       } else {
-        LinearLayout layout = (LinearLayout) findViewById(R.id.save_transcribe);
+        LinearLayout layout = findViewById(R.id.save_transcribe);
         layout.setVisibility(View.VISIBLE);
 
 				/* Uncomment for Tables
@@ -159,7 +159,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
 				*/
         surveyIntent = makeSurveyIntent();
 
-        Button saveData = (Button) findViewById(R.id.saveBtn);
+        Button saveData = findViewById(R.id.saveBtn);
         saveData.setOnClickListener(new View.OnClickListener() {
           public void onClick(View v) {
             Log.i(LOG_TAG, "Using template: " + templatePath);
@@ -180,7 +180,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
           }
         });
 
-        Button transcribeData = (Button) findViewById(R.id.transcribeBtn);
+        Button transcribeData = findViewById(R.id.transcribeBtn);
         transcribeData.setOnClickListener(new View.OnClickListener() {
           public void onClick(View v) {
             Log.i(LOG_TAG, "Using template: " + templatePath);
@@ -403,7 +403,7 @@ public class DisplayProcessedFormActivity extends BaseActivity {
     // Only launch intents if the result was ok
     if (resultCode == Activity.RESULT_OK) {
       if (requestCode == RequestCode.SAVE || requestCode == RequestCode.TRANSCRIBE) {
-        Button saveData = (Button) findViewById(R.id.saveBtn);
+        Button saveData = findViewById(R.id.saveBtn);
         saveData.setEnabled(false);
         saveData.setText("saved");
         /* Uncomment to launch tables
