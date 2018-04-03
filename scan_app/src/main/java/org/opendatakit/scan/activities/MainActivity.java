@@ -29,12 +29,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v13.app.ActivityCompat;
+import android.support.v4.app.ActivityCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.activities.IInitResumeActivity;
 import org.opendatakit.consts.IntentConsts;

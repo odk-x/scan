@@ -1,5 +1,6 @@
 package org.opendatakit.scan.activities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,8 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.app.Activity;
-
 import android.widget.Toast;
 import org.opendatakit.activities.BaseActivity;
 import org.opendatakit.scan.R;

@@ -3,6 +3,7 @@ package org.opendatakit.scan.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +21,6 @@ import org.opendatakit.scan.R;
 import org.opendatakit.scan.activities.AcquireFormImageActivity;
 import org.opendatakit.scan.activities.ViewScannedForms;
 
-import java.util.Random;
 import java.util.Set;
 
 public class MainMenuFragment extends Fragment {
@@ -72,7 +71,7 @@ public class MainMenuFragment extends Fragment {
   private void hookupButtonHandlers() {
     final Application scanApp = getActivity().getApplication();
 
-    Button scanForm = (Button) view.findViewById(R.id.ScanButton);
+    Button scanForm = view.findViewById(R.id.ScanButton);
     scanForm.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Intent intent = new Intent(scanApp, AcquireFormImageActivity.class);
@@ -83,7 +82,7 @@ public class MainMenuFragment extends Fragment {
       }
     });
 
-    Button viewForms = (Button) view.findViewById(R.id.ViewFormsButton);
+    Button viewForms = view.findViewById(R.id.ViewFormsButton);
     viewForms.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         Intent intent = new Intent(scanApp, ViewScannedForms.class);
@@ -99,7 +98,7 @@ public class MainMenuFragment extends Fragment {
     SharedPreferences settings = PreferenceManager
         .getDefaultSharedPreferences(containerActivity.getApplicationContext());
 
-    TextView templateText = (TextView) view.findViewById(R.id.TemplateText);
+    TextView templateText = view.findViewById(R.id.TemplateText);
 
     // If no template is selected, present a warning
     if (!settings.contains("select_templates")) {

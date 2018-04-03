@@ -1,10 +1,8 @@
 package org.opendatakit.scan.activities;
 
-
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-
 import org.opendatakit.activities.BaseLauncherActivity;
 import org.opendatakit.consts.IntentConsts;
 import org.opendatakit.utilities.ODKFileUtils;
