@@ -4,15 +4,13 @@ This project is __*actively maintained*__
 
 It is part of the ODK 2.0 Android tools suite.
 
-ODK Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK Tables or ODK Survey. Scan forms are generated with the [form designer](http://uw-ictd.github.io/odk-scan-form-designer/).
+ODK Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK Tables or ODK Survey. Scan forms are generated with the [scan form designer](https://docs.opendatakit.org/odk2/scan-form-designer-intro/).
 
-Instructions on how to use Scan can be found [here](https://opendatakit.org/use/2_0_tools/introduction-to-odk-scan/).
+Instructions on how to use Scan can be found [here](https://docs.opendatakit.org/odk2/scan-intro/).
 
 The developer [wiki](https://github.com/opendatakit/opendatakit/wiki) (including release notes) and
 [issues tracker](https://github.com/opendatakit/opendatakit/issues) are located under
 the [**opendatakit**](https://github.com/opendatakit/opendatakit) project.
-
-The Google group for software engineering questions is: [opendatakit-developers@](https://groups.google.com/forum/#!forum/opendatakit-developers)
 
 ## Setting up your environment
 This app makes use of the NDK, which is not yet fully integrated into the Android Studio/Gradle environment. Rebuilding the C++ is not necessary if you only want to modify the Java side, but to do NDK work you will need to complete the below steps until Android Studio fully supports NDK development.
