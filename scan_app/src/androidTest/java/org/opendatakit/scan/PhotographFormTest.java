@@ -14,44 +14,22 @@
 
 package org.opendatakit.scan;
 
-import org.opendatakit.scan.activities.MainActivity;
-
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opendatakit.scan.activities.MainActivity;
 
-import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
+@RunWith(AndroidJUnit4.class) public class PhotographFormTest {
 
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+   @Rule public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(
+       MainActivity.class);
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class PhotographFormTest {
-
-  @Rule
-  public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(
-      MainActivity.class);
-
-  // TODO: Fix these tests
-  @Test
-  public void dummyTest() {
-    assert (true);
-  }
+   // TODO: Fix these tests
+   @Test public void dummyTest() {
+      assert (true);
+   }
 
   /*
   //block external intents

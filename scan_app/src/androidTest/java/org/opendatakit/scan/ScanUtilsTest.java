@@ -14,12 +14,15 @@
 
 package org.opendatakit.scan;
 
-import android.test.AndroidTestCase;
-
-import org.opendatakit.utilities.ODKFileUtils;
+import android.support.test.runner.AndroidJUnit4;
+import org.junit.runner.RunWith;
 import org.opendatakit.scan.utils.ScanUtils;
+import org.opendatakit.utilities.ODKFileUtils;
 
-public class ScanUtilsTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+
+@RunWith(AndroidJUnit4.class)
+public class ScanUtilsTest {
   private static final String APP_NAME = ODKFileUtils.getOdkDefaultAppName();
 
   public void testValuesMatch() {
