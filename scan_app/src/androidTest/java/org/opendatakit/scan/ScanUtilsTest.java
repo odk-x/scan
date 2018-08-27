@@ -15,6 +15,7 @@
 package org.opendatakit.scan;
 
 import android.support.test.runner.AndroidJUnit4;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opendatakit.scan.utils.ScanUtils;
 import org.opendatakit.utilities.ODKFileUtils;
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 public class ScanUtilsTest {
   private static final String APP_NAME = ODKFileUtils.getOdkDefaultAppName();
 
+  @Test
   public void testValuesMatch() {
     String appName = ScanUtils.getODKAppName();
     assertEquals(appName, APP_NAME);
