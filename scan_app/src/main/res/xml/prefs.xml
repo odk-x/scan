@@ -9,7 +9,7 @@
             android:entries="@array/select_templates_default_entries"
             android:entryValues="@array/select_templates_default_values"/>
 
-    <android.preference.ListPreference
+    <ListPreference
             android:key="directory_search"
             android:title="@string/directory_search_method"
             android:dialogTitle="@string/directory_search_method"

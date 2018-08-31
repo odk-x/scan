@@ -394,9 +394,6 @@ public class MainActivity extends BaseActivity
       menuInflater.inflate(R.menu.scan_manager, menu);
     }
     lastMenuType = activeScreenType;
-
-    ActionBar actionBar = getActionBar();
-    actionBar.show();
   }
 
   @Override
