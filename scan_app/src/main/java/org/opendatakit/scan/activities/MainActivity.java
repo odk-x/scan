@@ -19,10 +19,10 @@ import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentManager.BackStackEntry;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.BackStackEntry;
+import android.support.v4.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity
 
   @Override
   public void databaseAvailable() {
-    FragmentManager mgr = this.getFragmentManager();
+    FragmentManager mgr = this.getSupportFragmentManager();
     int idxLast = mgr.getBackStackEntryCount() - 1;
     if (idxLast >= 0) {
       BackStackEntry entry = mgr.getBackStackEntryAt(idxLast);
@@ -252,7 +252,7 @@ public class MainActivity extends BaseActivity
 
   @Override
   public void databaseUnavailable() {
-    FragmentManager mgr = this.getFragmentManager();
+    FragmentManager mgr = this.getSupportFragmentManager();
     int idxLast = mgr.getBackStackEntryCount() - 1;
     if (idxLast >= 0) {
       BackStackEntry entry = mgr.getBackStackEntryAt(idxLast);
@@ -265,7 +265,7 @@ public class MainActivity extends BaseActivity
   }
 
   private void popBackStack() {
-    FragmentManager mgr = getFragmentManager();
+    FragmentManager mgr = getSupportFragmentManager();
     int idxLast = mgr.getBackStackEntryCount() - 2;
     if (idxLast < 0) {
       Intent result = new Intent();
@@ -295,7 +295,7 @@ public class MainActivity extends BaseActivity
     WebLogger.getLogger(getAppName()).i(TAG, "swapScreens: Transitioning from " +
         ((activeScreenType == null) ? "-none-" : activeScreenType.name()) +
         " to " + newScreenType.name());
-    FragmentManager mgr = this.getFragmentManager();
+    FragmentManager mgr = this.getSupportFragmentManager();
     FragmentTransaction trans = null;
     Fragment newFragment = null;
     switch (newScreenType) {
@@ -394,9 +394,6 @@ public class MainActivity extends BaseActivity
       menuInflater.inflate(R.menu.scan_manager, menu);
     }
     lastMenuType = activeScreenType;
-
-    ActionBar actionBar = getActionBar();
-    actionBar.show();
   }
 
   @Override

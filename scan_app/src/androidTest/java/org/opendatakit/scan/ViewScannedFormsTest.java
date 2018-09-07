@@ -14,26 +14,11 @@
 
 package org.opendatakit.scan;
 
-import org.junit.*;
-
+import android.support.test.runner.AndroidJUnit4;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
-
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-
 @RunWith(AndroidJUnit4.class)
-@LargeTest
 public class ViewScannedFormsTest {
   //private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
   //.substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);

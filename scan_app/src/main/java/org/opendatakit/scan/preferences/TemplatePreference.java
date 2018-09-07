@@ -15,7 +15,7 @@
 package org.opendatakit.scan.preferences;
 
 import android.content.Context;
-import android.preference.MultiSelectListPreference;
+import android.support.v14.preference.MultiSelectListPreference;
 import android.util.AttributeSet;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.utils.ScanUtils;
@@ -88,11 +88,4 @@ public class TemplatePreference extends MultiSelectListPreference {
 
     return summary;
   }
-
-  @Override
-  protected void onDialogClosed(boolean positiveResult) {
-    super.onDialogClosed(positiveResult);
-    setSummary(getSummary());
-  }
-
 }
