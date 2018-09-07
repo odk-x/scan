@@ -47,6 +47,7 @@ public class ViewScannedForms extends BaseListActivity {
     super.onCreate(savedInstanceState);
 
     File dir = new File(ScanUtils.getOutputDirPath());
+    dir.mkdirs();
 
     photoNames = dir.list(new FilenameFilter() {
       public boolean accept(File dir, String name) {

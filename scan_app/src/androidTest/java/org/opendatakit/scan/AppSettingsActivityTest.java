@@ -14,30 +14,14 @@
 
 package org.opendatakit.scan;
 
-import org.opendatakit.scan.activities.MainActivity;
-
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
-
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static android.support.test.espresso.matcher.PreferenceMatchers.withKey;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasValue;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import org.opendatakit.scan.activities.MainActivity;
 
 @RunWith(AndroidJUnit4.class)
-@LargeTest
 public class AppSettingsActivityTest {
   private static final String TEMPLATE_TO_USE = "numbers";
   private static final String PREFERENCE_KEY = "select_templates";
