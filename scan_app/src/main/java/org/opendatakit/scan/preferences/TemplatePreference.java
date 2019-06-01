@@ -53,6 +53,7 @@ public class TemplatePreference extends MultiSelectListPreference {
     });
 
     // Remove suffixes and set paths
+    if (templateNames == null) return;
     String[] templatePaths = new String[templateNames.length];
     for (int i = 0; i < templateNames.length; i++) {
       templateNames[i] = templateNames[i];
