@@ -14,12 +14,12 @@
 
 package org.opendatakit.scan;
 
-import android.support.test.espresso.matcher.BoundedMatcher;
+import androidx.test.espresso.matcher.BoundedMatcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
-import android.support.test.internal.util.Checks;
+import androidx.test.internal.util.Checks;
 import android.view.View;
 import android.widget.TextView;
 

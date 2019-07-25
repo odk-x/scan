@@ -14,14 +14,12 @@
 
 package org.opendatakit.scan;
 
-import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.espresso.intent.rule.IntentsTestRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.opendatakit.scan.activities.MainActivity;
 
-@RunWith(AndroidJUnit4.class) public class PhotographFormTest {
+public class PhotographFormTest {
 
    @Rule public IntentsTestRule<MainActivity> mActivityRule = new IntentsTestRule<>(
        MainActivity.class);

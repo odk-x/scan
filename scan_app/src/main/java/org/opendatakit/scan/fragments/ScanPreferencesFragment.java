@@ -15,7 +15,7 @@
 package org.opendatakit.scan.fragments;
 
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceFragmentCompat;
 import org.opendatakit.scan.R;
 
 public class ScanPreferencesFragment extends PreferenceFragmentCompat {
