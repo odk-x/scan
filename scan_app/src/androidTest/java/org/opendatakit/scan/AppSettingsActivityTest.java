@@ -14,14 +14,11 @@
 
 package org.opendatakit.scan;
 
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.rule.ActivityTestRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.opendatakit.scan.activities.MainActivity;
 
-@RunWith(AndroidJUnit4.class)
 public class AppSettingsActivityTest {
   private static final String TEMPLATE_TO_USE = "numbers";
   private static final String PREFERENCE_KEY = "select_templates";

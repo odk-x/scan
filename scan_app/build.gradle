@@ -102,10 +102,10 @@ configurations.all {
 
 dependencies {
     implementation fileTree(include: '*.jar', dir: 'libs')
-    implementation 'com.android.support:support-annotations:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.preference:preference:1.0.0'
 
 
     if (libraryProjectPath.exists() && gradle.useLocal) { // Local project is favoured
@@ -134,11 +134,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     //for Espresso
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
-	androidTestImplementation 'com.android.support:support-annotations:28.0.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+	androidTestImplementation 'androidx.annotation:annotation:1.1.0'
 
 }
 
