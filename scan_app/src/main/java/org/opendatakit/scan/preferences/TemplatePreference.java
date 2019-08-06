@@ -15,7 +15,7 @@
 package org.opendatakit.scan.preferences;
 
 import android.content.Context;
-import android.support.v14.preference.MultiSelectListPreference;
+import androidx.preference.MultiSelectListPreference;
 import android.util.AttributeSet;
 import org.opendatakit.scan.R;
 import org.opendatakit.scan.utils.ScanUtils;
