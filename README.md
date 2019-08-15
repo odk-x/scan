@@ -1,16 +1,14 @@
 # scan
 
-This project is __*actively maintained*__
+This project is actively upgraded to be compatible with the ODK-X tool suite but it is not actively checked for compatibility of every version of Android during release process. If you would like to help out and take ownership of Scan testing and fixing please let us know.
 
-It is part of the ODK 2.0 Android tools suite.
+Scan is part of the ODK-X Android tools suite. Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK-X Tables or ODK-X Survey. Scan forms are generated with the [scan form designer](https://docs.opendatakit.org/odk2/scan-form-designer-intro/).
 
-ODK Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK Tables or ODK Survey. Scan forms are generated with the [scan form designer](https://docs.opendatakit.org/odk2/scan-form-designer-intro/).
+Instructions on how to use ODK-X Scan can be found [here](https://docs.opendatakit.org/odk2/scan-intro/).
 
-Instructions on how to use Scan can be found [here](https://docs.opendatakit.org/odk2/scan-intro/).
-
-The developer [wiki](https://github.com/opendatakit/opendatakit/wiki) (including release notes) and
-[issues tracker](https://github.com/opendatakit/opendatakit/issues) are located under
-the [**opendatakit**](https://github.com/opendatakit/opendatakit) project.
+The [release notes] (https://github.com/opendatakit/tool-suite-X/wiki/ODK-X-Tool-Suite-Release-Notes) and
+[issues tracker](https://github.com/opendatakit/tool-suite-X/issues) are located under
+the [**Tool Suite X repo**](https://github.com/opendatakit/tool-suite-X/) project.
 
 ## Setting up your environment
 This app makes use of the NDK, which is not yet fully integrated into the Android Studio/Gradle environment. Rebuilding the C++ is not necessary if you only want to modify the Java side, but to do NDK work you will need to complete the below steps until Android Studio fully supports NDK development.
@@ -39,11 +37,11 @@ Set the NDK path in `local.env.mk`
 
 ### Android
 
-General instructions for setting up an ODK 2.0 environment can be found at our [DevEnv Setup wiki page](https://github.com/opendatakit/opendatakit/wiki/DevEnv-Setup)
+General instructions for setting up an ODK-X environment can be found at our [DevEnv Setup wiki page](https://github.com/opendatakit/opendatakit/wiki/DevEnv-Setup)
 
 Install [Android Studio](http://developer.android.com/tools/studio/index.html) and the [SDK](http://developer.android.com/sdk/index.html#Other).
 
-This project depends on ODK's [androidlibrary](https://github.com/opendatakit/androidlibrary) and [androidcommon](https://github.com/opendatakit/androidcommon) projects; their binaries will be downloaded automatically fom our maven repository during the build phase. If you wish to modify them yourself, you must clone them into the same parent directory as scan. You directory stucture should resemble the following:
+This project depends on ODK-X's [androidlibrary](https://github.com/opendatakit/androidlibrary) and [androidcommon](https://github.com/opendatakit/androidcommon) projects; their binaries will be downloaded automatically fom our maven repository during the build phase. If you wish to modify them yourself, you must clone them into the same parent directory as scan. You directory stucture should resemble the following:
 
         |-- odk
 
@@ -56,7 +54,7 @@ This project depends on ODK's [androidlibrary](https://github.com/opendatakit/an
 
   * Note that this only applies if you are modifying the library projects. If you use the maven dependencies (the default option), the projects will not show up in your directory. 
     
-ODK [Core](https://github.com/opendatakit/core) __MUST__ be installed on your device, whether by installing the APK or by cloning the project and deploying it. ODK [Survey](https://github.com/opendatakit/survey) and ODK [Tables](https://github.com/opendatakit/tables) also integrate well with ODK Scan, but are not required.
+ODK-X [Services](https://github.com/opendatakit/services) __MUST__ be installed on your device, whether by installing the APK or by cloning the project and deploying it. ODK-X [Survey](https://github.com/opendatakit/survey) and ODK-X [Tables](https://github.com/opendatakit/tables) also integrate well with ODK-X Scan, but are not required.
 
 Now you should be ready to build.
 
@@ -87,7 +85,7 @@ Open the Scan project in Android Studio. As long as androidlibrary and androidco
 
 ## Running
 
-Be sure to install ODK Core onto your device before attempting to run Scan.
+Be sure to install ODK-X Services onto your device before attempting to run Scan.
 
 The first time Scan is run it will take a few minutes to create its file structure and initialize its state. Subsequent launches should be much faster.
 
