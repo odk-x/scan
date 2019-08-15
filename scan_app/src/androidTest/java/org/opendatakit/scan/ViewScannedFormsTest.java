@@ -14,11 +14,8 @@
 
 package org.opendatakit.scan;
 
-import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(AndroidJUnit4.class)
 public class ViewScannedFormsTest {
   //private static final String OUTPUT_DIR_NAME = ScanUtils.getOutputDirPath()
   //.substring(ScanUtils.appFolder.length(), ScanUtils.getOutputDirPath().length() - 1);
