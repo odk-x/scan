@@ -1,6 +1,8 @@
 # Scan
 
-This project is actively upgraded to be compatible with the ODK-X tool suite but it is not actively checked for compatibility of every version of Android during release process. If you would like to help out and take ownership of Scan testing and fixing please let us know.
+**This project has not been updated in a couple of years, there is a chance that some parts of the project are redundant. If you would like to help out by maintaining this project and taking ownership of ODK-X Scan please let us know. We totally appreciate you!**
+
+This project is upgraded to be compatible with the ODK-X tool suite but it is not actively checked for compatibility of every version of Android during release process. **If you would like to help out and take ownership of Scan testing and fixing please let us know.**
 
 Scan is part of the ODK-X Android tools suite. Scan takes an image of a filled-in mark-sense form and converts it into a data row accessible from ODK-X Tables or ODK-X Survey. Scan forms are generated with the [scan form designer](https://docs.opendatakit.org/odk2/scan-form-designer-intro/).
 
